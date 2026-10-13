@@ -34,3 +34,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - CI Windows : `make` installé par `choco install make`.
 - **Écarts avec SPEC.md :** aucun. `schema.py` pas encore écrit (pas dans la tâche du soir).
 - **Suite prévue :** `ccm/schema.py` (SPEC.md §4), puis `reports/phase-0.md`.
+
+## 2026-10-13 — Phase 0 — Schémas de données, fin de phase
+- **Travail fait :** `ccm/schema.py` (SPEC.md §4) : énumérations, 24 relations et leurs identifiants, lexique de 25 jetons, DDL du stock SQLite et `ouvrir_stock`, modèles pydantic de l'exemple JSON avec contrôles. Exemple de §4 figé dans `tests/golden/exemple_spec.json`. Rapport `reports/phase-0.md`.
+- **Mesures :** clone neuf : `make setup && make test` OK ; 26 tests passés ; CI verte Ubuntu et Windows (`63b310d`). Seuil de phase 0 atteint.
+- **Décisions :** lexique et relations dans `schema.py` (contrat de `cible`), importés plus tard par `grammar/`. Sens d'une relation orientée = ordre du triplet. Texte de test hypothesis sans substituts Unicode isolés (texte invalide, non sérialisable).
+- **Écarts avec SPEC.md :** champs optionnels `signe` et `precision` ajoutés à `MarqueNombre` (exigés par §6, absents de l'exemple §4). Indices de `relations_props` non contrôlés (l'exemple §4 cite une proposition 1 absente). Questions dans `reports/phase-0.md`.
+- **Suite prévue :** phase 1 (SPEC.md §12, corpus synthétique) : générateur de monde, gabarits, contrôle des faits, graine fixe.

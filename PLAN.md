@@ -5,7 +5,7 @@ Une branche `phase-N` par phase ; étiquette `phase-N-ok` quand le seuil passe.
 
 | Phase | Contenu | Seuil de passage | État |
 | --- | --- | --- | --- |
-| 0 | Dépôt, configuration, CI, schémas de données | `make test` passe sur une machine neuve | en cours |
+| 0 | Dépôt, configuration, CI, schémas de données | `make test` passe sur une machine neuve | fait (`phase-0-ok`) |
 | 1 | Générateur de monde, corpus synthétique niveau 0 (gabarits) | contrôle à 100 % ; même graine, mêmes fichiers | à faire |
 | 2 | Ingestion, graphe, anonymiseur, recherche | rappel PER ≥ 0,98 ; rappel justificatives ≥ 0,95 ; T2 exact | à faire |
 | 3 | Grammaire, automate, vérificateur, rendu, oracle | suites de référence acceptées à 100 % ; 100 000 décodages valides ; aucun affichage hors contexte | à faire |
@@ -19,6 +19,6 @@ Une branche `phase-N` par phase ; étiquette `phase-N-ok` quand le seuil passe.
 - [x] `uv` + `uv.lock`, Python 3.11, `Makefile` (`setup`, `test`, `lint`), ruff, pytest, hypothesis
 - [x] Configs YAML lues par pydantic (`ccm/config.py`), CLI typer vide, CI GitHub Actions
 - [x] Squelette des paquets de SPEC.md §3
-- [ ] `ccm/schema.py` : contrats de données (SPEC.md §4)
+- [x] `ccm/schema.py` : contrats de données (SPEC.md §4)
 - [x] CI verte sur GitHub (Ubuntu + Windows)
-- [ ] Rapport `reports/phase-0.md`
+- [x] Rapport `reports/phase-0.md`
