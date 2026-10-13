@@ -1,0 +1,3 @@
+# Champs ajoutés avec la phase qui les utilise.
+version: 1
+description: "Prototype A1 : biais d'attention relationnels, à zéro au départ (SPEC.md §9, C9)."
