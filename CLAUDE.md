@@ -43,7 +43,6 @@ Arrête-toi et écris le problème dans `JOURNAL.md` si :
 - Quand le seuil passe : étiquette `phase-N-ok`, fusion de `phase-N` dans `main`, push des deux et de l'étiquette.
 
 ## Environnement
-- Windows 10. `make` n'est pas installé pour l'instant : la phase 0 doit le rendre disponible
-  (ex. `choco install make`) ou le signaler au journal.
+- Windows 10. GNU Make 4.4.1 installé via winget (`ezwinports.make`).
 - Python via `uv` (versions figées dans `uv.lock`). Règles de code : SPEC.md §3.
 - `runs/` reste hors de git.
