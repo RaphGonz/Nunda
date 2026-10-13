@@ -1,0 +1,3 @@
+# Champs ajoutés avec la phase qui les utilise.
+version: 1
+description: "Ingestion : extraction, segmentation, nombres, doublons, conflits (SPEC.md §5)."

@@ -1,0 +1,3 @@
+# Champs ajoutés avec la phase qui les utilise.
+version: 1
+description: "Prototype A0 : relations en jetons d'en-tête, attention inchangée (SPEC.md §9, C9)."

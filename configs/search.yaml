@@ -1,0 +1,3 @@
+# Champs ajoutés avec la phase qui les utilise.
+version: 1
+description: "Recherche : BM25, expansion par le graphe, budget (SPEC.md §7)."
