@@ -20,4 +20,5 @@ Une branche `phase-N` par phase ; étiquette `phase-N-ok` quand le seuil passe.
 - [x] Configs YAML lues par pydantic (`ccm/config.py`), CLI typer vide, CI GitHub Actions
 - [x] Squelette des paquets de SPEC.md §3
 - [ ] `ccm/schema.py` : contrats de données (SPEC.md §4)
-- [ ] CI verte sur GitHub (à confirmer), rapport `reports/phase-0.md`
+- [x] CI verte sur GitHub (Ubuntu + Windows)
+- [ ] Rapport `reports/phase-0.md`
