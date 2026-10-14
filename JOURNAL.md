@@ -48,3 +48,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** T7 couvre aujourd'hui l'import des modules (ils sont vides) ; chaque phase ajoutera ses appels d'inférence sous le garde `sans_reseau`. Liste des imports interdits limitée aux bibliothèques réseau ; `transformers` (phase 4) sera contrôlé par le garde dynamique.
 - **Écarts avec SPEC.md :** aucun.
 - **Suite prévue :** relecture des écarts de `reports/phase-0.md` avec Raphael, puis phase 1 (SPEC.md §12).
+
+## 2026-10-14 — Phase 0 — Écarts tranchés, fin de phase
+- **Travail fait :** relecture des écarts de `reports/phase-0.md` avec Raphael. `MarqueNombre` : `signe` obligatoire pour NUM, `precision` pour DATE (chacun interdit pour l'autre genre). `Exemple` : indices de `relations_props` contrôlés. Exemple de SPEC.md §4 et `tests/golden/exemple_spec.json` modifiés avec l'accord de Raphael (`"precision": "JOUR"`, `"relations_props": []`). 6 cas de test ajoutés. Rapport mis à jour ; étiquette `phase-0-ok`, fusion dans `main`.
+- **Mesures :** `make test` : 35 tests passés ; clone neuf `make setup && make test` OK ; CI verte Ubuntu et Windows (`7f04c66`).
+- **Décisions (Raphael) :** écart 1 → champs obligatoires par genre ; écart 2 → contrôle des indices, relation retirée de l'exemple ; écart 3 → sens par l'ordre du triplet, validé. Décision de l'agent : le champ de l'autre genre est interdit (un signe de date n'a pas de sens).
+- **Écarts avec SPEC.md :** aucun ouvert. §16 : heures et dépense maximale RTX 3090, modèle enseignant 7B exact, toujours à fixer.
+- **Suite prévue :** phase 1 (SPEC.md §12, corpus synthétique niveau 0) : générateur de monde, gabarits, contrôle des faits, graine fixe.
