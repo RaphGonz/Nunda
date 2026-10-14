@@ -155,10 +155,11 @@ L'anonymiseur produit cette structure à l'inférence. Les fichiers d'entraînem
      "marques": [{"genre": "NOM", "type": "PER", "nom": 5},
                  {"genre": "NOM", "type": "PER", "nom": 3},
                  {"genre": "NOM", "type": "ORG", "nom": 9},
-                 {"genre": "DATE", "unite": "date", "grandeur": null, "rang_valeur": 4, "valeur_id": 12}]}
+                 {"genre": "DATE", "unite": "date", "grandeur": null, "rang_valeur": 4, "valeur_id": 12,
+                  "precision": "JOUR"}]}
   ],
   "relations_noms": [[3, 5, "INITIALES_DE"], [3, 5, "ALIAS_DECLARE"]],
-  "relations_props": [[0, 1, "SUIVANTE"]],
+  "relations_props": [],
   "cible": ["P:0", "SAME", "M:q.0", "M:0.0", "P:0", "FIN"],
   "justificatives": [0]
 }
