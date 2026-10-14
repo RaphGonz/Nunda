@@ -46,6 +46,11 @@ def test_24_relations_et_25_jetons():
         lambda d: d["justificatives"].append(4),
         lambda d: d.update(inconnu=1),
         lambda d: d["propositions"][0].update(rang=5),
+        lambda d: d["relations_props"].append([0, 1, "SUIVANTE"]),
+        lambda d: d["propositions"][0]["marques"][3].pop("precision"),
+        lambda d: d["propositions"][0]["marques"][3].update(signe=1),
+        lambda d: d["propositions"][0]["marques"][3].update(genre="NUM"),
+        lambda d: d["propositions"][0]["marques"][3].update(genre="NUM", signe=1),
     ],
 )
 def test_exemple_invalide_refuse(modif):
@@ -68,3 +73,11 @@ def test_stock_cree_les_tables(tmp_path):
     assert tables == {"piece", "proposition", "mention", "nombre", "arete", "contrainte", "trace"}
     con.close()
     ouvrir_stock(tmp_path / "dossier.sqlite").close()  # réouverture sans erreur
+
+
+def test_marque_num_valide():
+    d = charger()
+    date = d["propositions"][0]["marques"][3]
+    del date["precision"]
+    date.update(genre="NUM", unite="€", grandeur=3, signe=1)
+    Exemple.model_validate(d)

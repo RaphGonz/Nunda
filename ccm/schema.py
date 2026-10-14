@@ -193,8 +193,16 @@ class MarqueNombre(_Strict):
     grandeur: int | None
     rang_valeur: int = Field(ge=0)
     valeur_id: int = Field(ge=0)
-    signe: Literal[-1, 0, 1] | None = None
-    precision: PrecisionDate | None = None
+    signe: Literal[-1, 0, 1] | None = None  # NUM seulement (SPEC.md §6)
+    precision: PrecisionDate | None = None  # DATE seulement (SPEC.md §6)
+
+    @model_validator(mode="after")
+    def _par_genre(self):
+        if (self.signe is None) != (self.genre == "DATE"):
+            raise ValueError("`signe` est obligatoire pour NUM et interdit pour DATE")
+        if (self.precision is None) != (self.genre == "NUM"):
+            raise ValueError("`precision` est obligatoire pour DATE et interdite pour NUM")
+        return self
 
 
 Marque = Annotated[MarqueNom | MarqueNombre, Field(discriminator="genre")]
@@ -244,10 +252,11 @@ class Exemple(_Strict):
         for _, _, r in self.relations_noms:
             if r not in RELATIONS_NOMS:
                 raise ValueError(f"{r} n'est pas une relation entre noms")
-        # Indices non contrôlés : l'exemple de SPEC.md §4 relie 0 à 1 avec une seule proposition.
-        for _, _, r in self.relations_props:
+        for a, b, r in self.relations_props:
             if r not in RELATIONS_PROPS:
                 raise ValueError(f"{r} n'est pas une relation entre propositions")
+            if not {a, b} <= set(locaux):
+                raise ValueError(f"relation {r} vers une proposition absente : ({a}, {b})")
         if not set(self.justificatives) <= set(locaux):
             raise ValueError("justificative hors des propositions")
         for pas in self.cible:
