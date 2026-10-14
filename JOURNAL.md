@@ -41,3 +41,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** lexique et relations dans `schema.py` (contrat de `cible`), importés plus tard par `grammar/`. Sens d'une relation orientée = ordre du triplet. Texte de test hypothesis sans substituts Unicode isolés (texte invalide, non sérialisable).
 - **Écarts avec SPEC.md :** champs optionnels `signe` et `precision` ajoutés à `MarqueNombre` (exigés par §6, absents de l'exemple §4). Indices de `relations_props` non contrôlés (l'exemple §4 cite une proposition 1 absente). Questions dans `reports/phase-0.md`.
 - **Suite prévue :** relecture des écarts de `reports/phase-0.md` avec Raphael (schema, fin de phase faits sans son accord explicite : « bah vas y » mal compris), puis phase 1 (SPEC.md §12, corpus synthétique) : générateur de monde, gabarits, contrôle des faits, graine fixe.
+
+## 2026-10-14 — Phase 0 — Test final : exemple JSON, stock, T7
+- **Travail fait :** `tests/unit/test_t7_hors_ligne.py` (T7, SPEC.md §14 et §3) : garde qui refuse `connect`, `connect_ex`, `create_connection`, `getaddrinfo` ; sous ce garde, import neuf de tous les modules de `ingest`, `search`, `anonymize`, `model`, `verify`, chargement de l'exemple JSON de §4, création du stock SQLite. Contrôle statique : aucun import de `socket`, `ssl`, `urllib`, `http`, `requests`, `httpx`, `aiohttp`, `ftplib`, `smtplib` dans ces paquets. Un test vérifie que le garde bloque bien.
+- **Mesures :** `make test` : ruff OK, 29 tests passés. Sonde : un module `ccm/verify/_sonde.py` qui ouvre une connexion fait échouer les deux tests T7 (sonde retirée).
+- **Décisions :** T7 couvre aujourd'hui l'import des modules (ils sont vides) ; chaque phase ajoutera ses appels d'inférence sous le garde `sans_reseau`. Liste des imports interdits limitée aux bibliothèques réseau ; `transformers` (phase 4) sera contrôlé par le garde dynamique.
+- **Écarts avec SPEC.md :** aucun.
+- **Suite prévue :** relecture des écarts de `reports/phase-0.md` avec Raphael, puis phase 1 (SPEC.md §12).
