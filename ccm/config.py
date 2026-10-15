@@ -4,6 +4,7 @@ Chaque fichier de `configs/` a sa classe. Les champs s'ajoutent phase par phase 
 une clé inconnue est une erreur.
 """
 
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -39,6 +40,37 @@ class FinetuneConfig(ConfigBase):
     pass
 
 
+Intervalle = tuple[int, int]
+
+
+class WorldgenConfig(ConfigBase):
+    """Générateur de monde (SPEC.md §12). Intervalles [min, max] inclus."""
+
+    personnes: Intervalle
+    societes: Intervalle
+    lieux: Intervalle
+    evenements: Intervalle
+    part_alias: float
+    part_meme_famille: float
+    part_meme_nom_complet: float
+    part_noms_inventes: float
+    part_femmes: float
+    part_adresses: float
+    part_activite: float
+    numero_rue: Intervalle
+    roles: tuple[str, ...]
+    types_evenement: tuple[str, ...]
+    types_avec_montant: tuple[str, ...]
+    types_avec_societe: tuple[str, ...]
+    participants: Intervalle
+    montants: Intervalle
+    montant_centimes: Intervalle
+    debut: date
+    fin: date
+    duree_dossier_jours: int
+    essais_max: int
+
+
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
     "ingest": IngestConfig,
     "search": SearchConfig,
@@ -48,6 +80,7 @@ CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
     "model_b_m": ModelConfig,
     "pretrain": PretrainConfig,
     "finetune": FinetuneConfig,
+    "worldgen": WorldgenConfig,
 }
 
 

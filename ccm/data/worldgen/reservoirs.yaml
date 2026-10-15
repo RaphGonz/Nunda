@@ -1,0 +1,57 @@
+# Réservoirs de noms du générateur de monde (SPEC.md §12).
+# Noms courants et morceaux de noms inventés. Le partage entre réservoir
+# d'entraînement et réservoir de test se fait par empreinte (worldgen/monde.py).
+# Les rues ne portent pas de nom de personne : ce serait un faux PER.
+# Guillemets sur "y", "on" : sinon YAML 1.1 les lit comme des booléens.
+
+prenoms_m: [
+  Jean, Pierre, Michel, Philippe, Alain, Nicolas, Christophe, Patrick, Daniel, Bernard,
+  Eric, Laurent, Frédéric, Stéphane, David, Olivier, Pascal, Thierry, Julien, Sébastien,
+  Thomas, Antoine, Maxime, Hugo, Lucas, Louis, Paul, Mathieu, Romain, Vincent,
+  Guillaume, Alexandre, Benoît, Cédric, Damien, Fabien, Gilles, Hervé, Jérôme, Karim,
+  Lionel, Marc, Noël, Rémi, Serge, Yann, Yves, Bruno, Didier, Jacques,
+  Jean-Pierre, Jean-Marc, Jean-Luc, Mehdi, Samir, Kevin, Dylan, Enzo, Théo, Nathan
+]
+prenoms_f: [
+  Marie, Nathalie, Isabelle, Sylvie, Catherine, Françoise, Valérie, Christine, Sandrine, Sophie,
+  Céline, Véronique, Stéphanie, Julie, Aurélie, Émilie, Camille, Laura, Manon, Léa,
+  Chloé, Sarah, Pauline, Anne, Claire, Hélène, Agnès, Brigitte, Corinne, Delphine,
+  Elodie, Fanny, Géraldine, Ingrid, Karine, Laetitia, Mélanie, Nadia, Océane, Patricia,
+  Rachida, Sonia, Virginie, Yasmine, Zoé, Inès, Jade, Lina, Margaux, Audrey,
+  Marie-Claire, Anne-Sophie, Marie-Hélène, Fatima, Leïla, Coralie, Justine, Morgane, Noémie, Alice
+]
+noms: [
+  Martin, Bernard, Thomas, Petit, Robert, Richard, Durand, Dubois, Moreau, Laurent,
+  Simon, Michel, Lefebvre, Leroy, Roux, David, Bertrand, Morel, Fournier, Girard,
+  Bonnet, Dupont, Lambert, Fontaine, Rousseau, Vincent, Muller, Lefèvre, Faure, André,
+  Mercier, Blanc, Guérin, Boyer, Garnier, Chevalier, François, Legrand, Gauthier, Garcia,
+  Perrin, Robin, Clément, Morin, Nicolas, Henry, Roussel, Mathieu, Gautier, Masson,
+  Marchand, Duval, Denis, Dumont, Marie, Lemaire, Noël, Meyer, Dufour, Meunier,
+  Brun, Blanchard, Giraud, Joly, Rivière, Lucas, Brunet, Gaillard, Barbier, Arnaud,
+  Martinez, Gérard, Roche, Renard, Schmitt, Roy, Leroux, Colin, Vidal, Caron,
+  Picard, Roger, Fabre, Aubert, Lemoine, Renaud, Dumas, Lacroix, Olivier, Philippe,
+  Bourgeois, Pierre, Benoît, Rey, Leclerc, Payet, Rolland, Leclercq, Guillaume, Lecomte,
+  de la Roche, Le Gall, Le Bihan, Da Silva, Ben Ali
+]
+surnoms: [
+  le Grand, le Petit, le Gitan, le Belge, le Marseillais, la Fouine, le Chat, Tonton,
+  Mimi, Bébert, Dédé, Jojo, Nono, Riri, Fifi, Titi, Zizou, Pépé, le Rouquin, la Bourrique,
+  le Rital, Bichette, le Gros, la Pince, le Prof, le Toubib, Coco, Lulu, Mémé, Kiki
+]
+rues: [
+  rue des Lilas, rue des Tilleuls, rue de la Gare, rue du Moulin, avenue des Acacias,
+  rue de l'Église, place du Marché, chemin des Vignes, rue des Écoles, boulevard de la Liberté,
+  rue du Stade, impasse des Roses, allée des Peupliers, rue de la Fontaine, route de la Forêt,
+  rue des Jardins, avenue de la République, rue du Port, quai des Brumes, rue de la Paix,
+  chemin du Lavoir, rue des Prés, rue de la Poste, avenue des Platanes, rue des Cerisiers
+]
+syllabes: [
+  ba, bel, bor, ca, cor, da, del, dor, fa, fer, ga, gal, gor, la, lan, ler, ma, mar, mor, na,
+  nel, pa, par, ra, ran, ros, sa, sal, ta, tal, tor, va, val, ver, vi, lo, ri, mi, ne, se
+]
+fins_nom: [ard, ier, in, eau, ot, et, ac, "y", "on", aud, ou, eix]
+fins_prenom_m: [ien, o, an, el, ric, in]
+fins_prenom_f: [ine, ette, a, elle, ie, ane]
+fins_commune: [ville, court, mont, bourg, ac, "y", -sur-Loire, -les-Bains, -le-Vieux]
+formes_societe: [SARL, SAS, SA, EURL, SCI]
+activites: [Transports, Bâtiment, Distribution, Immobilier, Conseil, Négoce, Services, Import-Export]

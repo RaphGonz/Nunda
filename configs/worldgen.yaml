@@ -1,0 +1,36 @@
+# Générateur de monde du corpus synthétique (SPEC.md §12, tableau « Corpus synthétique »).
+# Intervalles [min, max] inclus. Valeurs de départ.
+version: 1
+description: "Générateur de monde : personnes, sociétés, lieux, événements (SPEC.md §12)."
+
+personnes: [6, 20]
+societes: [2, 5]
+lieux: [3, 8]
+evenements: [15, 40]
+
+# Cas durs : part des dossiers.
+part_alias: 0.30
+part_meme_famille: 0.20
+part_meme_nom_complet: 0.05
+
+part_noms_inventes: 0.5
+part_femmes: 0.5
+part_adresses: 0.6
+part_activite: 0.5
+numero_rue: [1, 120]
+
+roles: [MIS_EN_CAUSE, VICTIME, TEMOIN, ENQUETEUR, PLAIGNANT, GERANT, EMPLOYE, AVOCAT, EXPERT]
+types_evenement: [AUDITION, VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+types_avec_montant: [VOL, VIREMENT, SIGNATURE]
+types_avec_societe: [VIREMENT, SIGNATURE, CONTROLE]
+
+participants: [1, 3]
+montants: [1, 2]
+montant_centimes: [1000, 5000000]
+
+debut: 2018-01-01
+fin: 2025-12-31
+duree_dossier_jours: 365
+
+# Tirages refusés (doublon, nom exclu, autre réservoir) avant erreur.
+essais_max: 10000
