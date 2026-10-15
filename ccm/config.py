@@ -6,6 +6,7 @@ une clé inconnue est une erreur.
 
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict
@@ -43,6 +44,14 @@ class FinetuneConfig(ConfigBase):
 Intervalle = tuple[int, int]
 
 
+class PartieCorpus(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    dossiers: int
+    graine: int
+    reservoir: Literal["entrainement", "test"]
+
+
 class WorldgenConfig(ConfigBase):
     """Générateur de monde (SPEC.md §12). Intervalles [min, max] inclus."""
 
@@ -68,6 +77,10 @@ class WorldgenConfig(ConfigBase):
     debut: date
     fin: date
     duree_dossier_jours: int
+    corpus: dict[str, PartieCorpus]
+    wikidata_url: str
+    wikidata_lot: int
+    wikidata_pause_s: float
     essais_max: int
 
 

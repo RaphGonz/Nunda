@@ -22,6 +22,8 @@ from ccm.config import WorldgenConfig
 
 Reservoir = Literal["entrainement", "test"]
 RESERVOIRS_YAML = Path(__file__).with_name("reservoirs.yaml")
+EXCLUS_WIKIDATA = Path(__file__).with_name("exclus_wikidata.txt")
+VERIFIES_WIKIDATA = Path(__file__).with_name("verifies_wikidata.txt")
 
 
 class _Strict(BaseModel):
@@ -240,3 +242,10 @@ def _evenements(t: _Tireur, n_per: int, n_soc: int, n_lieux: int) -> tuple[Evene
         )
     bruts.sort(key=lambda e: (e["date"], e["heure"]))
     return tuple(Evenement(id=i, **e) for i, e in enumerate(bruts))
+
+
+def mondes_corpus(cfg: WorldgenConfig, exclus: frozenset[str]):
+    """(partie, monde) de chaque dossier du corpus, graines consécutives par partie."""
+    for nom, partie in cfg.corpus.items():
+        for i in range(partie.dossiers):
+            yield nom, generer_monde(partie.graine + i, partie.reservoir, cfg, exclus)

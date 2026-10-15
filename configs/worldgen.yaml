@@ -32,5 +32,16 @@ debut: 2018-01-01
 fin: 2025-12-31
 duree_dossier_jours: 365
 
+# Corpus : nombre de dossiers, première graine, réservoir de noms, par partie.
+corpus:
+  entrainement: {dossiers: 2000, graine: 0, reservoir: entrainement}
+  validation: {dossiers: 200, graine: 1000000, reservoir: entrainement}
+  test: {dossiers: 200, graine: 2000000, reservoir: test}
+
+# Liste d'exclusion (worldgen/wikidata.py) : libellés français, par lots.
+wikidata_url: https://query.wikidata.org/sparql
+wikidata_lot: 500
+wikidata_pause_s: 1.0
+
 # Tirages refusés (doublon, nom exclu, autre réservoir) avant erreur.
 essais_max: 10000

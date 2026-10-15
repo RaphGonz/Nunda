@@ -4,7 +4,17 @@ from decimal import Decimal
 import pytest
 
 from ccm.config import load_config
-from ccm.data.worldgen.monde import Monde, charger_exclusion, cle, generer_monde, reservoir_de
+from ccm.data.worldgen import wikidata
+from ccm.data.worldgen.monde import (
+    EXCLUS_WIKIDATA,
+    VERIFIES_WIKIDATA,
+    Monde,
+    charger_exclusion,
+    cle,
+    generer_monde,
+    mondes_corpus,
+    reservoir_de,
+)
 
 CFG = load_config("worldgen")
 
@@ -122,3 +132,34 @@ def test_exclusion_respectee(tmp_path):
 def test_cle():
     assert cle("  Jean-Pierre   LEFÈVRE ") == "jean pierre lefevre"
     assert cle("Ｊｅａｎ") == "jean"
+
+
+def test_corpus_hors_liste_wikidata():
+    """Chaque nom complet du corpus a été vérifié dans Wikidata et n'y est pas (SPEC.md §12).
+
+    Échoue si les réservoirs ou la config changent sans relancer worldgen/wikidata.py.
+    """
+    verifies = set(VERIFIES_WIKIDATA.read_text(encoding="utf-8").splitlines())
+    lignes = EXCLUS_WIKIDATA.read_text(encoding="utf-8").splitlines()
+    assert lignes and all(lignes) and lignes == sorted(set(lignes))
+    exclus = charger_exclusion(EXCLUS_WIKIDATA)
+    parties = Counter()
+    for partie, m in mondes_corpus(CFG, exclus):
+        parties[partie] += 1
+        assert not {complet(p) for p in m.personnes} & exclus
+        assert {f"{p.prenom} {p.nom}" for p in m.personnes} <= verifies
+    assert parties == {nom: p.dossiers for nom, p in CFG.corpus.items()}
+
+
+def test_humains_par_lots(monkeypatch):
+    lots = []
+
+    def faux_sparql(valeurs, cfg):
+        lots.append(valeurs)
+        return {v for v in valeurs if v.startswith("Jean")}
+
+    monkeypatch.setattr(wikidata, "_sparql", faux_sparql)
+    monkeypatch.setattr(wikidata.time, "sleep", lambda s: None)
+    noms = [f"Jean {i}" for i in range(CFG.wikidata_lot)] + ["Zoé Zorvin"]
+    assert wikidata.humains(noms, CFG) == {f"Jean {i}" for i in range(CFG.wikidata_lot)}
+    assert [len(x) for x in lots] == [CFG.wikidata_lot, 1]
