@@ -279,7 +279,7 @@ class _Plume:
                 suite = "".join(t for t, _ in morceaux[i + 1 :])
                 if not suite or not suite[0].isalpha() and suite[0] != " ":
                     continue
-            elif not texte and s[:1].islower():
+            elif fait is None and not texte and s[:1].islower():  # jamais dans un nom
                 s = s[0].upper() + s[1:]
             if fait is None:
                 s = _ELISION.sub(r"\1'", s)

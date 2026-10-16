@@ -11,7 +11,7 @@ from hypothesis import strategies as st
 from ccm.config import load_config
 from ccm.data.worldgen import controle
 from ccm.data.worldgen.corpus import ecrire_corpus, produire_dossier
-from ccm.data.worldgen.monde import generer_monde
+from ccm.data.worldgen.monde import EXCLUS_WIKIDATA, charger_exclusion, generer_monde
 from ccm.data.worldgen.pdf import rendre_pdf
 from ccm.data.worldgen.pieces import (
     Fait,
@@ -44,6 +44,15 @@ def test_controle_passe_a_100_pourcent(reservoir):
         assert erreurs == []
         assert len(pdfs) == len(d.pieces)
         assert R.pieces[0] <= len(d.pieces) <= R.pieces[1]
+
+
+def test_surnom_en_debut_de_ligne():
+    """Régression : la majuscule de début de ligne ne touche pas un nom (« le Chat »)."""
+    exclus = charger_exclusion(EXCLUS_WIKIDATA)
+    d, _, erreurs = produire_dossier(1862, "entrainement", CFG, exclus)
+    assert erreurs == []
+    debuts = [x for p in d.pieces for x in p.lignes if x.faits and x.faits[0].debut == 0]
+    assert any(x.texte.startswith("le Chat") for x in debuts)
 
 
 def test_invariants_des_pieces(echantillon):

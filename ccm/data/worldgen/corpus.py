@@ -30,7 +30,7 @@ def produire_dossier(
         pdf = rendre_pdf(piece, cfg.redaction.pdf)
         e = controler_piece(d, piece) + controler_pdf(pdf, piece)
         if e:
-            erreurs += e
+            erreurs += [f"{d.id}/{x}" for x in e]
         else:
             pdfs[piece.id] = pdf
             gardees.append(piece)
@@ -49,8 +49,8 @@ def _ecrire(args) -> dict:
     (dossier_dir / "verite.json").write_text(d.model_dump_json(indent=1), encoding="utf-8")
     types = Counter(p.type for p in d.pieces)
     return dict(
-        pieces=len(d.pieces) + len({e.split(" ")[0] for e in erreurs}),
-        rejetees=len({e.split(" ")[0] for e in erreurs}),
+        pieces=len(d.pieces) + len({x.split(" ")[0] for x in erreurs}),
+        rejetees=len({x.split(" ")[0] for x in erreurs}),
         lignes=sum(len(p.lignes) for p in d.pieces),
         faits=sum(len(x.faits) for p in d.pieces for x in p.lignes),
         conflit=d.conflit is not None,
