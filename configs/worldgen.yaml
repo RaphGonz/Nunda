@@ -45,3 +45,39 @@ wikidata_pause_s: 1.0
 
 # Tirages refusés (doublon, nom exclu, autre réservoir) avant erreur.
 essais_max: 10000
+
+# Pièces rédigées par gabarits (worldgen/pieces.py, gabarits.yaml). Valeurs de départ.
+redaction:
+  pieces: [8, 25]
+  # Poids de tirage des types ; la première pièce est toujours un RAPPORT.
+  poids_pieces: {PV_AUDITION: 4, PV_CONSTATATION: 2, RAPPORT: 1, COURRIER: 2, CONTRAT: 1, RELEVE: 1}
+  # Types d'événements qu'une pièce peut rapporter.
+  types_par_piece:
+    PV_AUDITION: [VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+    PV_CONSTATATION: [VOL, CONTROLE, INTERPELLATION, CONSTATATION]
+    RAPPORT: [AUDITION, VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+    COURRIER: [VIREMENT, SIGNATURE, RENCONTRE, APPEL]
+    CONTRAT: [SIGNATURE]
+    RELEVE: [VIREMENT]
+  # Événements ajoutés à une pièce restée vide après la répartition.
+  evenements_piece: [1, 6]
+  delai_piece_jours: [1, 60]
+  # Versions contradictoires : part des dossiers ; champ changé par le second témoin.
+  part_contradiction: 0.30
+  champs_contradiction: [HEURE, MONTANT, PERSONNE]
+  decalage_heure_minutes: [30, 300]
+  # Formes d'un nom (SPEC.md §12) : première mention dans une pièce, puis suivantes.
+  # DIT = nom complet suivi de « , dit <surnom> » ; SURNOM = surnom seul.
+  formes_premiere: [COMPLET, NOM_PRENOM, DIT]
+  formes_suite: [COMPLET, NOM_PRENOM, INITIALES, NOM_SEUL, TITRE_NOM, SURNOM]
+  formes_societe: [COMPLET, COURT]
+  sortie: runs/corpus/niveau0
+  pdf:
+    largeur: 595
+    hauteur: 842
+    marge: 56
+    taille: 10.5
+    interligne: 14
+    espace_paragraphe: 6
+    colonnes: [0.2, 0.55, 0.25]
+    marge_cellule: 4

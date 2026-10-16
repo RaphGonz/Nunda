@@ -52,6 +52,41 @@ class PartieCorpus(BaseModel):
     reservoir: Literal["entrainement", "test"]
 
 
+class PdfConfig(BaseModel):
+    """Mise en page des pièces en PDF natif (points typographiques)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    largeur: float
+    hauteur: float
+    marge: float
+    taille: float
+    interligne: float
+    espace_paragraphe: float
+    colonnes: tuple[float, ...]
+    marge_cellule: float
+
+
+class RedactionConfig(BaseModel):
+    """Pièces rédigées par gabarits (SPEC.md §12). Intervalles [min, max] inclus."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    pieces: Intervalle
+    poids_pieces: dict[str, float]
+    types_par_piece: dict[str, tuple[str, ...]]
+    evenements_piece: Intervalle
+    delai_piece_jours: Intervalle
+    part_contradiction: float
+    champs_contradiction: tuple[str, ...]
+    decalage_heure_minutes: Intervalle
+    formes_premiere: tuple[str, ...]
+    formes_suite: tuple[str, ...]
+    formes_societe: tuple[str, ...]
+    sortie: str
+    pdf: PdfConfig
+
+
 class WorldgenConfig(ConfigBase):
     """Générateur de monde (SPEC.md §12). Intervalles [min, max] inclus."""
 
@@ -82,6 +117,7 @@ class WorldgenConfig(ConfigBase):
     wikidata_lot: int
     wikidata_pause_s: float
     essais_max: int
+    redaction: RedactionConfig
 
 
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
