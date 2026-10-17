@@ -81,3 +81,37 @@ redaction:
     espace_paragraphe: 6
     colonnes: [0.2, 0.55, 0.25]
     marge_cellule: 4
+
+# Questions et vérité terrain (worldgen/questions.py, questions.yaml). Valeurs de départ.
+questions:
+  par_dossier: 40
+  # Parts visées sur tout le corpus (SPEC.md §12).
+  parts:
+    FAIT_SIMPLE: 0.20
+    PLUSIEURS_ETAPES: 0.25
+    IDENTITE: 0.15
+    FAIT_ABSENT: 0.10
+    CONFLIT: 0.10
+    CALCUL: 0.10
+    DIALOGUE: 0.10
+  # Seuls les dossiers à versions contradictoires (30 %) ont des questions de conflit :
+  # 13 par dossier donnent environ 10 % du corpus ; les autres types se partagent le reste.
+  conflit_par_dossier: 13
+  # Nombre d'étapes (citations en chaîne) des questions à plusieurs étapes.
+  etapes: {2: 0.6, 3: 0.3, 4: 0.1}
+  calculs: [SOMME, ECART, DUREE, MIN, MAX]
+  # Part des sommes faites sur les montants d'un seul événement.
+  part_somme_une: 0.3
+  dialogues: {SUITE: 0.4, NOTE_SAME: 0.15, NOTE_DIFF: 0.15, DECLARATION_FAUSSE: 0.15, ASK_SAME: 0.15}
+  # Part des questions qui nomment une société plutôt qu'une personne (quand c'est possible).
+  part_societe: 0.2
+  # Part des noms seuls écrits avec leur titre (« M. Dupont »).
+  part_titre: 0.5
+  # Part des événements décrits avec leur date quand elle n'est pas nécessaire.
+  part_date: 0.3
+  # Part des questions d'identité avec preuve (« X, dit S ») plutôt que par ressemblance.
+  part_preuve: 0.6
+  # Part des questions de conflit qui désignent l'événement par son type et sa date, sans nom.
+  part_conflit_date: 0.3
+  # Tirages par type de question avant d'abandonner le reste du quota du dossier.
+  essais: 300

@@ -1,8 +1,9 @@
 """Écriture du corpus synthétique niveau 0 (SPEC.md §12).
 
-Arborescence : `<sortie>/<partie>/<dossier>/P01.pdf …` et `verite.json` (monde, pièces
-gardées, lignes et faits déclarés, conflit). Une pièce qui échoue au contrôle de
-provenance n'est pas écrite. `<sortie>/controle.json` compte pièces et rejets.
+Arborescence : `<sortie>/<partie>/<dossier>/P01.pdf …`, `verite.json` (monde, pièces
+gardées, lignes et faits déclarés, conflit) et `questions.json` (questions, vérité terrain
+et synthèses, `questions.py`). Une pièce qui échoue au contrôle de provenance n'est pas
+écrite. `<sortie>/controle.json` compte pièces, rejets, questions et erreurs.
 La vérité terrain contient les noms : elle reste dans `runs/`, hors de git, et n'est
 pas un fichier d'entraînement (les exemples passeront par l'anonymiseur).
 """
@@ -18,6 +19,7 @@ from ccm.data.worldgen.controle import controler_pdf, controler_piece
 from ccm.data.worldgen.monde import generer_monde
 from ccm.data.worldgen.pdf import rendre_pdf
 from ccm.data.worldgen.pieces import Dossier, rediger_dossier
+from ccm.data.worldgen.questions import controler_questions, poser_questions
 
 
 def produire_dossier(
@@ -47,6 +49,9 @@ def _ecrire(args) -> dict:
     for pid, pdf in pdfs.items():
         (dossier_dir / f"{pid}.pdf").write_bytes(pdf)
     (dossier_dir / "verite.json").write_text(d.model_dump_json(indent=1), encoding="utf-8")
+    qs = poser_questions(d, cfg)
+    texte = json.dumps([q.model_dump(mode="json") for q in qs], ensure_ascii=False, indent=1)
+    (dossier_dir / "questions.json").write_text(texte, encoding="utf-8")
     types = Counter(p.type for p in d.pieces)
     return dict(
         pieces=len(d.pieces) + len({x.split(" ")[0] for x in erreurs}),
@@ -56,6 +61,9 @@ def _ecrire(args) -> dict:
         conflit=d.conflit is not None,
         types=dict(types),
         erreurs=erreurs,
+        questions=Counter(f"{q.type}/{q.sous_type}" for q in qs),
+        formulations={(ph.relation, ph.gabarit) for q in qs for ph in q.synthese},
+        erreurs_questions=controler_questions(d, qs),
     )
 
 
@@ -87,8 +95,13 @@ def ecrire_corpus(
                 b[k] += r[k]
             b.setdefault("types", Counter()).update(r["types"])
             b.setdefault("erreurs", []).extend(r["erreurs"])
+            b.setdefault("questions", Counter()).update(r["questions"])
+            b.setdefault("formulations", set()).update(r["formulations"])
+            b.setdefault("erreurs_questions", []).extend(r["erreurs_questions"])
     for b in bilan.values():
         b["types"] = dict(sorted(b["types"].items()))
+        b["questions"] = dict(sorted(b["questions"].items()))
+        b["formulations"] = dict(sorted(Counter(rel for rel, _ in b["formulations"]).items()))
     sortie.mkdir(parents=True, exist_ok=True)
     (sortie / "controle.json").write_text(
         json.dumps(bilan, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8"

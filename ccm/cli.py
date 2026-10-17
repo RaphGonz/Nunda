@@ -29,9 +29,11 @@ def corpus(
     bilan = ecrire_corpus(cfg, charger_exclusion(EXCLUS_WIKIDATA), sortie, partie, limite)
     for nom, b in bilan.items():
         typer.echo(
-            f"{nom} : {b['dossiers']} dossiers, {b['pieces']} pièces, {b['rejetees']} rejetées"
+            f"{nom} : {b['dossiers']} dossiers, {b['pieces']} pièces, {b['rejetees']} rejetées, "
+            f"{sum(b['questions'].values())} questions, "
+            f"{len(b['erreurs_questions'])} erreurs de questions"
         )
-    if any(b["rejetees"] for b in bilan.values()):
+    if any(b["rejetees"] or b["erreurs_questions"] for b in bilan.values()):
         raise typer.Exit(1)
 
 

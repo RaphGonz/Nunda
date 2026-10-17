@@ -87,6 +87,26 @@ class RedactionConfig(BaseModel):
     pdf: PdfConfig
 
 
+class QuestionsConfig(BaseModel):
+    """Questions et vérité terrain du corpus synthétique (SPEC.md §12, §10 bis)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    par_dossier: int
+    parts: dict[str, float]
+    conflit_par_dossier: int
+    etapes: dict[int, float]
+    calculs: tuple[str, ...]
+    part_somme_une: float
+    dialogues: dict[str, float]
+    part_societe: float
+    part_titre: float
+    part_date: float
+    part_preuve: float
+    part_conflit_date: float
+    essais: int
+
+
 class WorldgenConfig(ConfigBase):
     """Générateur de monde (SPEC.md §12). Intervalles [min, max] inclus."""
 
@@ -118,6 +138,7 @@ class WorldgenConfig(ConfigBase):
     wikidata_pause_s: float
     essais_max: int
     redaction: RedactionConfig
+    questions: QuestionsConfig
 
 
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
