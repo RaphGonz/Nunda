@@ -189,6 +189,12 @@ def test_versions_contradictoires(echantillon):
         }
         assert versions == {p1.id: {0}, p2.id: {1}}
         assert all(x.version == 0 for p in d.pieces if p is not p2 for x in p.lignes)
+        # Le champ changé est écrit par les deux témoins : le conflit se lit dans le texte.
+        genre = {"HEURE": "HEURE", "MONTANT": "NUM", "PERSONNE": "PER"}[c.champ]
+        for p in (p1, p2):
+            assert any(
+                f.genre == genre for x in p.lignes if x.evenement == c.evenement for f in x.faits
+            )
     assert set(champs) == set(R.champs_contradiction)
 
 

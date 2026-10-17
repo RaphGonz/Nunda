@@ -166,6 +166,30 @@ _VOYELLES = "aeiouyàâéèêîôûAEIOUYÀÂÉÈÊÎÔÛ"
 _ELISION = re.compile(rf"\b([QqDd]u?)e (?=[{_VOYELLES}])")
 
 
+def assembler(morceaux: list) -> tuple[str, list[Fait]]:
+    """Texte et faits d'une suite de morceaux (texte, fait sans position ou None).
+
+    Majuscule de début (jamais dans un nom), élisions (« que un » → « qu'un »).
+    Le fait "VIRGULE" ferme un « X, dit S » seulement si la phrase continue.
+    """
+    texte, faits = "", []
+    for i, (s, fait) in enumerate(morceaux):
+        if fait == "VIRGULE":  # « X, dit S, a viré » mais « … dit S. »
+            suite = "".join(t for t, _ in morceaux[i + 1 :])
+            if not suite or not suite[0].isalpha() and suite[0] != " ":
+                continue
+        elif fait is None and not texte and s[:1].islower():  # jamais dans un nom
+            s = s[0].upper() + s[1:]
+        if fait is None:
+            s = _ELISION.sub(r"\1'", s)
+        if s[:1] in _VOYELLES and (m := re.search(r"\b([QqDd]u?)e $", texte)):
+            texte = texte[: m.start()] + m[1] + "'"
+        if fait not in (None, "VIRGULE"):
+            faits.append(Fait(debut=len(texte), fin=len(texte) + len(s), surface=s, **fait))
+        texte += s
+    return texte, faits
+
+
 class _Plume:
     """Rédige les lignes d'une pièce ; suit les noms déjà cités dans la pièce."""
 
@@ -273,21 +297,7 @@ class _Plume:
         morceaux: list = []
         for i, bout in enumerate(_CHAMP.split(modele)):
             morceaux += self._champ(bout, ev) if i % 2 else [(bout, None)]
-        texte, faits = "", []
-        for i, (s, fait) in enumerate(morceaux):
-            if fait == "VIRGULE":  # « X, dit S, a viré » mais « … dit S. »
-                suite = "".join(t for t, _ in morceaux[i + 1 :])
-                if not suite or not suite[0].isalpha() and suite[0] != " ":
-                    continue
-            elif fait is None and not texte and s[:1].islower():  # jamais dans un nom
-                s = s[0].upper() + s[1:]
-            if fait is None:
-                s = _ELISION.sub(r"\1'", s)
-            if s[:1] in _VOYELLES and (m := re.search(r"\b([QqDd]u?)e $", texte)):
-                texte = texte[: m.start()] + m[1] + "'"
-            if fait not in (None, "VIRGULE"):
-                faits.append(Fait(debut=len(texte), fin=len(texte) + len(s), surface=s, **fait))
-            texte += s
+        texte, faits = assembler(morceaux)
         if genre is None:
             genre = "CHAMP" if _LIBELLE_CHAMP.match(texte) else "PHRASE"
         return Ligne(
@@ -425,6 +435,8 @@ def rediger_dossier(m: Monde, cfg: WorldgenConfig) -> Dossier:
                 if e.id not in a["evenements"]:
                     a["evenements"].append(e.id)
             a2["variante"] = e.id
+            if champ == "HEURE":  # le champ changé doit être écrit par les deux témoins
+                a1["avec_heure"] = a2["avec_heure"] = e.id
             conflit_ = (e.id, champ, a1, a2)
 
     # Dates et références ; pièces rangées par date.
@@ -474,6 +486,8 @@ def _rediger_piece(rng, m: Monde, cfg, g, info: dict, variante) -> Piece:
         for e_id in info["evenements"]:
             ev, version = ev_de(e_id)
             cadre, cid = _choisir(rng, g, f"cadres/{t}")
+            while info.get("avec_heure") == e_id and "{H}" not in cadre:
+                cadre, cid = _choisir(rng, g, f"cadres/{t}")
             k = rng.choice(noyaux_possibles(g, ev))
             noyau = g["noyaux"][ev.type][k]
             gid = f"{cid}+noyaux/{ev.type}/{k}"
