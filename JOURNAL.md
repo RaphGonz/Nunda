@@ -102,6 +102,6 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Identité avec preuve seulement entre surnom et nom complet (ligne « X, dit S ») ; sinon ressemblance (initiales, NOM Prénom, nom seul). La ligne de preuve compte parmi les justificatives.
   - Synthèse : 2 phrases par événement final (fait, circonstances), 1 par étape intermédiaire, plus une phrase d'identité, de conflit ou de calcul ; 2 à 5 phrases. Sans « un », « une » (nombres en lettres possibles dans V). Abstention et ASK_SAME : sans synthèse.
 - **Écarts avec SPEC.md :** part des conflits 0,086 au lieu de 0,10 en entraînement (un seul événement contredit par dossier : environ 11 questions distinctes possibles). La liste V n'existe pas encore (phase 5) : le contrôle des mots est une liste de mots refusés, à refaire contre V. Une question dont la version contradictoire nomme les témoins seulement par initiales n'a de conflit que par la date.
-- **Décision de Raphael (même jour) :** 8,6 % de conflits acceptés.
+- **Décisions de Raphael (même jour) :** 8,6 % de conflits acceptés. La ligne de preuve d'un SAME est citée : elle peut être source d'une phrase de synthèse (choix déjà appliqué).
 - **Questions pour Raphael :** la preuve d'un SAME (le P de `SAME M M P`) compte-t-elle comme citée pour servir de source à une phrase de synthèse ? Accepter 8,6 % de conflits, ou ajouter un second événement contredit dans les dossiers à conflit ?
 - **Suite prévue :** rapport de phase 1 (`reports/phase-1.md`) et relecture avec Raphael avant l'étiquette `phase-1-ok`.
