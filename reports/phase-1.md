@@ -33,7 +33,7 @@ Autres contrôles : clone neuf de `phase-1` (`f93b7b8`), `make setup && make tes
 - La validation garde le réservoir et les gabarits d'entraînement ; §12 demande des gabarits différents pour le test seulement.
 
 ## Risques ouverts
-- **Licence de PyMuPDF : AGPL.** Choisie par §3 pour écrire et lire les PDF. Elle pèse sur la licence de publication du code (§16).
+- **Licence de PyMuPDF : AGPL.** Décision de Raphael (2026-10-18) : code fermé, poids ouverts. PyMuPDF reste dans `worldgen` (outil interne, jamais distribué ; l'AGPL ne couvre pas les fichiers produits). L'ingestion de la phase 2 utilisera une bibliothèque sans copyleft (pdfplumber ou pypdfium2), et PyMuPDF sortira des dépendances distribuées.
 - **COURRIER** n'a pas de motif d'en-tête dans la table de §5 : l'ingestion de la phase 2 classera ces pièces AUTRE (rang 0).
 - **Liste V** (phase 5) absente : le contrôle des mots de la synthèse est une liste de mots refusés. Il faudra le refaire contre V.
 - **Homonymes Wikidata** sous une autre graphie (sans accent, autre casse) ou seulement en anglais : non vus.
@@ -42,7 +42,7 @@ Autres contrôles : clone neuf de `phase-1` (`f93b7b8`), `make setup && make tes
 - Questions de conflit dont les témoins ne sont nommés que par initiales : le conflit ne se lit que par la date.
 
 ## Questions pour Raphael
-1. PyMuPDF (AGPL) : on le garde, ou on passe à une autre bibliothèque (pypdf, pdfminer.six, reportlab) avant que le code en dépende davantage ? Cela dépend de la licence de publication (§16).
+1. ~~PyMuPDF (AGPL)~~ : tranché le 2026-10-18 (voir Risques ouverts).
 2. COURRIER : faut-il ajouter un motif d'en-tête à la table de §5 (« Objet : », par exemple) ? Sinon, faut-il laisser ces pièces en AUTRE ?
 3. §16 encore ouvert : heures et dépense maximale sur la RTX 3090 ; modèle enseignant 7B exact (bloque la phase 4).
 4. Accord pour l'étiquette `phase-1-ok` et la fusion de `phase-1` dans `main` après cette relecture ?

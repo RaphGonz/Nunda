@@ -115,3 +115,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Les personnes ne changent pas (tirées avant les sociétés) : la liste Wikidata reste valable sans nouvelle requête (`test_corpus_hors_liste_wikidata` passe). Sociétés, lieux, pièces et questions changent.
 - **Écarts avec SPEC.md :** aucun nouveau.
 - **Suite prévue :** rapport de phase 1 (`reports/phase-1.md`) et relecture avec Raphael avant l'étiquette `phase-1-ok`.
+
+## 2026-10-18 — Phase 1 — Rapport de phase, licence PyMuPDF
+- **Travail fait :** `reports/phase-1.md` (seuils, écarts, risques, questions). Clone neuf de `phase-1` : `make setup && make test` OK (75 tests) ; CI verte.
+- **Mesures :** les deux seuils de phase 1 sont atteints (contrôle à 100 %, même graine, mêmes fichiers).
+- **Décisions (Raphael) :** §16 « Publication » : **code fermé, modèle à poids ouverts**. Conséquence : PyMuPDF (AGPL) reste seulement dans `worldgen` (outil interne, non distribué ; l'AGPL ne couvre pas les PDF ni la vérité terrain produits). L'ingestion de la phase 2 se fera avec une bibliothèque sans copyleft (pdfplumber, MIT, ou pypdfium2, Apache/BSD) ; PyMuPDF passera dans un groupe de dépendances interne. Changement de SPEC.md §3 et §5 (« PyMuPDF », `find_tables()`) validé, à faire au début de la phase 2.
+- **Écarts avec SPEC.md :** §3 et §5 nomment encore PyMuPDF (changement validé, pas encore écrit).
+- **Suite prévue :** réponses de Raphael aux questions 2 à 4 de `reports/phase-1.md` (motif COURRIER, §16 budget et enseignant, accord pour `phase-1-ok` et la fusion dans `main`).
