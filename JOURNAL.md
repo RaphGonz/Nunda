@@ -122,3 +122,13 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions (Raphael) :** §16 « Publication » : **code fermé, modèle à poids ouverts**. Conséquence : PyMuPDF (AGPL) reste seulement dans `worldgen` (outil interne, non distribué ; l'AGPL ne couvre pas les PDF ni la vérité terrain produits). L'ingestion de la phase 2 se fera avec une bibliothèque sans copyleft (pdfplumber, MIT, ou pypdfium2, Apache/BSD) ; PyMuPDF passera dans un groupe de dépendances interne. Changement de SPEC.md §3 et §5 (« PyMuPDF », `find_tables()`) validé, à faire au début de la phase 2.
 - **Écarts avec SPEC.md :** §3 et §5 nomment encore PyMuPDF (changement validé, pas encore écrit).
 - **Suite prévue :** réponses de Raphael aux questions 2 à 4 de `reports/phase-1.md` (motif COURRIER, §16 budget et enseignant, accord pour `phase-1-ok` et la fusion dans `main`).
+
+## 2026-10-18 — Phase 1 — Relecture, fin de phase
+- **Travail fait :** relecture de `reports/phase-1.md` avec Raphael ; réponses écrites au rapport. Étiquette `phase-1-ok`, fusion de `phase-1` dans `main` (accord de Raphael).
+- **Mesures :** aucune nouvelle (seuils atteints, voir l'entrée précédente).
+- **Décisions (Raphael) :**
+  - §16 « Budget de calcul » : RTX 3090, **aucun plafond d'heures** ; l'entraînement sera étalé sur plusieurs jours (éviter l'effondrement de représentation). Le cas d'arrêt 4 (§15) garde sa limite de 5 jours par durée mesurée.
+  - §16 « Modèle enseignant » : **Qwen, 7B, local**. Mistral écarté par Raphael (restriction sur l'entraînement d'autres modèles). Qwen2.5-7B-Instruct est sous Apache 2.0 (fichier `LICENSE` du dépôt Hugging Face, lu le 2026-10-18) ; la version exacte s'écrira dans `DATA_LICENSES.md` au téléchargement.
+  - COURRIER : motif d'en-tête à choisir sur de vrais dossiers ; pas de changement de §5 pour l'instant.
+- **Écarts avec SPEC.md :** §3 et §5 nomment encore PyMuPDF (changement validé, à faire en phase 2).
+- **Suite prévue :** phase 2 (SPEC.md §5, §6, §7) : branche `phase-2` ; d'abord SPEC.md §3 et §5 avec la bibliothèque d'ingestion sans copyleft (pdfplumber ou pypdfium2, à mesurer sur le niveau 0), puis extraction.

@@ -43,6 +43,6 @@ Autres contrôles : clone neuf de `phase-1` (`f93b7b8`), `make setup && make tes
 
 ## Questions pour Raphael
 1. ~~PyMuPDF (AGPL)~~ : tranché le 2026-10-18 (voir Risques ouverts).
-2. COURRIER : faut-il ajouter un motif d'en-tête à la table de §5 (« Objet : », par exemple) ? Sinon, faut-il laisser ces pièces en AUTRE ?
-3. §16 encore ouvert : heures et dépense maximale sur la RTX 3090 ; modèle enseignant 7B exact (bloque la phase 4).
-4. Accord pour l'étiquette `phase-1-ok` et la fusion de `phase-1` dans `main` après cette relecture ?
+2. COURRIER : selon Raphael, cela dépend des vrais dossiers. Ouvert : à décider sur des pièces réelles (§16 « Types de pièces »). En attendant, COURRIER est classé AUTRE à l'ingestion.
+3. ~~Budget et modèle enseignant~~ : tranchés le 2026-10-18. Pas de plafond d'heures ; entraînement étalé sur plusieurs jours. Enseignant : Qwen 7B local (Mistral exclu par Raphael) ; la version exacte et sa licence seront écrites dans `DATA_LICENSES.md` au téléchargement (phase 4).
+4. ~~Étiquette et fusion~~ : accord de Raphael le 2026-10-18.
