@@ -44,5 +44,5 @@ Autres contrôles : clone neuf de `phase-1` (`f93b7b8`), `make setup && make tes
 ## Questions pour Raphael
 1. ~~PyMuPDF (AGPL)~~ : tranché le 2026-10-18 (voir Risques ouverts).
 2. COURRIER : selon Raphael, cela dépend des vrais dossiers. Ouvert : à décider sur des pièces réelles (§16 « Types de pièces »). En attendant, COURRIER est classé AUTRE à l'ingestion.
-3. ~~Budget et modèle enseignant~~ : tranchés le 2026-10-18. Pas de plafond d'heures ; entraînement étalé sur plusieurs jours. Enseignant : Qwen 7B local (Mistral exclu par Raphael) ; la version exacte et sa licence seront écrites dans `DATA_LICENSES.md` au téléchargement (phase 4).
+3. ~~Budget et modèle enseignant~~ : tranchés le 2026-10-18. Pas de plafond d'heures ; entraînement étalé sur plusieurs jours. Enseignant : Mistral local, un modèle sous Apache 2.0 (Ministral 8B écarté : licence propre) ; la version exacte et sa licence seront écrites dans `DATA_LICENSES.md` au téléchargement (phase 4).
 4. ~~Étiquette et fusion~~ : accord de Raphael le 2026-10-18.

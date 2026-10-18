@@ -128,7 +128,7 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Mesures :** aucune nouvelle (seuils atteints, voir l'entrée précédente).
 - **Décisions (Raphael) :**
   - §16 « Budget de calcul » : RTX 3090, **aucun plafond d'heures** ; l'entraînement sera étalé sur plusieurs jours (éviter l'effondrement de représentation). Le cas d'arrêt 4 (§15) garde sa limite de 5 jours par durée mesurée.
-  - §16 « Modèle enseignant » : **Qwen, 7B, local**. Mistral écarté par Raphael (restriction sur l'entraînement d'autres modèles). Qwen2.5-7B-Instruct est sous Apache 2.0 (fichier `LICENSE` du dépôt Hugging Face, lu le 2026-10-18) ; la version exacte s'écrira dans `DATA_LICENSES.md` au téléchargement.
+  - §16 « Modèle enseignant » : **Mistral, local** (Raphael, après avoir d'abord choisi Qwen : meilleur en français). Licences lues sur Hugging Face le 2026-10-18 : Mistral-7B-Instruct-v0.3, Mistral-Nemo-Instruct-2407 (12B) et Mistral-Small-3.1-24B-Instruct-2503 sous Apache 2.0 ; Ministral-8B-Instruct-2410 sous licence propre, écarté. Modèle exact à choisir en phase 4 parmi les modèles Apache 2.0 (Nemo 12B ou Small 3.1 24B quantifié tiennent sur la RTX 3090) ; il s'écrira dans `DATA_LICENSES.md` au téléchargement.
   - COURRIER : motif d'en-tête à choisir sur de vrais dossiers ; pas de changement de §5 pour l'instant.
 - **Écarts avec SPEC.md :** §3 et §5 nomment encore PyMuPDF (changement validé, à faire en phase 2).
 - **Suite prévue :** phase 2 (SPEC.md §5, §6, §7) : branche `phase-2` ; d'abord SPEC.md §3 et §5 avec la bibliothèque d'ingestion sans copyleft (pdfplumber ou pypdfium2, à mesurer sur le niveau 0), puis extraction.
