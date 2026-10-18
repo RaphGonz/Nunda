@@ -13,6 +13,7 @@ from ccm.data.worldgen.monde import (
     cle,
     generer_monde,
     mondes_corpus,
+    noms_du_monde,
     reservoir_de,
 )
 
@@ -49,9 +50,9 @@ def verifier(m: Monde):
     assert paires_famille == (1 if m.cas.meme_famille else 0)
 
     # Réservoir : chaque nom tiré vient du réservoir du monde.
-    for s in [p.prenom for p in m.personnes] + [p.nom for p in m.personnes] + surnoms:
-        assert reservoir_de(s) == m.reservoir, s
-    for s in [x.nom for x in m.societes] + [x.nom.split(", ")[-1] for x in m.lieux]:
+    chaines = noms_du_monde(m)
+    assert {p.nom for p in m.personnes} | {x.nom for x in m.societes} <= chaines
+    for s in chaines:
         assert reservoir_de(s) == m.reservoir, s
 
     # Événements.

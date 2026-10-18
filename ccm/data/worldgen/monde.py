@@ -134,6 +134,14 @@ class _Tireur:
             return self.invente(fins)
         return self.rng.choice(self.r[liste])
 
+    def du_reservoir(self, tirer) -> str:
+        """Tire jusqu'à une chaîne du bon réservoir (peut se répéter dans le monde)."""
+        for _ in range(self.cfg.essais_max):
+            s = tirer()
+            if reservoir_de(s) == self.reservoir:
+                return s
+        raise RuntimeError(f"aucun tirage accepté après {self.cfg.essais_max} essais")
+
     def prenom(self, genre: str, accepte) -> str:
         """Prénom du bon réservoir, accepté ; deux personnes peuvent le partager."""
         sexe = genre.lower()
@@ -189,7 +197,7 @@ def generer_monde(
     for i in range(t.entre(cfg.lieux)):
         commune = t.unique(lambda: t.invente("fins_commune"))
         if rng.random() < cfg.part_adresses:
-            rue = rng.choice(t.r["rues"])
+            rue = t.du_reservoir(lambda: rng.choice(t.r["rues"]))
             lieux.append(
                 Lieu(id=i, genre="ADRESSE", nom=f"{t.entre(cfg.numero_rue)} {rue}, {commune}")
             )
@@ -209,7 +217,7 @@ def generer_monde(
 
 
 def _nom_societe(t: _Tireur) -> str:
-    racine = t.inventer_ou_choisir("fins_nom", "noms")
+    racine = t.du_reservoir(lambda: t.inventer_ou_choisir("fins_nom", "noms"))
     nom = f"{t.rng.choice(t.r['formes_societe'])} {racine}"
     if t.rng.random() < t.cfg.part_activite:
         nom += f" {t.rng.choice(t.r['activites'])}"
@@ -242,6 +250,24 @@ def _evenements(t: _Tireur, n_per: int, n_soc: int, n_lieux: int) -> tuple[Evene
         )
     bruts.sort(key=lambda e: (e["date"], e["heure"]))
     return tuple(Evenement(id=i, **e) for i, e in enumerate(bruts))
+
+
+def noms_du_monde(m: Monde) -> set[str]:
+    """Chaînes de nom d'un monde : prénoms, noms, surnoms, sociétés et leur racine, communes,
+    rues. Chacune doit venir du réservoir du monde (séparation entraînement et test)."""
+    r = _reservoirs()
+    noms = {s for p in m.personnes for s in (p.prenom, p.nom, p.surnom) if s}
+    for x in m.societes:
+        racine = x.nom.split(" ", 1)[1]
+        for a in r["activites"]:
+            racine = racine.removesuffix(f" {a}")
+        noms |= {x.nom, racine}
+    for x in m.lieux:
+        *adresse, commune = x.nom.split(", ")
+        noms.add(commune)
+        if adresse:
+            noms.add(adresse[0].split(" ", 1)[1])
+    return noms
 
 
 def mondes_corpus(cfg: WorldgenConfig, exclus: frozenset[str]):
