@@ -1,4 +1,5 @@
 import hashlib
+import json
 import re
 from collections import Counter, defaultdict
 from datetime import date, time
@@ -10,7 +11,7 @@ from hypothesis import strategies as st
 
 from ccm.config import load_config
 from ccm.data.worldgen import controle
-from ccm.data.worldgen.corpus import ecrire_corpus, produire_dossier
+from ccm.data.worldgen.corpus import ecrire_corpus, produire_dossier, separation
 from ccm.data.worldgen.monde import EXCLUS_WIKIDATA, charger_exclusion, generer_monde
 from ccm.data.worldgen.pdf import rendre_pdf
 from ccm.data.worldgen.pieces import (
@@ -93,8 +94,31 @@ def test_corpus_memes_fichiers(tmp_path):
 
     a, b = empreintes(tmp_path / "a"), empreintes(tmp_path / "b")
     assert a == b
+    controle = json.loads((tmp_path / "a" / "controle.json").read_text(encoding="utf-8"))
     assert sum(k.endswith(".pdf") for k in a) >= 4 * R.pieces[0]
     assert sum(k.endswith("verite.json") for k in a) == 4
+    assert controle["separation"] == {}
+
+
+def test_separation_des_parties():
+    """Graines et dossiers propres à chaque partie ; noms du test absents des autres (§12)."""
+
+    def vus(graines, ids, noms):
+        return dict(graines=set(graines), ids=set(ids), noms=set(noms))
+
+    propre = dict(
+        entrainement=vus([0, 1], ["syn-0"], ["dupont"]),
+        validation=vus([9], ["syn-9"], ["dupont"]),
+        test=vus([5], ["syn-5"], ["morel"]),
+    )
+    assert separation(propre) == {}
+    propre["test"]["noms"].add("dupont")
+    propre["validation"]["graines"].add(1)
+    assert separation(propre) == {
+        "entrainement/test/noms": ["dupont"],
+        "entrainement/validation/graines": [1],
+        "test/validation/noms": ["dupont"],
+    }
 
 
 def _textes(x):

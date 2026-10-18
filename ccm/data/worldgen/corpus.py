@@ -3,7 +3,9 @@
 Arborescence : `<sortie>/<partie>/<dossier>/P01.pdf …`, `verite.json` (monde, pièces
 gardées, lignes et faits déclarés, conflit) et `questions.json` (questions, vérité terrain
 et synthèses, `questions.py`). Une pièce qui échoue au contrôle de provenance n'est pas
-écrite. `<sortie>/controle.json` compte pièces, rejets, questions et erreurs.
+écrite. `<sortie>/controle.json` compte pièces, rejets, questions et erreurs, et contrôle la
+séparation des parties (`separation`) : graines et dossiers propres à chaque partie, aucune
+chaîne de nom commune entre le test et les autres parties.
 La vérité terrain contient les noms : elle reste dans `runs/`, hors de git, et n'est
 pas un fichier d'entraînement (les exemples passeront par l'anonymiseur).
 """
@@ -16,7 +18,7 @@ from pathlib import Path
 
 from ccm.config import WorldgenConfig
 from ccm.data.worldgen.controle import controler_pdf, controler_piece
-from ccm.data.worldgen.monde import generer_monde
+from ccm.data.worldgen.monde import cle, generer_monde, noms_du_monde
 from ccm.data.worldgen.pdf import rendre_pdf
 from ccm.data.worldgen.pieces import Dossier, rediger_dossier
 from ccm.data.worldgen.questions import controler_questions, poser_questions
@@ -54,6 +56,9 @@ def _ecrire(args) -> dict:
     (dossier_dir / "questions.json").write_text(texte, encoding="utf-8")
     types = Counter(p.type for p in d.pieces)
     return dict(
+        graine=graine,
+        id=d.id,
+        noms={cle(s) for s in noms_du_monde(d.monde)},
         pieces=len(d.pieces) + len({x.split(" ")[0] for x in erreurs}),
         rejetees=len({x.split(" ")[0] for x in erreurs}),
         lignes=sum(len(p.lignes) for p in d.pieces),
@@ -83,6 +88,7 @@ def ecrire_corpus(
         for i in range(n):
             taches.append((nom, (partie.graine + i, partie.reservoir, cfg, exclus, sortie / nom)))
     bilan: dict = {}
+    vus: dict[str, dict[str, set]] = {}
     with ProcessPoolExecutor(processus) as ex:
         resultats = ex.map(_ecrire, [t for _, t in taches], chunksize=8)
         for (nom, _), r in zip(taches, resultats, strict=True):
@@ -90,6 +96,10 @@ def ecrire_corpus(
                 nom, dict(dossiers=0, pieces=0, rejetees=0, lignes=0, faits=0, conflits=0)
             )
             b["dossiers"] += 1
+            v = vus.setdefault(nom, dict(graines=set(), ids=set(), noms=set()))
+            v["graines"].add(r["graine"])
+            v["ids"].add(r["id"])
+            v["noms"] |= r["noms"]
             b["conflits"] += r["conflit"]
             for k in ("pieces", "rejetees", "lignes", "faits"):
                 b[k] += r[k]
@@ -103,7 +113,22 @@ def ecrire_corpus(
         b["questions"] = dict(sorted(b["questions"].items()))
         b["formulations"] = dict(sorted(Counter(rel for rel, _ in b["formulations"]).items()))
     sortie.mkdir(parents=True, exist_ok=True)
+    controle = dict(bilan, separation=separation(vus))
     (sortie / "controle.json").write_text(
-        json.dumps(bilan, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8"
+        json.dumps(controle, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8"
     )
-    return bilan
+    return controle
+
+
+def separation(vus: dict[str, dict[str, set]]) -> dict[str, list]:
+    """Recouvrements interdits entre parties (SPEC.md §12) : graines et dossiers entre deux
+    parties quelconques, chaînes de nom (clés) entre le test et les autres. Vide si séparé."""
+    out = {}
+    noms = sorted(vus)
+    for i, a in enumerate(noms):
+        for b in noms[i + 1 :]:
+            for k in ("graines", "ids") + (("noms",) if "test" in (a, b) else ()):
+                commun = vus[a][k] & vus[b][k]
+                if commun:
+                    out[f"{a}/{b}/{k}"] = sorted(commun)[:20]
+    return out

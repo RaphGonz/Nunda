@@ -27,13 +27,16 @@ def corpus(
     cfg = load_config("worldgen")
     sortie = sortie or Path(cfg.redaction.sortie)
     bilan = ecrire_corpus(cfg, charger_exclusion(EXCLUS_WIKIDATA), sortie, partie, limite)
+    separation = bilan.pop("separation")
     for nom, b in bilan.items():
         typer.echo(
             f"{nom} : {b['dossiers']} dossiers, {b['pieces']} pièces, {b['rejetees']} rejetées, "
             f"{sum(b['questions'].values())} questions, "
             f"{len(b['erreurs_questions'])} erreurs de questions"
         )
-    if any(b["rejetees"] or b["erreurs_questions"] for b in bilan.values()):
+    for k, v in separation.items():
+        typer.echo(f"séparation : {k} communs : {', '.join(map(str, v))}")
+    if separation or any(b["rejetees"] or b["erreurs_questions"] for b in bilan.values()):
         raise typer.Exit(1)
 
 
