@@ -1,0 +1,117 @@
+# Générateur de monde du corpus synthétique (SPEC.md §12, tableau « Corpus synthétique »).
+# Intervalles [min, max] inclus. Valeurs de départ.
+version: 1
+description: "Générateur de monde : personnes, sociétés, lieux, événements (SPEC.md §12)."
+
+personnes: [6, 20]
+societes: [2, 5]
+lieux: [3, 8]
+evenements: [15, 40]
+
+# Cas durs : part des dossiers.
+part_alias: 0.30
+part_meme_famille: 0.20
+part_meme_nom_complet: 0.05
+
+part_noms_inventes: 0.5
+part_femmes: 0.5
+part_adresses: 0.6
+part_activite: 0.5
+numero_rue: [1, 120]
+
+roles: [MIS_EN_CAUSE, VICTIME, TEMOIN, ENQUETEUR, PLAIGNANT, GERANT, EMPLOYE, AVOCAT, EXPERT]
+types_evenement: [AUDITION, VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+types_avec_montant: [VOL, VIREMENT, SIGNATURE]
+types_avec_societe: [VIREMENT, SIGNATURE, CONTROLE]
+
+participants: [1, 3]
+montants: [1, 2]
+montant_centimes: [1000, 5000000]
+
+debut: 2018-01-01
+fin: 2025-12-31
+duree_dossier_jours: 365
+
+# Corpus : nombre de dossiers, première graine, réservoir de noms, par partie.
+corpus:
+  entrainement: {dossiers: 2000, graine: 0, reservoir: entrainement}
+  validation: {dossiers: 200, graine: 1000000, reservoir: entrainement}
+  test: {dossiers: 200, graine: 2000000, reservoir: test}
+
+# Liste d'exclusion (worldgen/wikidata.py) : libellés français, par lots.
+wikidata_url: https://query.wikidata.org/sparql
+wikidata_lot: 500
+wikidata_pause_s: 1.0
+
+# Tirages refusés (doublon, nom exclu, autre réservoir) avant erreur.
+essais_max: 10000
+
+# Pièces rédigées par gabarits (worldgen/pieces.py, gabarits.yaml). Valeurs de départ.
+redaction:
+  pieces: [8, 25]
+  # Poids de tirage des types ; la première pièce est toujours un RAPPORT.
+  poids_pieces: {PV_AUDITION: 4, PV_CONSTATATION: 2, RAPPORT: 1, COURRIER: 2, CONTRAT: 1, RELEVE: 1}
+  # Types d'événements qu'une pièce peut rapporter.
+  types_par_piece:
+    PV_AUDITION: [VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+    PV_CONSTATATION: [VOL, CONTROLE, INTERPELLATION, CONSTATATION]
+    RAPPORT: [AUDITION, VOL, VIREMENT, APPEL, RENCONTRE, SIGNATURE, CONTROLE, INTERPELLATION, CONSTATATION]
+    COURRIER: [VIREMENT, SIGNATURE, RENCONTRE, APPEL]
+    CONTRAT: [SIGNATURE]
+    RELEVE: [VIREMENT]
+  # Événements ajoutés à une pièce restée vide après la répartition.
+  evenements_piece: [1, 6]
+  delai_piece_jours: [1, 60]
+  # Versions contradictoires : part des dossiers ; champ changé par le second témoin.
+  part_contradiction: 0.30
+  champs_contradiction: [HEURE, MONTANT, PERSONNE]
+  decalage_heure_minutes: [30, 300]
+  # Formes d'un nom (SPEC.md §12) : première mention dans une pièce, puis suivantes.
+  # DIT = nom complet suivi de « , dit <surnom> » ; SURNOM = surnom seul.
+  formes_premiere: [COMPLET, NOM_PRENOM, DIT]
+  formes_suite: [COMPLET, NOM_PRENOM, INITIALES, NOM_SEUL, TITRE_NOM, SURNOM]
+  formes_societe: [COMPLET, COURT]
+  sortie: runs/corpus/niveau0
+  pdf:
+    largeur: 595
+    hauteur: 842
+    marge: 56
+    taille: 10.5
+    interligne: 14
+    espace_paragraphe: 6
+    colonnes: [0.2, 0.55, 0.25]
+    marge_cellule: 4
+
+# Questions et vérité terrain (worldgen/questions.py, questions.yaml). Valeurs de départ.
+questions:
+  par_dossier: 40
+  # Parts visées sur tout le corpus (SPEC.md §12).
+  parts:
+    FAIT_SIMPLE: 0.20
+    PLUSIEURS_ETAPES: 0.25
+    IDENTITE: 0.15
+    FAIT_ABSENT: 0.10
+    CONFLIT: 0.10
+    CALCUL: 0.10
+    DIALOGUE: 0.10
+  # Seuls les dossiers à versions contradictoires (30 %) ont des questions de conflit :
+  # 13 par dossier donnent environ 10 % du corpus ; les autres types se partagent le reste.
+  conflit_par_dossier: 13
+  # Nombre d'étapes (citations en chaîne) des questions à plusieurs étapes.
+  etapes: {2: 0.6, 3: 0.3, 4: 0.1}
+  calculs: [SOMME, ECART, DUREE, MIN, MAX]
+  # Part des sommes faites sur les montants d'un seul événement.
+  part_somme_une: 0.3
+  dialogues: {SUITE: 0.4, NOTE_SAME: 0.15, NOTE_DIFF: 0.15, DECLARATION_FAUSSE: 0.15, ASK_SAME: 0.15}
+  # Part des questions qui nomment une société plutôt qu'une personne (quand c'est possible).
+  part_societe: 0.2
+  # Part des noms seuls écrits avec leur titre (« M. Dupont »).
+  part_titre: 0.5
+  # Part des événements décrits avec leur date quand elle n'est pas nécessaire.
+  part_date: 0.3
+  # Part des questions d'identité avec preuve (« X, dit S ») plutôt que par ressemblance.
+  part_preuve: 0.6
+  # Part des questions de conflit qui désignent l'événement par son type et sa date, sans nom.
+  part_conflit_date: 0.3
+  # Tirages par type de question avant d'abandonner le reste du quota du dossier.
+  essais: 300

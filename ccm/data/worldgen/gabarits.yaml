@@ -1,0 +1,344 @@
+# Gabarits des pièces du corpus synthétique (SPEC.md §12). Un jeu par réservoir :
+# `entrainement` (entraînement et validation) et `test` ; aucun texte commun.
+#
+# Champs d'un événement : {P} tous les participants, {A} le premier, {B} les autres
+# (demande deux participants), {a} « a » ou « ont » selon le nombre, {S} la société
+# avec son article, {M} les montants, {D} la date, {H} l'heure, {L} le lieu avec
+# « à » ou « au ». Un cadre contient {N}, remplacé par un noyau.
+# Champs d'une pièce : {DP} date, {REF} référence, {AUT} enquêteur avec grade,
+# {LOC} personne entendue, {SUR} son surnom, {EXP} société expéditrice ou titulaire,
+# {SIG} signataire, {D1} {D2} période.
+# Aucun chiffre, aucun mois, aucun nom propre dans le texte fixe : le contrôle le refuse.
+
+entrainement:
+  grades: [le brigadier, le lieutenant, le capitaine, l'adjudant, le gardien de la paix]
+  noyaux:
+    AUDITION:
+      - "les enquêteurs ont entendu {P}"
+      - "{P} {a} fait l'objet d'une audition"
+      - "une audition de {P} a été menée"
+      - "{P} {a} déposé devant les enquêteurs"
+      - "les déclarations de {P} ont été recueillies"
+    VOL:
+      - "{P} {a} dérobé {M} en espèces"
+      - "un vol portant sur {M} a été commis par {P}"
+      - "{P} {a} soustrait frauduleusement la somme de {M}"
+      - "la somme de {M} a été volée par {P}"
+      - "{P} {a} pris {M} dans la caisse sans autorisation"
+      - "{A} a dérobé {M} au préjudice de {B}"
+    VIREMENT:
+      - "{P} {a} viré {M} sur le compte de {S}"
+      - "un virement de {M} a été émis par {P} au profit de {S}"
+      - "{S} a reçu de {P} un virement de {M}"
+      - "{P} {a} ordonné un virement de {M} vers {S}"
+      - "la somme de {M} a été transférée par {P} à {S}"
+      - "{A} a fait virer {M} à {S} pour le compte de {B}"
+    APPEL:
+      - "{P} {a} passé un appel téléphonique"
+      - "un appel téléphonique a été passé par {P}"
+      - "{P} {a} eu une conversation téléphonique"
+      - "{P} {a} reçu un appel"
+      - "une communication téléphonique impliquant {P} a été relevée"
+      - "{A} a appelé {B}"
+      - "{A} a eu {B} au téléphone"
+    RENCONTRE:
+      - "{P} {a} participé à une rencontre"
+      - "une rencontre a réuni {P}"
+      - "{P} {a} pris part à une réunion"
+      - "une entrevue a eu lieu en présence de {P}"
+      - "{P} {a} assisté à un rendez-vous"
+      - "{A} a rencontré {B}"
+    SIGNATURE:
+      - "{P} {a} signé avec {S} un contrat de {M}"
+      - "un contrat d'un montant de {M} a été signé entre {S} et {P}"
+      - "{S} a conclu avec {P} une convention de {M}"
+      - "{P} {a} paraphé un contrat de {M} avec {S}"
+      - "la signature d'un accord de {M} entre {P} et {S} est intervenue"
+    CONTROLE:
+      - "{P} {a} procédé à un contrôle de {S}"
+      - "un contrôle a été effectué dans les locaux de {S} en présence de {P}"
+      - "{S} a fait l'objet d'un contrôle mené par {P}"
+      - "{P} {a} contrôlé les livres de {S}"
+      - "une vérification de {S} a été conduite par {P}"
+    INTERPELLATION:
+      - "les policiers ont interpellé {P}"
+      - "une interpellation de {P} a eu lieu"
+      - "{P} {a} fait l'objet d'une interpellation"
+      - "les enquêteurs ont procédé à l'interpellation de {P}"
+      - "l'arrestation de {P} a été réalisée"
+    CONSTATATION:
+      - "{P} {a} constaté des dégradations"
+      - "des dégradations ont été constatées par {P}"
+      - "{P} {a} relevé des traces d'effraction"
+      - "un constat de dommages a été dressé en présence de {P}"
+      - "{P} {a} signalé des dégâts matériels"
+  cadres:
+    PV_AUDITION:
+      - "Je sais que le {D} vers {H}, {L}, {N}."
+      - "À ma connaissance, {N} le {D} {L}."
+      - "Le {D}, j'ai appris que {N}."
+      - "Je peux vous dire que le {D} à {H}, {N}."
+    PV_CONSTATATION:
+      - "Le {D} à {H}, {L}, nous constatons que {N}."
+      - "Il ressort de nos constatations que {N} le {D} {L}."
+      - "Le {D}, {L}, {N}."
+    RAPPORT:
+      - "Le {D} à {H}, {L}, {N}."
+      - "Il est établi que le {D} {N}."
+      - "{N} le {D} vers {H} {L}."
+      - "L'enquête montre que, le {D}, {N} {L}."
+    COURRIER:
+      - "Nous vous informons que le {D} {N}."
+      - "Par la présente, je vous confirme que {N} le {D} à {H}."
+      - "Pour mémoire, le {D}, {L}, {N}."
+  pieces:
+    PV_AUDITION:
+      titre: ["PROCÈS-VERBAL D'AUDITION", "PROCÈS-VERBAL D'AUDITION DE TÉMOIN"]
+      ref: ["P.V. n° {REF}", "Procès-verbal n° : {REF}"]
+      date: ["Date : {DP}", "Fait le : {DP}"]
+      intro_auteur:
+        - "Le {DP}, nous, {AUT}, entendons {LOC}, qui déclare :"
+        - "Devant nous, {AUT}, comparaît le {DP} {LOC}, qui déclare :"
+      intro:
+        - "Le {DP}, entendons {LOC}, qui déclare :"
+        - "Comparaît le {DP} {LOC}, qui déclare :"
+      identite:
+        - "Je m'appelle {LOC}."
+        - "Je me nomme {LOC}."
+        - "Mon identité est {LOC}."
+        - "Je suis {LOC}."
+        - "Je déclare me nommer {LOC}."
+      alias:
+        - "On me surnomme {SUR}."
+        - "Tout le monde m'appelle {SUR}."
+        - "Dans le quartier, on m'appelle {SUR}."
+        - "Mon surnom est {SUR}."
+        - "Je suis connu sous le nom de {SUR}."
+      fin: ["Lecture faite, persiste et signe.", "Après lecture, le témoin signe avec nous."]
+    PV_CONSTATATION:
+      titre: ["PROCÈS-VERBAL DE CONSTATATIONS", "PROCÈS-VERBAL DE CONSTAT"]
+      ref: ["P.V. n° {REF}", "Procès-verbal n° : {REF}"]
+      date: ["Date : {DP}", "Fait le : {DP}"]
+      intro_auteur:
+        - "Nous, {AUT}, officier de police judiciaire, constatons ce qui suit :"
+        - "Le {DP}, nous, {AUT}, rapportons les constatations suivantes :"
+      intro:
+        - "Nous, officier de police judiciaire, constatons ce qui suit :"
+        - "Le {DP}, nous rapportons les constatations suivantes :"
+      fin: ["Dont acte.", "Clos le présent procès-verbal."]
+    RAPPORT:
+      titre: ["RAPPORT DE SYNTHÈSE", "RAPPORT D'ENQUÊTE"]
+      ref: ["Procédure n° {REF}", "Référence : {REF}"]
+      date: ["Date : {DP}", "Établi le : {DP}"]
+      intro_auteur: ["Rapport établi par {AUT}.", "Le présent rapport est rédigé par {AUT}."]
+      intro: ["Rapport établi par le service enquêteur.", "Le présent rapport résume l'enquête."]
+      fin: ["Fin du rapport.", "Tels sont les éléments recueillis à ce jour."]
+    COURRIER:
+      titre: ["{EXP}"]
+      ref: ["N/Réf. : {REF}", "Notre référence : {REF}"]
+      date: ["Le {DP}", "Courrier du {DP}"]
+      objet: ["Objet : informations sur le dossier", "Objet : votre demande de renseignements"]
+      intro: ["Madame, Monsieur,", "Maître,"]
+      fin:
+        - "Veuillez agréer, Madame, Monsieur, nos salutations distinguées."
+        - "Nous restons à votre disposition pour tout complément."
+      signature: ["{SIG}", "Pour la direction, {SIG}"]
+    CONTRAT:
+      titre: ["CONTRAT DE PRESTATION DE SERVICES", "CONTRAT DE VENTE"]
+      ref: ["Contrat n° {REF}", "Référence du contrat : {REF}"]
+      parties:
+        - "Entre {S} et {P}, il a été convenu ce qui suit."
+        - "Le présent contrat est conclu entre {S}, d'une part, et {P}, d'autre part."
+        - "Les parties au présent contrat sont {S} et {P}."
+        - "{S} confie à {P} la mission décrite ci-après."
+        - "Entre les soussignés : {S} et {P}."
+      prix:
+        - "Le prix est fixé à {M}."
+        - "En contrepartie, {S} versera {M}."
+        - "Le montant total s'élève à {M}."
+        - "La rémunération convenue est de {M}."
+        - "Les sommes dues sont de {M}."
+      fait:
+        - "Fait {L}, le {D}."
+        - "Fait {L}, le {D}, à {H}."
+        - "Signé {L} le {D}."
+        - "Contrat signé le {D} à {H}, {L}."
+        - "Ainsi fait le {D} {L}."
+      signatures: ["Signatures : {P}", "Signataires : {P}"]
+    RELEVE:
+      titre: ["RELEVÉ DE COMPTE", "RELEVÉ DE COMPTE BANCAIRE"]
+      ref: ["Compte n° {REF}", "Numéro de compte : {REF}"]
+      titulaire: ["Titulaire : {EXP}", "Titulaire du compte : {EXP}"]
+      periode: ["Période : du {D1} au {D2}", "Période du relevé : du {D1} au {D2}"]
+      colonnes: ["Date | Opération | Montant", "Date | Libellé | Montant"]
+      libelles:
+        - "Virement de {P} vers {S}"
+        - "VIR SEPA {P} au profit de {S}"
+        - "Virement émis par {P} pour {S}"
+        - "Transfert de {P} à {S}"
+        - "Ordre de virement {P} en faveur de {S}"
+
+test:
+  grades: [le major, le sous-lieutenant, le commandant, le maréchal des logis, l'enquêteur]
+  noyaux:
+    AUDITION:
+      - "{P} {a} répondu aux questions des enquêteurs"
+      - "l'audition de {P} a eu lieu"
+      - "les enquêteurs ont recueilli le témoignage de {P}"
+      - "{P} {a} fourni une déposition"
+      - "une déposition de {P} a été enregistrée"
+    VOL:
+      - "{P} {a} volé {M}"
+      - "{M} ont disparu du fait de {P}"
+      - "{P} {a} emporté une somme de {M}"
+      - "le vol de {M} est imputé à {P}"
+      - "{P} {a} détourné {M}"
+      - "{A} a volé {M} à {B}"
+    VIREMENT:
+      - "{P} {a} transféré {M} à {S}"
+      - "{S} a été créditée de {M} par {P}"
+      - "{P} {a} effectué un virement de {M} en faveur de {S}"
+      - "un transfert de {M} de {P} vers {S} a été enregistré"
+      - "{P} {a} versé {M} à {S} par virement"
+    APPEL:
+      - "{P} {a} téléphoné à plusieurs reprises"
+      - "{P} {a} échangé par téléphone"
+      - "un échange téléphonique concernant {P} a été enregistré"
+      - "{P} {a} pris un appel"
+      - "la ligne de {P} a servi pour un appel"
+      - "{A} a téléphoné à {B}"
+    RENCONTRE:
+      - "{P} {a} tenu une réunion"
+      - "une réunion s'est tenue avec {P}"
+      - "{P} {a} fréquenté le même rendez-vous"
+      - "un entretien a rassemblé {P}"
+      - "la présence de {P} à une réunion est attestée"
+      - "{A} a retrouvé {B}"
+    SIGNATURE:
+      - "{P} {a} conclu un contrat de {M} avec {S}"
+      - "{S} et {P} ont signé un accord portant sur {M}"
+      - "un marché de {M} a été signé par {P} pour {S}"
+      - "{P} {a} engagé {S} par un contrat de {M}"
+      - "l'accord de {M} liant {S} à {P} a été signé"
+    CONTROLE:
+      - "{P} {a} inspecté {S}"
+      - "une inspection de {S} a été réalisée par {P}"
+      - "{S} a été contrôlée par {P}"
+      - "{P} {a} vérifié la comptabilité de {S}"
+      - "un audit de {S} a été mené avec {P}"
+    INTERPELLATION:
+      - "la police a arrêté {P}"
+      - "le placement en garde à vue de {P} a été décidé"
+      - "une arrestation visant {P} a eu lieu"
+      - "les gendarmes ont appréhendé {P}"
+      - "{P} {a} subi une interpellation"
+    CONSTATATION:
+      - "{P} {a} remarqué une vitre brisée"
+      - "une porte forcée a été constatée par {P}"
+      - "{P} {a} découvert des dommages"
+      - "des traces de lutte ont été relevées par {P}"
+      - "{P} {a} fait état de dégradations"
+  cadres:
+    PV_AUDITION:
+      - "Je me souviens que le {D} à {H}, {N}."
+      - "D'après moi, {N} le {D}, {L}."
+      - "Le {D} vers {H}, j'ai su que {N}."
+      - "Il me semble que {N} le {D}."
+    PV_CONSTATATION:
+      - "Nous observons que le {D} vers {H} {N}."
+      - "Constatons que, le {D}, {L}, {N}."
+      - "En date du {D}, {N}."
+    RAPPORT:
+      - "Il apparaît que le {D}, {L}, {N}."
+      - "En date du {D} à {H}, {N}."
+      - "Les investigations établissent que {N} le {D}."
+    COURRIER:
+      - "Je vous signale que le {D} à {H}, {N}."
+      - "Nous attirons votre attention sur le fait que {N} le {D}."
+      - "Comme convenu, le {D}, {L}, {N}."
+  pieces:
+    PV_AUDITION:
+      titre: ["PROCÈS-VERBAL D'AUDITION DE PERSONNE", "PROCÈS-VERBAL : AUDITION"]
+      ref: ["Numéro du P.V. : {REF}", "Numéro du procès-verbal : {REF}"]
+      date: ["Daté du : {DP}", "Le : {DP}"]
+      intro_auteur:
+        - "Nous, {AUT}, recevons le {DP} la déposition de {LOC} :"
+        - "Ce {DP}, {AUT} recueille les propos de {LOC} :"
+      intro:
+        - "Nous recevons le {DP} la déposition de {LOC} :"
+        - "Ce {DP}, sont recueillis les propos de {LOC} :"
+      identite:
+        - "Mon nom est {LOC}."
+        - "Je réponds au nom de {LOC}."
+        - "Je m'identifie comme {LOC}."
+        - "Je me présente : {LOC}."
+        - "Vous avez devant vous {LOC}."
+      alias:
+        - "On m'a toujours appelé {SUR}."
+        - "Mes amis me disent {SUR}."
+        - "Mon sobriquet est {SUR}."
+        - "Certains me connaissent comme {SUR}."
+        - "J'ai pour surnom {SUR}."
+      fin: ["Le témoin relit et signe.", "Fin de la déposition, signature du déclarant."]
+    PV_CONSTATATION:
+      titre: ["PROCÈS-VERBAL DE CONSTATATIONS MATÉRIELLES", "PROCÈS-VERBAL : CONSTATATIONS"]
+      ref: ["Numéro du P.V. : {REF}", "Numéro du procès-verbal : {REF}"]
+      date: ["Daté du : {DP}", "Le : {DP}"]
+      intro_auteur:
+        - "Nous, {AUT}, consignons les observations ci-dessous :"
+        - "Ce {DP}, {AUT} note les éléments suivants :"
+      intro:
+        - "Nous consignons les observations ci-dessous :"
+        - "Ce {DP}, sont notés les éléments suivants :"
+      fin: ["Fin des constatations.", "Le présent acte est clos."]
+    RAPPORT:
+      titre: ["RAPPORT D'INVESTIGATIONS", "RAPPORT DE FIN D'ENQUÊTE"]
+      ref: ["Dossier n° {REF}", "Numéro de procédure : {REF}"]
+      date: ["Daté du : {DP}", "Rédigé le : {DP}"]
+      intro_auteur: ["Auteur du rapport : {AUT}.", "Rédacteur : {AUT}."]
+      intro: ["Synthèse des investigations menées.", "Résumé des faits établis."]
+      fin: ["Clôture du rapport.", "Le rapport s'arrête ici."]
+    COURRIER:
+      titre: ["{EXP}"]
+      ref: ["Votre contact : {REF}", "Réf. dossier : {REF}"]
+      date: ["Envoyé le {DP}", "En date du {DP}"]
+      objet: ["Objet : suite à votre courrier", "Objet : éléments demandés"]
+      intro: ["Monsieur le Commissaire,", "Madame la Juge,"]
+      fin:
+        - "Recevez nos meilleures salutations."
+        - "Avec nos remerciements, nous vous prions de croire en notre considération."
+      signature: ["{SIG}", "Le responsable, {SIG}"]
+    CONTRAT:
+      titre: ["CONTRAT DE FOURNITURE", "CONTRAT DE CESSION"]
+      ref: ["Convention n° {REF}", "Numéro de convention : {REF}"]
+      parties:
+        - "Les soussignés {S} et {P} conviennent de ce qui suit."
+        - "Il est convenu entre {S} et {P} les dispositions suivantes."
+        - "{S} et {P} s'engagent selon les termes ci-dessous."
+        - "Sont parties à la présente convention {S} et {P}."
+        - "{P} {a} accepté les conditions proposées par {S}."
+      prix:
+        - "La somme convenue est de {M}."
+        - "Le règlement s'élève à {M}."
+        - "{S} s'engage à payer {M}."
+        - "Le coût de la prestation est arrêté à {M}."
+        - "Le total à régler est de {M}."
+      fait:
+        - "Signé le {D} {L}."
+        - "Conclu le {D}, à {H}, {L}."
+        - "Établi {L} en date du {D}."
+        - "Accord passé le {D} {L}."
+        - "Rédigé {L}, le {D} à {H}."
+      signatures: ["Ont signé : {P}", "Pour accord : {P}"]
+    RELEVE:
+      titre: ["RELEVÉ D'OPÉRATIONS", "EXTRAIT DE COMPTE"]
+      ref: ["Compte : {REF}", "Identifiant du compte : {REF}"]
+      titulaire: ["Client : {EXP}", "Au nom de : {EXP}"]
+      periode: ["Opérations : du {D1} au {D2}", "Extrait couvrant : du {D1} au {D2}"]
+      colonnes: ["Date | Détail | Somme", "Date | Nature | Somme"]
+      libelles:
+        - "Paiement de {P} à {S}"
+        - "Versement {P} pour {S}"
+        - "Transfert émis par {P} vers {S}"
+        - "Règlement {P} au bénéfice de {S}"
+        - "Remise de fonds de {P} à {S}"

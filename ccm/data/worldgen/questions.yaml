@@ -1,0 +1,413 @@
+# Gabarits des questions et des synthèses de référence (SPEC.md §12, §10 bis).
+# Un jeu par réservoir : `entrainement` (entraînement et validation) et `test` ; aucun texte commun.
+#
+# Questions. {E} : description d'un événement ; {X} : personne ou société citée ;
+# {D} : date (seule dans « par_date ») ; {E1} {E2} : deux événements ; {EL} : liste d'événements ;
+# {il} {lui} : pronoms accordés au genre de la personne de la question précédente.
+#
+# Synthèses. Mots en minuscules, sans chiffre, sans nombre en lettres (ni « un », ni « une »),
+# sans mois, sans négation, sans sigle : le contrôle le refuse (règles du masque, §10 bis).
+# Champs : {P} participants nommés dans la source, {a} « a » ou « ont », {M} montants,
+# {S} société, {D} date, {H} heure, {L} lieu avec « à » ou « au », {X} {Y} noms,
+# {V0} {V1} valeurs contradictoires, {C} calcul. Un groupe [ … ] est gardé seulement si
+# tous ses champs existent dans la source.
+
+entrainement:
+  evenements:
+    AUDITION: ["l'audition de {X}", "la déposition de {X}"]
+    VOL: ["le vol commis par {X}", "le vol reproché à {X}"]
+    VIREMENT: ["le virement fait par {X}", "le virement ordonné par {X}"]
+    APPEL: ["l'appel téléphonique de {X}", "la conversation téléphonique de {X}"]
+    RENCONTRE: ["la rencontre avec {X}", "la réunion à laquelle {X} a participé"]
+    SIGNATURE: ["le contrat signé par {X}", "la signature du contrat par {X}"]
+    CONTROLE: ["le contrôle mené avec {X}", "le contrôle auquel {X} a pris part"]
+    INTERPELLATION: ["l'interpellation de {X}", "l'arrestation de {X}"]
+    CONSTATATION: ["le constat fait par {X}", "la constatation faite par {X}"]
+  evenements_societe:
+    VIREMENT: ["le virement reçu par {X}", "le virement au profit de {X}"]
+    SIGNATURE: ["le contrat conclu avec {X}", "le contrat passé avec {X}"]
+    CONTROLE: ["le contrôle de {X}", "le contrôle subi par {X}"]
+  par_date:
+    AUDITION: ["l'audition du {D}"]
+    VOL: ["le vol du {D}"]
+    VIREMENT: ["le virement du {D}"]
+    APPEL: ["l'appel téléphonique du {D}"]
+    RENCONTRE: ["la rencontre du {D}"]
+    SIGNATURE: ["la signature de contrat du {D}"]
+    CONTROLE: ["le contrôle du {D}"]
+    INTERPELLATION: ["l'interpellation du {D}"]
+    CONSTATATION: ["le constat du {D}"]
+  qualif_date: [" du {D}", " le {D}"]
+  relais:
+    AUDITION: ["la personne entendue en même temps que {X}"]
+    VOL: ["la personne qui a commis un vol avec {X}"]
+    VIREMENT: ["la personne qui a fait un virement avec {X}"]
+    APPEL: ["la personne qui a eu {X} au téléphone"]
+    RENCONTRE: ["la personne qui a rencontré {X}"]
+    SIGNATURE: ["la personne qui a signé un contrat avec {X}"]
+    CONTROLE: ["la personne qui a participé à un contrôle avec {X}"]
+    INTERPELLATION: ["la personne interpellée en même temps que {X}"]
+    CONSTATATION: ["la personne qui a fait des constatations avec {X}"]
+  attributs:
+    DATE: ["Quand a eu lieu {E} ?", "À quelle date situer {E} ?", "De quand date {E} ?"]
+    HEURE:
+      - "À quelle heure a eu lieu {E} ?"
+      - "Quelle est l'heure de {E} ?"
+      - "À quel moment de la journée a eu lieu {E} ?"
+    LIEU: ["Où a eu lieu {E} ?", "Quel est le lieu de {E} ?", "À quel endroit a eu lieu {E} ?"]
+    MONTANT:
+      - "Quel montant était en jeu dans {E} ?"
+      - "Quelle somme concerne {E} ?"
+      - "Quel est le montant de {E} ?"
+    SOCIETE:
+      - "Quelle société était concernée par {E} ?"
+      - "Quelle entreprise est liée à {E} ?"
+      - "Quelle est la société en cause dans {E} ?"
+    PERSONNE:
+      - "Qui d'autre était impliqué dans {E} ?"
+      - "Quelles autres personnes ont pris part à {E} ?"
+      - "Quels autres participants compte {E} ?"
+  calculs:
+    SOMME:
+      - "Quel est le montant total de {E1} et de {E2} ?"
+      - "Quelle somme atteignent ensemble {E1} et {E2} ?"
+      - "Additionnés, combien font les montants de {E1} et de {E2} ?"
+    SOMME_UNE: ["Quel est le total des montants de {E} ?", "Combien font au total les sommes de {E} ?"]
+    ECART:
+      - "Quel écart sépare le montant de {E1} et celui de {E2} ?"
+      - "Quelle est la différence entre le montant de {E1} et celui de {E2} ?"
+    DUREE: ["Combien de jours séparent {E1} et {E2} ?", "Quel délai s'est écoulé entre {E1} et {E2} ?"]
+    MIN:
+      - "Quel est le plus petit montant parmi {EL} ?"
+      - "Quelle est la somme la plus faible parmi {EL} ?"
+    MAX:
+      - "Quel est le montant le plus élevé parmi {EL} ?"
+      - "Quelle est la plus grosse somme parmi {EL} ?"
+  suites:
+    DATE: ["Et quand cela s'est-il passé ?", "Et à quelle date ?"]
+    HEURE: ["Et à quelle heure ?", "Et vers quelle heure cela s'est-il produit ?"]
+    LIEU: ["Et où cela s'est-il passé ?", "Et où se trouvait-{il} alors ?"]
+    MONTANT: ["Et pour quel montant ?", "Et quelle somme était en jeu ?"]
+    SOCIETE: ["Et quelle société était concernée ?", "Et avec quelle entreprise ?"]
+    PERSONNE: ["Et qui était avec {lui} ?", "Et avec qui était-{il} ?"]
+  declarations:
+    MEME: ["{X} et {Y} sont la même personne.", "Je précise que {X} et {Y} désignent la même personne."]
+    DIFFERENT:
+      - "{X} et {Y} sont deux personnes différentes."
+      - "Attention, {X} et {Y} ne sont pas la même personne."
+  synthese:
+    AUDITION:
+      - "les enquêteurs ont entendu {P}."
+      - "l'audition concerne {P}."
+      - "{P} {a} déposé devant les enquêteurs."
+      - "d'après la pièce, {P} {a} fait l'objet de l'audition."
+      - "les déclarations de {P} ont été recueillies."
+    VOL:
+      - "{P} {a} commis le vol[ de {M}]."
+      - "le vol[ de {M}] est le fait de {P}."
+      - "{P} {a} dérobé[ la somme de {M}]."
+      - "d'après la pièce, {P} {a} pris part au vol[ portant sur {M}]."
+      - "{P} {a} volé[ {M}]."
+    VIREMENT:
+      - "{P} {a} viré[ {M}][ à la société {S}]."
+      - "le virement[ de {M}] émane de {P}[ au profit de la société {S}]."
+      - "{P} {a} ordonné le virement[ de {M}][ vers la société {S}]."
+      - "d'après la pièce, {P} {a} transféré[ {M}][ à la société {S}]."
+      - "les fonds envoyés par {P}[ à la société {S}][ s'élèvent à {M}]."
+    APPEL:
+      - "{P} {a} passé l'appel téléphonique."
+      - "l'appel téléphonique implique {P}."
+      - "{P} {a} échangé par téléphone."
+      - "d'après la pièce, {P} {a} eu cette conversation téléphonique."
+      - "la communication téléphonique concerne {P}."
+    RENCONTRE:
+      - "{P} {a} participé à la rencontre."
+      - "la rencontre réunit {P}."
+      - "{P} {a} pris part à cette réunion."
+      - "d'après la pièce, {P} {a} assisté au rendez-vous."
+      - "l'entrevue s'est tenue en présence de {P}."
+    SIGNATURE:
+      - "{P} {a} signé le contrat[ de {M}][ avec la société {S}]."
+      - "le contrat[ conclu avec la société {S}] engage {P}[ pour {M}]."
+      - "{P} {a} conclu l'accord[ de {M}][ avec la société {S}]."
+      - "d'après la pièce, {P} {a} paraphé le contrat[ avec la société {S}][ pour {M}]."
+      - "la signature du contrat[ de {M}] implique {P}[ et la société {S}]."
+    CONTROLE:
+      - "{P} {a} participé au contrôle[ de la société {S}]."
+      - "le contrôle[ de la société {S}] a été mené par {P}."
+      - "{P} {a} vérifié les comptes[ de la société {S}]."
+      - "d'après la pièce, {P} {a} pris part à l'inspection[ de la société {S}]."
+      - "la vérification[ visant la société {S}] associe {P}."
+    INTERPELLATION:
+      - "l'interpellation concerne {P}."
+      - "les policiers ont interpellé {P}."
+      - "{P} {a} fait l'objet de l'interpellation."
+      - "d'après la pièce, l'arrestation vise {P}."
+      - "la police a arrêté {P}."
+    CONSTATATION:
+      - "{P} {a} constaté les dégradations."
+      - "les constatations ont été faites par {P}."
+      - "{P} {a} relevé des dommages."
+      - "d'après la pièce, {P} {a} signalé des dégâts."
+      - "le constat associe {P}."
+    CIRCONSTANCES:
+      - "les faits ont eu lieu le {D}[ vers {H}][ {L}]."
+      - "cela s'est produit[ {L}] le {D}[ à {H}]."
+      - "la date retenue est le {D}[, vers {H}][, {L}]."
+      - "l'événement est daté du {D}[ et situé {L}][, à {H}]."
+      - "le {D}[ à {H}], les faits se sont déroulés[ {L}]."
+    ALIAS:
+      - "{X} porte le surnom {Y}."
+      - "le surnom de {X} est {Y}."
+      - "{Y} désigne {X}."
+      - "d'après cette pièce, {X} se fait appeler {Y}."
+      - "{X} et {Y} désignent la même personne."
+    RESSEMBLANCE:
+      - "la pièce nomme cette personne {Y}."
+      - "cette personne apparaît sous la forme {Y}."
+      - "le nom écrit dans la pièce est {Y}."
+      - "{Y} semble désigner la personne visée."
+      - "la personne de la question correspond probablement à {Y}."
+    CONFLIT:
+      - "les témoins se contredisent : {V0} contre {V1}."
+      - "les sources divergent, avec {V0} face à {V1}."
+      - "les versions s'opposent : {V0} ou {V1}."
+      - "il existe des versions contradictoires : {V0} et {V1}."
+      - "les témoignages diffèrent entre {V0} et {V1}."
+    SOMME:
+      - "le total de ces montants atteint {C}."
+      - "ensemble, ces sommes font {C}."
+      - "l'addition des montants donne {C}."
+      - "au total, cela représente {C}."
+      - "la somme cumulée s'élève à {C}."
+    ECART:
+      - "l'écart entre ces montants est de {C}."
+      - "la différence s'élève à {C}."
+      - "ces sommes diffèrent de {C}."
+      - "la soustraction des montants donne {C}."
+      - "l'écart constaté atteint {C}."
+    DUREE:
+      - "ces faits sont séparés de {C}."
+      - "le délai entre ces dates est de {C}."
+      - "il s'écoule {C} entre ces faits."
+      - "la durée entre ces événements atteint {C}."
+      - "l'intervalle entre ces dates vaut {C}."
+    MIN:
+      - "le montant minimal est {C}."
+      - "la somme la plus faible vaut {C}."
+      - "le minimum de ces montants est {C}."
+      - "parmi ces sommes, la plus basse atteint {C}."
+      - "le montant le moins élevé est {C}."
+    MAX:
+      - "le plus gros montant est {C}."
+      - "la somme la plus élevée vaut {C}."
+      - "le maximum de ces montants est {C}."
+      - "parmi ces sommes, la plus haute atteint {C}."
+      - "le montant le plus important est {C}."
+    DISTINCTS:
+      - "{X} et {Y} apparaissent ensemble dans cette pièce."
+      - "cette pièce cite {X} aux côtés de {Y}."
+      - "{X} et {Y} y figurent comme des personnes distinctes."
+      - "la pièce mentionne à la fois {X} et {Y}."
+      - "{X} agit ici avec {Y}, ce qui les distingue."
+
+test:
+  evenements:
+    AUDITION: ["l'interrogatoire de {X}", "le témoignage recueilli auprès de {X}"]
+    VOL: ["le vol attribué à {X}", "le larcin de {X}"]
+    VIREMENT: ["le transfert d'argent réalisé par {X}", "le virement émis par {X}"]
+    APPEL: ["l'échange téléphonique de {X}", "le coup de téléphone de {X}"]
+    RENCONTRE: ["le rendez-vous de {X}", "l'entrevue avec {X}"]
+    SIGNATURE: ["l'accord conclu par {X}", "le contrat paraphé par {X}"]
+    CONTROLE: ["l'inspection à laquelle {X} a participé", "la vérification menée avec {X}"]
+    INTERPELLATION: ["l'interpellation dont {X} a fait l'objet", "l'arrestation visant {X}"]
+    CONSTATATION: ["le constat établi par {X}", "la découverte faite par {X}"]
+  evenements_societe:
+    VIREMENT: ["le transfert d'argent vers {X}", "le versement destiné à {X}"]
+    SIGNATURE: ["l'accord passé avec {X}", "la convention signée avec {X}"]
+    CONTROLE: ["l'inspection de {X}", "la vérification visant {X}"]
+  par_date:
+    AUDITION: ["le témoignage recueilli le {D}"]
+    VOL: ["le vol survenu le {D}"]
+    VIREMENT: ["le transfert d'argent survenu le {D}"]
+    APPEL: ["le coup de téléphone passé le {D}"]
+    RENCONTRE: ["le rendez-vous tenu le {D}"]
+    SIGNATURE: ["l'accord conclu le {D}"]
+    CONTROLE: ["l'inspection menée le {D}"]
+    INTERPELLATION: ["l'arrestation survenue le {D}"]
+    CONSTATATION: ["la découverte faite le {D}"]
+  qualif_date: [" en date du {D}", " à la date du {D}"]
+  relais:
+    AUDITION: ["la personne auditionnée aux côtés de {X}"]
+    VOL: ["la personne ayant volé avec {X}"]
+    VIREMENT: ["la personne ayant participé à un transfert d'argent avec {X}"]
+    APPEL: ["la personne ayant téléphoné avec {X}"]
+    RENCONTRE: ["la personne ayant retrouvé {X}"]
+    SIGNATURE: ["la personne ayant conclu un accord avec {X}"]
+    CONTROLE: ["la personne ayant inspecté une société avec {X}"]
+    INTERPELLATION: ["la personne arrêtée avec {X}"]
+    CONSTATATION: ["la personne ayant découvert des dommages avec {X}"]
+  attributs:
+    DATE: ["À quelle date remonte {E} ?", "Quelle est la date de {E} ?", "Pouvez-vous dater {E} ?"]
+    HEURE:
+      - "À quelle heure situer {E} ?"
+      - "Quelle heure était-il lors de {E} ?"
+      - "Pouvez-vous donner l'heure de {E} ?"
+    LIEU:
+      - "Où situer {E} ?"
+      - "Quel endroit correspond à {E} ?"
+      - "Pouvez-vous indiquer le lieu de {E} ?"
+    MONTANT:
+      - "Combien d'argent représente {E} ?"
+      - "Quelle somme a été en cause lors de {E} ?"
+      - "Pouvez-vous donner le montant de {E} ?"
+    SOCIETE:
+      - "Quelle entreprise apparaît dans {E} ?"
+      - "Quelle société est mentionnée à propos de {E} ?"
+      - "Pouvez-vous nommer la société liée à {E} ?"
+    PERSONNE:
+      - "Qui a participé à {E} ?"
+      - "Quelles personnes sont mêlées à {E} ?"
+      - "Pouvez-vous citer les participants à {E} ?"
+  calculs:
+    SOMME:
+      - "À combien s'élèvent au total {E1} et {E2} ?"
+      - "Pouvez-vous additionner les sommes de {E1} et de {E2} ?"
+    SOMME_UNE: ["Quelle est la somme cumulée de {E} ?", "Pouvez-vous totaliser les montants de {E} ?"]
+    ECART:
+      - "De combien diffèrent les montants de {E1} et de {E2} ?"
+      - "Pouvez-vous calculer l'écart entre les sommes de {E1} et de {E2} ?"
+    DUREE:
+      - "Combien de temps s'est-il passé entre {E1} et {E2} ?"
+      - "Pouvez-vous calculer la durée entre {E1} et {E2} ?"
+    MIN:
+      - "Quelle est la somme la moins élevée entre {EL} ?"
+      - "Pouvez-vous trouver le montant minimal entre {EL} ?"
+    MAX:
+      - "Quelle est la somme la plus forte entre {EL} ?"
+      - "Pouvez-vous trouver le montant maximal entre {EL} ?"
+  suites:
+    DATE: ["Et ça s'est passé quel jour ?", "Et la date, s'il vous plaît ?"]
+    HEURE: ["Et l'heure ?", "Et à quel moment de la journée ?"]
+    LIEU: ["Et où était-{il} à ce moment ?", "Et le lieu ?"]
+    MONTANT: ["Et la somme ?", "Et combien d'argent ?"]
+    SOCIETE: ["Et l'entreprise concernée ?", "Et quelle société ?"]
+    PERSONNE: ["Et qui l'accompagnait ?", "Et {il} était avec qui ?"]
+  declarations:
+    MEME: ["{X}, c'est {Y}.", "Sachez que {X} n'est autre que {Y}."]
+    DIFFERENT: ["{X} n'est pas {Y}.", "Il ne faut pas confondre {X} et {Y}."]
+  synthese:
+    AUDITION:
+      - "{P} {a} répondu aux questions des enquêteurs."
+      - "le témoignage de {P} a été recueilli."
+      - "les policiers ont auditionné {P}."
+      - "selon cette pièce, {P} {a} livré sa version."
+      - "la déposition émane de {P}."
+    VOL:
+      - "{P} {a} emporté[ {M}]."
+      - "le larcin[ de {M}] est imputé à {P}."
+      - "{P} {a} détourné[ la somme de {M}]."
+      - "selon cette pièce, {P} {a} participé au vol[ de {M}]."
+      - "la disparition[ de {M}] est attribuée à {P}."
+    VIREMENT:
+      - "{P} {a} versé[ {M}][ à la société {S}]."
+      - "le transfert[ de {M}] provient de {P}[ en faveur de la société {S}]."
+      - "{P} {a} effectué le transfert[ de {M}][ pour la société {S}]."
+      - "selon cette pièce, {P} {a} envoyé[ {M}][ à la société {S}]."
+      - "la société {S} a reçu des fonds de {P}[ pour {M}]."
+    APPEL:
+      - "{P} {a} téléphoné."
+      - "l'échange téléphonique implique {P}."
+      - "{P} {a} pris part à cet appel."
+      - "selon cette pièce, {P} {a} communiqué par téléphone."
+      - "la ligne de {P} a servi pour cet échange."
+    RENCONTRE:
+      - "{P} {a} assisté à la réunion."
+      - "l'entretien rassemble {P}."
+      - "{P} {a} tenu cette réunion."
+      - "selon cette pièce, {P} {a} pris place au rendez-vous."
+      - "la réunion s'est déroulée avec {P}."
+    SIGNATURE:
+      - "{P} {a} paraphé l'accord[ de {M}][ avec la société {S}]."
+      - "l'accord[ passé avec la société {S}] lie {P}[ à hauteur de {M}]."
+      - "{P} {a} engagé la société {S} par contrat[ pour {M}]."
+      - "selon cette pièce, {P} {a} signé le marché[ de {M}][ avec la société {S}]."
+      - "la convention[ de {M}] associe {P}[ à la société {S}]."
+    CONTROLE:
+      - "{P} {a} inspecté la société {S}."
+      - "l'audit[ de la société {S}] a été conduit par {P}."
+      - "{P} {a} examiné la comptabilité[ de la société {S}]."
+      - "selon cette pièce, {P} {a} mené l'inspection[ de la société {S}]."
+      - "la société {S} a été inspectée avec {P}."
+    INTERPELLATION:
+      - "la police a appréhendé {P}."
+      - "l'arrestation concerne {P}."
+      - "{P} {a} subi l'interpellation."
+      - "selon cette pièce, les gendarmes ont arrêté {P}."
+      - "la garde à vue vise {P}."
+    CONSTATATION:
+      - "{P} {a} découvert les dommages."
+      - "les dégâts ont été remarqués par {P}."
+      - "{P} {a} fait état de dégradations."
+      - "selon cette pièce, {P} {a} observé des traces suspectes."
+      - "le relevé des dommages associe {P}."
+    CIRCONSTANCES:
+      - "la scène se passe le {D}[ {L}][ vers {H}]."
+      - "ceci a eu lieu le {D}[ à {H}][ {L}]."
+      - "les éléments renvoient au {D}[, à {H}][, {L}]."
+      - "le moment retenu est le {D}[, {L}][, vers {H}]."
+      - "en date du {D}[, vers {H}], la scène se déroule[ {L}]."
+    ALIAS:
+      - "{X} se fait surnommer {Y}."
+      - "{Y} est le sobriquet de {X}."
+      - "{X} répond aussi au nom de {Y}."
+      - "selon cette pièce, {Y} et {X} renvoient à la même personne."
+      - "on connaît {X} sous le nom de {Y}."
+    RESSEMBLANCE:
+      - "cette pièce écrit le nom sous la forme {Y}."
+      - "la personne figure ici comme {Y}."
+      - "{Y} correspond vraisemblablement à la personne demandée."
+      - "le document mentionne {Y}, qui semble être la même personne."
+      - "la forme {Y} paraît désigner cette personne."
+    CONFLIT:
+      - "les récits divergent : {V0} face à {V1}."
+      - "les dépositions se contredisent entre {V0} et {V1}."
+      - "il y a contradiction : {V0} contre {V1}."
+      - "les témoins avancent {V0} puis {V1}."
+      - "les déclarations recueillies opposent {V0} à {V1}."
+    SOMME:
+      - "le cumul de ces sommes vaut {C}."
+      - "réunies, ces sommes donnent {C}."
+      - "le montant global atteint {C}."
+      - "en additionnant ces sommes, on obtient {C}."
+      - "le total calculé est de {C}."
+    ECART:
+      - "la différence entre ces sommes vaut {C}."
+      - "ces montants s'écartent de {C}."
+      - "l'écart calculé est de {C}."
+      - "entre ces sommes, la différence atteint {C}."
+      - "le décalage entre ces montants est de {C}."
+    DUREE:
+      - "le temps écoulé entre ces faits est de {C}."
+      - "ces événements sont espacés de {C}."
+      - "la période entre ces dates couvre {C}."
+      - "il se passe {C} entre ces faits."
+      - "la distance entre ces dates atteint {C}."
+    MIN:
+      - "la somme minimale vaut {C}."
+      - "le montant le plus bas atteint {C}."
+      - "la plus faible de ces sommes est {C}."
+      - "parmi ces montants, le minimum vaut {C}."
+      - "le plus modeste de ces montants est {C}."
+    MAX:
+      - "la somme maximale vaut {C}."
+      - "le montant le plus haut atteint {C}."
+      - "la plus forte de ces sommes est {C}."
+      - "parmi ces montants, le maximum vaut {C}."
+      - "le plus élevé de ces montants est {C}."
+    DISTINCTS:
+      - "{X} et {Y} figurent côte à côte dans ce document."
+      - "ce document nomme {X} en même temps que {Y}."
+      - "{X} y côtoie {Y}, ce sont donc des personnes distinctes."
+      - "le document mentionne {X} et {Y} ensemble."
+      - "{X} intervient ici avec {Y}."
