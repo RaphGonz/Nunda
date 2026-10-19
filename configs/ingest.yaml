@@ -1,3 +1,46 @@
-# Champs ajoutés avec la phase qui les utilise.
+# Champs ajoutés avec la phase qui les utilise. Valeurs de départ (SPEC.md §5).
 version: 1
 description: "Ingestion : extraction, segmentation, nombres, doublons, conflits (SPEC.md §5)."
+
+# Étape 1 : extraction (ingest/extract.py). Distances en points typographiques.
+extraction:
+  ocr_caracteres_min: 20
+  ocr_dpi: 300
+  ocr_langue: fra
+  tesseract: [tesseract, "C:/Program Files/Tesseract-OCR/tesseract.exe"]
+  tessdata: runs/modeles/tessdata
+  gouttiere_min: 15
+  largeur_min_colonne: 150
+  ecart_bloc: 1.5
+  facteur_paragraphe: 0.2
+  facteur_paragraphe_ocr: 0.65
+
+# Étape 2 : pièces et types (ingest/piece_type.py). Le premier motif trouvé donne le type ;
+# tous sont des motifs d'en-tête.
+pieces:
+  lignes_en_tete: 15
+  motifs:
+    - {motif: "PROCÈS-VERBAL D'AUDITION", type: PV_AUDITION}
+    - {motif: "PROCÈS-VERBAL DE CONSTAT", type: PV_CONSTATATION}
+    - {motif: "RAPPORT", type: RAPPORT}
+    - {motif: "CONTRAT", type: CONTRAT}
+    - {motif: "RELEVÉ DE COMPTE", type: RELEVE}
+    - {motif: "RÉQUISITION", type: AUTRE}
+    - {motif: "PROCÈS-VERBAL", type: AUTRE}
+    - {motif: "P\\.V\\. n°", type: AUTRE}
+    - {motif: "Article L\\.", type: LOI}
+  rang: {LOI: 1}
+
+# Étapes 3 et 3 bis : segmentation (ingest/segment.py).
+segmentation:
+  dependance_mots: [Toutefois, Cependant, Dans ce cas, En effet, Ainsi, Par conséquent,
+    Il, Elle, Ils, Elles, Celui-ci, Celle-ci, Ce dernier, Cette dernière]
+  mots_min: 4
+  motif_question: "(?:Q|QUESTION|Question)\\s*[:.–-]"
+  motif_reponse: "(?:R|RÉPONSE|Réponse)\\s*[:.–-]"
+  # Points qui ne finissent pas une phrase (les initiales « J. », « P.V. » aussi).
+  abreviations: [M, MM, Mme, Mmes, Mlle, Me, Mes, Dr, Pr, art, Art, al, cf, chap, p, pp,
+    réf, Réf, n, "no", vol, éd, c, Cass, crim, civ, com, soc, ass, plén, ch, av, bd, boul,
+    janv, févr, avr, juil, sept, oct, nov, déc, env, ex, St, Ste]
+  # 128 jetons du tokenizer quand il existera (phase 5).
+  mots_max: 80

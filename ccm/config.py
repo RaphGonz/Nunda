@@ -11,6 +11,8 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict
 
+from ccm.schema import TypePiece
+
 CONFIGS_DIR = Path(__file__).resolve().parent.parent / "configs"
 
 
@@ -21,8 +23,53 @@ class ConfigBase(BaseModel):
     description: str
 
 
+class _Bloc(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class ExtractionConfig(_Bloc):
+    """Étape 1 (SPEC.md §5). Distances en points."""
+
+    ocr_caracteres_min: int
+    ocr_dpi: int
+    ocr_langue: str
+    tesseract: tuple[str, ...]  # exécutables essayés dans l'ordre
+    tessdata: str  # dossier des modèles, relatif à la racine du dépôt (ignoré s'il manque)
+    gouttiere_min: float
+    largeur_min_colonne: float
+    ecart_bloc: float  # × hauteur médiane des mots
+    facteur_paragraphe: float  # × hauteur médiane des lignes (texte natif)
+    facteur_paragraphe_ocr: float
+
+
+class MotifPiece(_Bloc):
+    motif: str  # expression régulière, sensible à la casse
+    type: TypePiece
+
+
+class PiecesConfig(_Bloc):
+    """Étape 2 (SPEC.md §5)."""
+
+    lignes_en_tete: int
+    motifs: tuple[MotifPiece, ...]  # le premier trouvé donne le type
+    rang: dict[TypePiece, int]  # type absent : 0 (non classé)
+
+
+class SegmentationConfig(_Bloc):
+    """Étapes 3 et 3 bis (SPEC.md §5)."""
+
+    dependance_mots: tuple[str, ...]
+    mots_min: int
+    motif_question: str
+    motif_reponse: str
+    abreviations: tuple[str, ...]  # sans le point final
+    mots_max: int
+
+
 class IngestConfig(ConfigBase):
-    pass
+    extraction: ExtractionConfig
+    pieces: PiecesConfig
+    segmentation: SegmentationConfig
 
 
 class SearchConfig(ConfigBase):
