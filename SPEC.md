@@ -56,7 +56,7 @@ Tout le projet est en Python, dans un seul dépôt, et tourne hors ligne après 
 | Réseau de neurones | PyTorch 2.5 ou plus, `transformers`, `peft`, `tokenizers`, `safetensors` | PyTorch 2.5 est le minimum pour FlexAttention |
 | Stock et graphe | SQLite (bibliothèque standard) | Un fichier par base de dossiers |
 | Exemples d'entraînement | Parquet (`pyarrow`), un fichier par lot de 10 000 exemples |  |
-| PDF natif | PyMuPDF | Texte et position de chaque mot |
+| PDF natif | pypdfium2 (Apache 2.0 / BSD) | Texte et position de chaque caractère. PyMuPDF (AGPL) reste dans `worldgen`, outil interne non distribué (décision de Raphael, 2026-10-18 : code fermé, poids ouverts) |
 | OCR | Tesseract 5, modèle `fra` | Donne une confiance par mot. Option : docTR |
 | Phrases | Découpeur à règles (`pysbd`, français) et liste d'abréviations juridiques | Option pour les niveaux 2 et plus : `wtpsplit` |
 | Détection de noms | Union de GLiNER multilingue, spaCy `fr_core_news_lg` et règles | Modèles encodeurs, non génératifs. Vérifier chaque licence au téléchargement |
@@ -175,11 +175,11 @@ L'ingestion est une suite de 9 étapes de code, sans modèle génératif. Chaque
 
 | Étape | Algorithme | Paramètres de départ |
 | --- | --- | --- |
-| 1. Extraction | PyMuPDF, mot par mot, ordre de lecture par blocs (haut vers bas, colonnes détectées par groupes d'abscisses). Une page sans texte natif passe à l'OCR. Le code recolle les lignes et les mots coupés en fin de ligne ; il ne change rien d'autre. | OCR si la page a moins de 20 caractères natifs ; 300 dpi ; `ocr_conf` = moyenne des confiances des mots ; `ocr_bas` si < 0,85 |
+| 1. Extraction | pypdfium2, mot par mot, ordre de lecture par blocs (haut vers bas, colonnes détectées par groupes d'abscisses). Une page sans texte natif passe à l'OCR. Le code recolle les lignes et les mots coupés en fin de ligne ; il ne change rien d'autre. | OCR si la page a moins de 20 caractères natifs ; 300 dpi ; `ocr_conf` = moyenne des confiances des mots ; `ocr_bas` si < 0,85 |
 | 2. Pièces et types | Un fichier est une pièce. Dans un fichier, une nouvelle pièce commence à chaque page dont les 15 premières lignes contiennent un motif d'en-tête. Le type vient d'une table de motifs ; le rang vient d'une table type → rang. | Motifs : « PROCÈS-VERBAL », « P.V. n° », « RAPPORT », « RÉQUISITION », « CONTRAT », « RELEVÉ DE COMPTE », « Article L. ». Rang : loi et règlement 1, circulaire 2, doctrine 3, pédagogique 4, autre 0 (non classé) |
 | 3. Segmentation | Une proposition par phrase. Une phrase reçoit DÉPEND_DE vers la précédente si elle commence par un mot de la liste, si elle a moins de 4 mots, ou si elle est une réponse dans un motif question-réponse d'audition. | Liste : Toutefois, Cependant, Dans ce cas, En effet, Ainsi, Par conséquent, Il, Elle, Ils, Elles, Celui-ci, Celle-ci, Ce dernier, Cette dernière |
 | 3 bis. Phrases longues | Une phrase trop longue est coupée aux points-virgules et aux deux-points. Les parties ont le genre PARTIE et dépendent les unes des autres : citer une partie affiche la phrase entière. | Limite : 128 jetons du tokenizer du modèle (80 mots avant que le tokenizer existe) |
-| 4. Tableaux et formulaires | `find_tables()` de PyMuPDF. Une ligne devient une proposition « cellule \| cellule \| … », avec DÉPEND_DE vers la ligne d'en-tête. Une ligne « Libellé : valeur » devient une proposition CHAMP. | Motif de champ : libellé de 2 à 40 caractères avant « : » |
+| 4. Tableaux et formulaires | Détection des tableaux sans PyMuPDF (bibliothèque sans copyleft, choisie avec l'étape 4). Une ligne devient une proposition « cellule \| cellule \| … », avec DÉPEND_DE vers la ligne d'en-tête. Une ligne « Libellé : valeur » devient une proposition CHAMP. | Motif de champ : libellé de 2 à 40 caractères avant « : » |
 | 5. Noms | Voir section 6. |  |
 | 6. Nombres et dates | Expressions régulières pour les formats français. Les références (articles, numéros de PV, téléphones, IBAN, plaques) sont détectées avant et ne sont jamais des nombres. Un nombre en lettres est un slot seulement devant une unité connue. | Unités : €, %, km, m, kg, g, an, mois, jour, heure, minute, heure du jour. Une année seule (1900 à 2100) est une date de précision ANNEE |
 | 7. Doublons | Hachage SHA-1 du texte normalisé pour les copies exactes. MinHash sur des triplets de mots pour les quasi-copies. La copie de meilleure confiance OCR est la version gardée ; la recherche ignore les autres ; le rendu les liste (« aussi dans la pièce X, page Y »). | 128 permutations ; seuil de Jaccard 0,9 |
