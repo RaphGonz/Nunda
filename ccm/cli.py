@@ -45,16 +45,16 @@ def ingest(
     sources: Annotated[list[Path], typer.Argument(help="Fichiers PDF ou dossiers de PDF.")],
     stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (créée si absente).")],
 ) -> None:
-    """Ingère des pièces PDF dans un stock : extraction, pièces, propositions (SPEC.md §5)."""
+    """Ingère des pièces PDF dans un stock : pièces, propositions, nombres, doublons (§5)."""
     from ccm.config import load_config
-    from ccm.ingest.pipeline import fichiers_pdf, ingerer_fichier
+    from ccm.ingest.pipeline import fichiers_pdf, ingerer_fichiers
     from ccm.schema import ouvrir_stock
 
     cfg = load_config("ingest")
     con = ouvrir_stock(stock)
     try:
         fichiers = fichiers_pdf(sources)
-        pieces = [p for f in fichiers for p in ingerer_fichier(con, f, cfg)]
+        pieces = ingerer_fichiers(con, fichiers, cfg)
         n = con.execute("SELECT COUNT(*) FROM proposition").fetchone()[0]
     finally:
         con.close()

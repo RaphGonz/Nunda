@@ -195,7 +195,9 @@ def test_ocr_d_une_page_image(tmp_path):
 
 
 def test_dossier_synthetique(tmp_path):
-    """Chaque ligne d'une pièce synthétique (hors tableaux, étape 4) est une proposition."""
+    """Chaque ligne d'une pièce synthétique est une proposition ; un champ, une ligne de
+    tableau, un en-tête (sauf de courrier) en gardent le genre ; chaque nombre, date et
+    heure déclaré est lu."""
     for graine in (1_000_000, 1_000_003):
         d, pdfs, erreurs = produire_dossier(graine, "entrainement", WORLDGEN, frozenset())
         assert not erreurs
@@ -204,9 +206,35 @@ def test_dossier_synthetique(tmp_path):
             chemin = tmp_path / f"{d.id}-{piece.id}.pdf"
             chemin.write_bytes(pdfs[piece.id])
             assert len(ingerer_fichier(con, chemin, CFG)) == 1
-            props = Counter(textes(con, chemin.stem))
-            attendues = Counter(x.texte for x in piece.lignes if x.genre != "LIGNE_TABLEAU")
+            props = Counter(
+                con.execute(
+                    "SELECT texte, genre FROM proposition WHERE piece_id = ?", (chemin.stem,)
+                )
+            )
+            attendues = Counter(
+                (x.texte, x.genre)
+                for x in piece.lignes
+                if x.genre != "PHRASE" and not (x.genre == "EN_TETE" and piece.type == "COURRIER")
+            )
             assert attendues - props == Counter(), piece.id
+            assert (
+                Counter(x.texte for x in piece.lignes) - Counter(t for t, _ in props) == Counter()
+            )
+            lus = Counter(
+                r[0]
+                for r in con.execute(
+                    "SELECT surface FROM nombre JOIN proposition USING (prop_id) "
+                    "WHERE piece_id = ?",
+                    (chemin.stem,),
+                )
+            )
+            declares = Counter(
+                f.surface
+                for x in piece.lignes
+                for f in x.faits
+                if f.genre in ("NUM", "DATE", "HEURE")
+            )
+            assert declares - lus == Counter(), piece.id
             t = con.execute("SELECT type FROM piece WHERE piece_id = ?", (chemin.stem,)).fetchone()
             assert t[0] == ("AUTRE" if piece.type == "COURRIER" else piece.type)
 

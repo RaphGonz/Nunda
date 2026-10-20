@@ -1,8 +1,9 @@
 """Suite des étapes de l'ingestion, d'un fichier PDF au stock (SPEC.md §5).
 
-Étapes faites : 1 (extraction), 2 (pièces et types), 3 et 3 bis (segmentation). Un
-fichier déjà ingéré (même SHA-256) est ignoré. La première pièce d'un fichier porte le
-nom du fichier sans extension, les suivantes `<nom>.2`, `<nom>.3`, …
+Étapes faites : 1 (extraction), 2 (pièces et types), 3 et 3 bis (segmentation), 4
+(tableaux et champs), 6 (nombres et dates), 7 (doublons, recalculés sur tout le stock
+après les fichiers). Un fichier déjà ingéré (même SHA-256) est ignoré. La première pièce
+d'un fichier porte le nom du fichier sans extension, les suivantes `<nom>.2`, `<nom>.3`, …
 """
 
 import hashlib
@@ -10,8 +11,10 @@ import sqlite3
 from pathlib import Path
 
 from ccm.config import IngestConfig
-from ccm.graph.store import ajouter_piece, piece_connue
+from ccm.graph.store import ajouter_nombres, ajouter_piece, piece_connue
+from ccm.ingest.dedup import dedoublonner
 from ccm.ingest.extract import lire_pdf
+from ccm.ingest.numbers import nombres
 from ccm.ingest.piece_type import decouper_pieces
 from ccm.ingest.segment import segmenter
 
@@ -25,7 +28,7 @@ def ingerer_fichier(con: sqlite3.Connection, chemin: Path, cfg: IngestConfig) ->
     for k, piece in enumerate(decouper_pieces(lire_pdf(chemin, cfg.extraction), cfg.pieces)):
         pid = chemin.stem if k == 0 else f"{chemin.stem}.{k + 1}"
         props, aretes = segmenter(piece, cfg)
-        ajouter_piece(
+        ids = ajouter_piece(
             con,
             pid,
             chemin.as_posix(),
@@ -36,7 +39,17 @@ def ingerer_fichier(con: sqlite3.Connection, chemin: Path, cfg: IngestConfig) ->
             [(p.page, p.texte, p.genre, p.conf) for p in props],
             aretes,
         )
+        for i, p in zip(ids, props, strict=True):
+            ajouter_nombres(con, i, nombres(p.texte, cfg.nombres))
         ajoutees.append(pid)
+    con.commit()
+    return ajoutees
+
+
+def ingerer_fichiers(con: sqlite3.Connection, fichiers: list[Path], cfg: IngestConfig) -> list[str]:
+    """Ingère les fichiers, puis recalcule les doublons du stock ; rend les pièces ajoutées."""
+    ajoutees = [p for f in fichiers for p in ingerer_fichier(con, f, cfg)]
+    dedoublonner(con, cfg.doublons)
     con.commit()
     return ajoutees
 

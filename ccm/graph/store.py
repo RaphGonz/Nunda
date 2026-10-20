@@ -41,3 +41,24 @@ def ajouter_piece(
         "INSERT INTO arete VALUES (?, ?, ?)", [(ids[a], ids[b], str(t)) for a, b, t in aretes]
     )
     return ids
+
+
+def ajouter_nombres(con: sqlite3.Connection, prop_id: int, nombres) -> None:
+    """Nombres et dates d'une proposition (`ingest.numbers.NombreLu`)."""
+    con.executemany(
+        "INSERT INTO nombre (prop_id, debut, fin, surface, genre, valeur, unite, precision_date) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+            (
+                prop_id,
+                n.debut,
+                n.fin,
+                n.surface,
+                str(n.genre),
+                n.valeur,
+                n.unite,
+                None if n.precision is None else str(n.precision),
+            )
+            for n in nombres
+        ],
+    )
