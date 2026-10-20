@@ -27,9 +27,18 @@ class _Bloc(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+class TableauxConfig(_Bloc):
+    """Étape 4 (SPEC.md §5) : cellules tracées. Distances en points."""
+
+    cote_min: float  # largeur et hauteur minimales d'une cellule (un filet n'en est pas une)
+    tolerance: float  # écart d'ordonnée admis entre les cellules d'une rangée
+    cellules_min: int
+
+
 class ExtractionConfig(_Bloc):
     """Étape 1 (SPEC.md §5). Distances en points."""
 
+    tableaux: TableauxConfig
     ocr_caracteres_min: int
     ocr_dpi: int
     ocr_langue: str
@@ -64,12 +73,42 @@ class SegmentationConfig(_Bloc):
     motif_reponse: str
     abreviations: tuple[str, ...]  # sans le point final
     mots_max: int
+    motif_champ: str  # étape 4 : paragraphe « Libellé : valeur »
+
+
+class UniteConfig(_Bloc):
+    unite: str
+    formes: tuple[str, ...]  # expressions régulières, après le nombre
+
+
+class NombresConfig(_Bloc):
+    """Étape 6 (SPEC.md §5)."""
+
+    references: tuple[str, ...]  # expressions régulières ; jamais des nombres
+    mois: tuple[str, ...]  # janvier … décembre
+    annee_min: int
+    annee_max: int
+    unites: tuple[UniteConfig, ...]  # la première forme trouvée l'emporte
+    unite_heure_du_jour: str
+    avant_heure_du_jour: tuple[str, ...]  # « à 21 heures » : heure du jour, pas durée
+    lettres: dict[str, int]  # nombres en lettres ; 100 et plus : multiplicateurs
+
+
+class DoublonsConfig(_Bloc):
+    """Étape 7 (SPEC.md §5)."""
+
+    permutations: int
+    seuil_jaccard: float
+    mots_par_triplet: int
+    graine: int
 
 
 class IngestConfig(ConfigBase):
     extraction: ExtractionConfig
     pieces: PiecesConfig
     segmentation: SegmentationConfig
+    nombres: NombresConfig
+    doublons: DoublonsConfig
 
 
 class SearchConfig(ConfigBase):

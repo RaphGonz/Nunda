@@ -4,6 +4,8 @@ description: "Ingestion : extraction, segmentation, nombres, doublons, conflits 
 
 # Étape 1 : extraction (ingest/extract.py). Distances en points typographiques.
 extraction:
+  # Étape 4 : cellules tracées (rectangles) ; une rangée a au moins 2 cellules.
+  tableaux: {cote_min: 2, tolerance: 1, cellules_min: 2}
   ocr_caracteres_min: 20
   ocr_dpi: 300
   ocr_langue: fra
@@ -44,3 +46,45 @@ segmentation:
     janv, févr, avr, juil, sept, oct, nov, déc, env, ex, St, Ste]
   # 128 jetons du tokenizer quand il existera (phase 5).
   mots_max: 80
+  # Étape 4 : paragraphe « Libellé : valeur », libellé de 2 à 40 caractères.
+  motif_champ: '[^:]{2,40}:\s+\S'
+
+# Étape 6 : nombres et dates (ingest/numbers.py). Motifs sensibles à la casse.
+nombres:
+  references:
+    - '\d{4}/\d{3,}'                                   # numéro de PV, de compte
+    - '(?:[Aa]rticles?|[Aa]rt\.)\s+(?:[LRDA]\.?\s*)?\d+(?:[-–.]\d+)*'
+    - '[LRD]\.\s?\d+(?:-\d+)*'                         # article L. 121-1
+    - 'n°\s*:?\s*[\w/.-]*\d[\w/.-]*'                     # n° 12, n° 2025/123
+    - '(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}'             # téléphone
+    - '[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,3})?'  # IBAN
+    - '[A-Z]{2}-\d{3}-[A-Z]{2}'                          # plaque
+  mois: [janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre,
+    novembre, décembre]
+  annee_min: 1900
+  annee_max: 2100
+  unites:
+    - {unite: "€", formes: ["€", "euros?", "EUR"]}
+    - {unite: "%", formes: ["%", "pour ?cent"]}
+    - {unite: km, formes: [km, "kilomètres?"]}
+    - {unite: kg, formes: [kg, "kilos?(?:grammes?)?"]}
+    - {unite: mois, formes: [mois]}
+    - {unite: m, formes: [m, "mètres?"]}
+    - {unite: g, formes: [g, "grammes?"]}
+    - {unite: an, formes: ["ans?", "années?"]}
+    - {unite: jour, formes: ["jours?"]}
+    - {unite: heure, formes: ["heures?"]}
+    - {unite: minute, formes: ["minutes?", min]}
+  unite_heure_du_jour: heure du jour
+  avant_heure_du_jour: [à, À, vers, Vers, dès, Dès, jusqu'à]
+  lettres: {zéro: 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7,
+    huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15,
+    seize: 16, vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60,
+    cent: 100, cents: 100, mille: 1000}  # 100 et plus : multiplicateurs
+
+# Étape 7 : doublons (ingest/dedup.py).
+doublons:
+  permutations: 128
+  seuil_jaccard: 0.9
+  mots_par_triplet: 3
+  graine: 1
