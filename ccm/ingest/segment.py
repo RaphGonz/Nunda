@@ -8,6 +8,12 @@ phrase vers la précédente) si la phrase commence par un mot de la liste, a moi
 `mots_min` mots, ou répond à une question dans une audition. Une phrase de plus de
 `mots_max` mots est coupée après les points-virgules et les deux-points : ses parties
 ont le genre PARTIE et dépendent l'une de l'autre dans les deux sens.
+
+Étape 4 : une rangée de tableau est une proposition LIGNE_TABLEAU « cellule | … » ; la
+première rangée d'un tableau (rangées qui se suivent, même d'une page à l'autre) en est
+l'en-tête, les autres en dépendent. Un paragraphe « Libellé : valeur » (`motif_champ`)
+est une proposition CHAMP, non découpée en phrases, sauf s'il est une question ou une
+réponse d'audition (« Question : … »).
 """
 
 import re
@@ -81,6 +87,15 @@ def _depend(phrase: str, precedente: str | None, audition: bool, cfg: Segmentati
     )
 
 
+def _champ(texte: str, cfg: SegmentationConfig) -> bool:
+    """« Libellé : valeur », sauf une question ou une réponse d'audition."""
+    return (
+        re.match(cfg.motif_champ, texte) is not None
+        and re.match(cfg.motif_question, texte) is None
+        and re.match(cfg.motif_reponse, texte) is None
+    )
+
+
 def segmenter(
     piece: PieceLue, cfg: IngestConfig
 ) -> tuple[list[PropLue], list[tuple[int, int, TypeArete]]]:
@@ -90,6 +105,7 @@ def segmenter(
     audition = piece.type == TypePiece.PV_AUDITION
     premiere = piece.pages[0].numero
     precedente = None
+    tete = None  # ligne d'en-tête du tableau en cours
     for par in paragraphes(piece.pages):
         en_tete = (
             par.page == premiere
@@ -97,9 +113,22 @@ def segmenter(
             and motif_en_tete(par.texte, cfg.pieces) is not None
             and not any(c.islower() for c in par.texte)
         )
-        if en_tete:
-            conf = par.conf(0, len(par.texte))
-            props.append(PropLue(par.texte, GenreProposition.EN_TETE, par.page, conf))
+        if par.rangee:
+            genre = GenreProposition.LIGNE_TABLEAU
+        elif en_tete:
+            genre = GenreProposition.EN_TETE
+        elif _champ(par.texte, cfg.segmentation):
+            genre = GenreProposition.CHAMP
+        else:
+            genre = None
+        if not par.rangee:
+            tete = None
+        elif tete is None:
+            tete = len(props)
+        else:
+            aretes.append((len(props), tete, TypeArete.DEPEND_DE))
+        if genre is not None:
+            props.append(PropLue(par.texte, genre, par.page, par.conf(0, len(par.texte))))
             precedente = par.texte
             continue
         for d, f in phrases(par.texte, cfg.segmentation):

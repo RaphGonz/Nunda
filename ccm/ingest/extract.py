@@ -8,6 +8,13 @@ paragraphes (écart entre deux lignes plus grand qu'une part de la hauteur médi
 lignes ; boîtes de police pour le texte natif, boîtes serrées pour l'OCR, d'où deux
 facteurs). Le code recolle les lignes et les mots coupés en fin de ligne ; il ne change
 rien d'autre. Coordonnées en points, origine en haut à gauche.
+
+Tableaux (étape 4) : les cellules sont les rectangles tracés de la page (objets chemin de
+pdfium). Les rectangles de même ordonnée et de même hauteur forment une rangée ; une
+rangée d'au moins `cellules_min` cellules est une ligne de tableau. Les mots des cellules
+sortent du texte courant ; la rangée y entre comme un seul mot (sa boîte), placé par la
+coupe XY comme le reste, puis devient un paragraphe à part. Un tableau en image (OCR)
+n'est pas détecté.
 """
 
 import csv
@@ -19,8 +26,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pypdfium2 as pdfium
+import pypdfium2.raw as pdfium_c
 
-from ccm.config import ExtractionConfig
+from ccm.config import ExtractionConfig, TableauxConfig
 
 RACINE = Path(__file__).resolve().parent.parent.parent
 
@@ -33,6 +41,7 @@ class Mot:
     x1: float
     y1: float
     conf: float = 1.0
+    cellules: tuple[tuple["Mot", ...], ...] | None = None  # rangée : mots de chaque cellule
 
 
 @dataclass(frozen=True)
@@ -41,6 +50,7 @@ class Paragraphe:
     page: int  # page du fichier où il commence (1, 2, …)
     ligne: int  # rang de sa première ligne dans la page (0, 1, …)
     mots: tuple[tuple[int, int, float], ...]  # (début, fin, confiance) de chaque mot
+    rangee: bool = False  # ligne de tableau : « cellule | cellule | … »
 
     def conf(self, debut: int, fin: int) -> float:
         """Moyenne des confiances des mots de texte[debut:fin]."""
@@ -125,6 +135,45 @@ def _mots_ocr(page: pdfium.PdfPage, cfg: ExtractionConfig) -> list[Mot]:
     return mots
 
 
+def _rangees(page: pdfium.PdfPage, cfg: TableauxConfig) -> list[list[tuple[float, ...]]]:
+    """Rangées de cellules tracées (x0, y0, x1, y1), chacune de gauche à droite."""
+    hauteur = page.get_height()
+    boites = []
+    for o in page.get_objects(filter=[pdfium_c.FPDF_PAGEOBJ_PATH]):
+        g, b, d, h = o.get_bounds()
+        if d - g >= cfg.cote_min and h - b >= cfg.cote_min:
+            boites.append((g, hauteur - h, d, hauteur - b))
+    rangees: list[list[tuple[float, ...]]] = []
+    for c in sorted(boites, key=lambda c: (c[1], c[0])):
+        r = rangees[-1] if rangees else None
+        if r and abs(r[0][1] - c[1]) <= cfg.tolerance and abs(r[0][3] - c[3]) <= cfg.tolerance:
+            r.append(c)
+        else:
+            rangees.append([c])
+    return [r for r in rangees if len(r) >= cfg.cellules_min]
+
+
+def _sortir_tableaux(mots: list[Mot], rangees: list[list[tuple[float, ...]]]) -> list[Mot]:
+    """Remplace les mots des cellules par un mot par rangée (sa boîte, ses cellules)."""
+
+    def dans(m: Mot, c: tuple[float, ...]) -> bool:
+        x, y = (m.x0 + m.x1) / 2, (m.y0 + m.y1) / 2
+        return c[0] <= x <= c[2] and c[1] <= y <= c[3]
+
+    pris: set[int] = set()
+    out = []
+    for r in rangees:
+        cellules = []
+        for c in r:
+            ks = [k for k, m in enumerate(mots) if k not in pris and dans(m, c)]
+            pris.update(ks)
+            cellules.append(tuple(mots[k] for k in ks))
+        if any(cellules):
+            texte = " | ".join(texte_ligne(list(c)) for c in cellules)
+            out.append(Mot(texte, r[0][0], r[0][1], r[-1][2], r[0][3], cellules=tuple(cellules)))
+    return [m for k, m in enumerate(mots) if k not in pris] + out
+
+
 def _gouttiere(mots: list[Mot], cfg: ExtractionConfig) -> float | None:
     """Abscisse d'une coupe entre deux colonnes, assez larges toutes les deux."""
     gauche, droite = min(m.x0 for m in mots), max(m.x1 for m in mots)
@@ -181,16 +230,25 @@ def lire_page(page: pdfium.PdfPage, numero: int, cfg: ExtractionConfig) -> Page:
     ocr = sum(len(m.texte) for m in mots) < cfg.ocr_caracteres_min
     if ocr:
         mots = _mots_ocr(page, cfg)
+    else:
+        mots = _sortir_tableaux(mots, _rangees(page, cfg.tableaux))
     if not mots:
         return Page(numero, ocr, [], [])
-    hauteur = statistics.median(m.y1 - m.y0 for m in mots)
+    texte = [m for m in mots if m.cellules is None] or mots
+    hauteur = statistics.median(m.y1 - m.y0 for m in texte)
     blocs = [_lignes(b) for b in _blocs(mots, cfg, cfg.ecart_bloc * hauteur)]
     facteur = cfg.facteur_paragraphe_ocr if ocr else cfg.facteur_paragraphe
-    seuil = facteur * statistics.median(_haut_bas(d)[1] - _haut_bas(d)[0] for b in blocs for d in b)
+    hauteurs = [_haut_bas(d)[1] - _haut_bas(d)[0] for b in blocs for d in b if not _est_rangee(d)]
+    seuil = facteur * statistics.median(hauteurs or [hauteur])
     paragraphes = []
     for b in blocs:
         for k, ligne in enumerate(b):
-            if k == 0 or _haut_bas(ligne)[0] - _haut_bas(b[k - 1])[1] > seuil:
+            if (
+                k == 0
+                or _est_rangee(ligne)
+                or _est_rangee(b[k - 1])
+                or _haut_bas(ligne)[0] - _haut_bas(b[k - 1])[1] > seuil
+            ):
                 paragraphes.append([])
             paragraphes[-1].append(ligne)
     return Page(numero, ocr, [d for b in blocs for d in b], paragraphes)
@@ -206,6 +264,10 @@ def lire_pdf(chemin: Path, cfg: ExtractionConfig) -> list[Page]:
 
 def texte_ligne(ligne: list[Mot]) -> str:
     return " ".join(m.texte for m in ligne)
+
+
+def _est_rangee(ligne: list[Mot]) -> bool:
+    return ligne[0].cellules is not None
 
 
 def _recoller(lignes: list[list[Mot]]) -> tuple[str, list[tuple[int, int, float]]]:
@@ -246,13 +308,34 @@ def paragraphes(pages: list[Page]) -> list[Paragraphe]:
     for p in pages:
         rang = 0
         for k, par in enumerate(p.paragraphes):
-            if k == 0 and groupes and _coupe_par_la_page(groupes[-1][2][-1], par[0], droite):
+            fin = groupes[-1][2][-1] if groupes else None
+            if (
+                k == 0
+                and fin is not None
+                and not _est_rangee(fin)
+                and not _est_rangee(par[0])
+                and _coupe_par_la_page(fin, par[0], droite)
+            ):
                 groupes[-1][2].extend(par)
             else:
                 groupes.append((p.numero, rang, list(par)))
             rang += len(par)
     out = []
     for numero, rang, lignes in groupes:
-        texte, mots = _recoller(lignes)
-        out.append(Paragraphe(texte, numero, rang, tuple(mots)))
+        if _est_rangee(lignes[0]):
+            out.append(_rangee(lignes[0][0], numero, rang))
+        else:
+            texte, mots = _recoller(lignes)
+            out.append(Paragraphe(texte, numero, rang, tuple(mots)))
     return out
+
+
+def _rangee(rangee: Mot, numero: int, rang: int) -> Paragraphe:
+    """Chaque cellule recollée comme un paragraphe ; cellules jointes par « | »."""
+    texte, spans = "", []
+    for k, cellule in enumerate(rangee.cellules or ()):
+        t, s = _recoller(_lignes(list(cellule))) if cellule else ("", [])
+        texte += " | " if k else ""
+        spans += [(d + len(texte), f + len(texte), c) for d, f, c in s]
+        texte += t
+    return Paragraphe(texte, numero, rang, tuple(spans), rangee=True)
