@@ -1,6 +1,6 @@
 # Proposition : conflits à deux niveaux
 
-État : **proposition, à valider par Raphael**. SPEC.md n'est pas modifié.
+État : **validée par Raphael le 2026-10-21** (rappel minimal laissé à l'agent : ≥ 0,5 sur heure et montant ; versions d'articles dès la phase 2). Appliquée dans SPEC.md §2, §5, §10, §11, §12, §14, §16 ; SPEC.md fait foi.
 Origine : séance du 2026-10-21 (JOURNAL.md). La règle de §5 donne une précision de 0,0003 sur
 la validation ; la règle « même fait » mesurée ensuite donne 0,86.
 
