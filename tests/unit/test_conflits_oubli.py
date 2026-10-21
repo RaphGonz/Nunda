@@ -1,41 +1,57 @@
-"""Ingestion, étape 8 (conflits) et suppression d'une personne : test T8 (SPEC.md §5, §14)."""
+"""Ingestion, étape 8 (conflits établis) et suppression d'une personne : test T8 (SPEC.md §5,
+§14)."""
 
 import json
 import re
 
 import pymupdf
+import pytest
 from typer.testing import CliRunner
 
-from ccm.anonymize.names import norme
+from ccm.anonymize.names import nom_famille, norme
 from ccm.cli import app
 from ccm.config import load_config
 from ccm.graph.store import ajouter_mentions, ajouter_nombres
-from ccm.ingest.conflicts import detecter_conflits, signature
+from ccm.ingest.conflicts import detecter_conflits
 from ccm.ingest.numbers import nombres
 from ccm.ingest.racines import racines
 from ccm.schema import ouvrir_stock
 from ccm.search.bm25 import construire_index, dossier_index
 
 CFG = load_config("ingest")
+NOMS = {
+    "Paul Morel": "PER",
+    "MOREL Paul": "PER",
+    "Jean Rival": "PER",
+    "Hugo Non": "PER",
+    "L.M.": "PER",
+    "Lyon": "LIEU",
+    "Brest": "LIEU",
+}
 
 
 def _mentions(texte, noms):
-    """Mentions PER de chaque occurrence des noms (en attendant l'étape 5)."""
+    """Mentions de chaque occurrence des noms (en attendant l'étape 5)."""
     return [
-        (m.start(), m.end(), n, norme(n, CFG.noms), "PER", "regle")
-        for n in noms
+        (m.start(), m.end(), n, norme(n, CFG.noms), t, "regle")
+        for n, t in noms.items()
         for m in re.finditer(re.escape(n), texte)
     ]
 
 
-def _stock(lignes, noms=()):
-    """Une pièce par ligne ; mentions des `noms`, nombres de l'étape 6."""
+def _stock(lignes, noms=NOMS):
+    """Une pièce par ligne (ou par (pièce, genre, texte)) ; mentions, nombres de l'étape 6."""
     con = ouvrir_stock(":memory:")
-    for k, texte in enumerate(lignes):
-        con.execute("INSERT INTO piece (piece_id) VALUES (?)", (f"P{k}",))
+    ordre = {}
+    for k, ligne in enumerate(lignes):
+        piece, genre, texte = ligne if isinstance(ligne, tuple) else (f"P{k}", "PHRASE", ligne)
+        if piece not in ordre:
+            con.execute("INSERT INTO piece (piece_id) VALUES (?)", (piece,))
+        ordre[piece] = ordre.get(piece, -1) + 1
         pid = con.execute(
-            "INSERT INTO proposition (piece_id, ordre, texte, ocr_conf) VALUES (?, 0, ?, 1.0)",
-            (f"P{k}", texte),
+            "INSERT INTO proposition (piece_id, ordre, texte, genre, ocr_conf) "
+            "VALUES (?, ?, ?, ?, 1.0)",
+            (piece, ordre[piece], texte, genre),
         ).lastrowid
         ms = _mentions(texte, noms)
         ajouter_mentions(con, pid, ms)
@@ -49,50 +65,107 @@ def conflits(con):
     return con.execute(q).fetchall()
 
 
-def test_signature():
-    texte = "Le 7 décembre 2024 à 21h59, Paul Morel a versé 1 250 € à la société."
-    ms = [(t[0], t[1], "PER") for t in _mentions(texte, ["Paul Morel"])]
-    ns = [(n.debut, n.fin, n.genre, n.unite) for n in nombres(texte, CFG.nombres)]
-    assert signature(texte, ms, ns, CFG) == {
-        "DATE",
-        "NUM:heure_du_jour",
-        "NUM:€",
-        "PER",
-        *racines("a versé société", CFG.racines),
+def test_nom_famille():
+    attendu = {
+        "MOREL Paul": "morel",
+        "Paul Morel": "morel",
+        "Mme Rot": "rot",
+        "M. Boyer": "boyer",
+        "Jean de la Fontaine": "de la fontaine",
+        "DA SILVA Ana": "da silva",
+        "Jean-Luc Borac": "borac",
+        "L.M.": None,
+        "J.-P.": None,
+        "JP": None,
     }
+    assert {s: nom_famille(s, CFG.noms) for s in attendu} == attendu
 
 
-def test_conflit_de_valeur():
+def test_norme():
+    assert norme("M. Jean-Pierre DUPRÉ", CFG.noms) == "jean pierre dupre"
+    assert norme("Maître  Éloïse   Vadec", CFG.noms) == "eloise vadec"
+    assert norme("Major", CFG.noms) == "major"  # un mot seul reste
+
+
+def test_meme_fait_heure_differente():
     con = _stock(
         [
             "Le 7 décembre 2024 à 21h59, Paul Morel a versé 1 250 € à la société Vadec.",
-            "Le 7 décembre 2024 à 23h10, Paul Morel a versé 1 250 € à la société Vadec.",
+            "Le 07/12/2024 vers 23h10, MOREL Paul a fait un virement de 1250 euros à Vadec.",
             "Le 7 décembre 2024 à 21h59, Paul Morel a versé 1 250 € à la société Vadec.",
-            "Le 7 décembre 2024 à 21h59, Paul Morel a versé 900 € à la société Vadec.",
-        ],
-        ["Paul Morel"],
+        ]
     )
-    # 1 et 3 sont des copies : 3 n'est pas une version gardée.
+    # 3 est une copie de 1 : seule la version gardée entre.
     con.execute("UPDATE proposition SET groupe_doublon = 1 WHERE prop_id IN (1, 3)")
-    assert conflits(con) == [(1, 2), (1, 4), (2, 4)]
-    # Arête dans les deux sens.
-    assert con.execute("SELECT COUNT(*) FROM arete WHERE type = 'CONFLIT'").fetchone()[0] == 6
-    # Recalcul : pas d'arête en double.
-    assert conflits(con) == [(1, 2), (1, 4), (2, 4)]
+    assert conflits(con) == [(1, 2)]
+    # Arête dans les deux sens ; recalcul sans arête en double.
+    assert con.execute("SELECT COUNT(*) FROM arete WHERE type = 'CONFLIT'").fetchone()[0] == 2
+    assert conflits(con) == [(1, 2)]
 
 
-def test_pas_de_conflit():
+def test_montants_en_recouvrement_partiel():
     con = _stock(
         [
-            # Mêmes valeurs ; une date moins précise n'est pas une autre date.
-            "En décembre 2024, Paul Morel a versé 1 250 € à la société Vadec.",
-            "Le 7 décembre 2024, Paul Morel a versé 1 250 € à la société Vadec.",
-            # Noms non inclus l'un dans l'autre.
-            "Le 7 décembre 2024, Jean Rival a versé 300 € à la société Vadec.",
-            # Texte trop différent (Jaccard < 0,6).
-            "Le 9 mars 2023, Paul Morel a reçu 300 € pour la vente de la voiture rouge.",
-        ],
-        ["Paul Morel", "Jean Rival"],
+            "Le 3 mai 2024, Paul Morel a versé 1 250 € et 300 € à Vadec.",
+            "Le 3 mai 2024, Paul Morel a versé 1 250,00 € et 450 € à Vadec.",
+            # Sous-ensemble de 1 ; sans montant commun avec 2 : un autre montant du fait.
+            "Le 3 mai 2024, Paul Morel a versé 300 € à Vadec.",
+        ]
+    )
+    assert conflits(con) == [(1, 2)]
+
+
+@pytest.mark.parametrize(
+    "a, b",
+    [
+        # Une date différente : un autre fait (répétition, ou alibi : conflit supposé).
+        (
+            "Le 8 mai 2024 à 10h00, Paul Morel a versé 100 €.",
+            "Le 9 mai 2024 à 11h00, Paul Morel a versé 100 €.",
+        ),
+        # Aucun nom de famille commun ; des initiales n'en ont pas.
+        (
+            "Le 8 mai 2024 à 10h00, Paul Morel a versé 100 €.",
+            "Le 8 mai 2024 à 15h00, Jean Rival a versé 100 €.",
+        ),
+        (
+            "Le 8 mai 2024 à 10h00, Paul Morel a versé 100 €.",
+            "Le 8 mai 2024 à 15h00, L.M. a versé 100 €.",
+        ),
+        # Deux actes différents le même jour.
+        (
+            "Le 8 mai 2024 à 10h00, Paul Morel a versé 100 €.",
+            "Le 8 mai 2024 à 18h00, Paul Morel a été interpellé.",
+        ),
+        # Deux lieux différents.
+        (
+            "Le 8 mai 2024 à 10h00, à Lyon, Paul Morel a versé 100 €.",
+            "Le 8 mai 2024 à 20h00, à Brest, Paul Morel a versé 100 €.",
+        ),
+        # Mêmes valeurs, écrites autrement (décimal exact).
+        (
+            "Le 8 mai 2024 à 10h00, Paul Morel a versé 1 250 € et 300 €.",
+            "Le 08/05/2024 à 10:00, MOREL Paul a versé 1 250,00 € et 300,00 euros.",
+        ),
+        # Deux montants sans montant commun.
+        ("Le 8 mai 2024, Paul Morel a versé 100 €.", "Le 8 mai 2024, Paul Morel a versé 250 €."),
+        # « Non » dans un nom n'est pas une négation.
+        (
+            "Le 8 mai 2024, Hugo Non a signé le contrat.",
+            "Le 8 mai 2024, Hugo Non a signé le contrat avec Vadec.",
+        ),
+    ],
+)
+def test_pas_de_conflit(a, b):
+    assert conflits(_stock([a, b])) == []
+
+
+def test_pas_de_conflit_dans_une_meme_piece():
+    con = _stock(
+        [
+            ("P", "PHRASE", "Le 8 mai 2024 à 10h00, Paul Morel a versé 100 €."),
+            ("P", "PHRASE", "Le 8 mai 2024 à 11h00, Paul Morel a versé 100 €."),
+        ]
     )
     assert conflits(con) == []
 
@@ -100,19 +173,38 @@ def test_pas_de_conflit():
 def test_conflit_de_negation():
     con = _stock(
         [
-            "Paul Morel a signé le contrat de vente avec la société Vadec.",
-            "Paul Morel n'a pas signé le contrat de vente avec la société Vadec.",
-            "Paul Morel a signé le contrat de vente avec la société Vadec hier.",
-        ],
-        ["Paul Morel"],
+            "Le 8 mai 2024, Paul Morel a signé le contrat de vente.",
+            "Le 8 mai 2024, Paul Morel n'a pas signé le contrat de vente.",
+        ]
     )
-    assert conflits(con) == [(1, 2), (2, 3)]
+    assert conflits(con) == [(1, 2)]
 
 
-def test_norme():
-    assert norme("M. Jean-Pierre DUPRÉ", CFG.noms) == "jean pierre dupre"
-    assert norme("Maître  Éloïse   Vadec", CFG.noms) == "eloise vadec"
-    assert norme("Major", CFG.noms) == "major"  # un mot seul reste
+def test_versions_d_un_article():
+    con = _stock(
+        [
+            ("L1", "EN_TETE", "Code de commerce"),
+            ("L1", "PHRASE", "Article L. 121-1"),
+            ("L1", "PHRASE", "Le contrat est conclu par écrit."),  # 3
+            ("L1", "PHRASE", "Il est signé par les parties."),
+            ("L1", "PHRASE", "Article L. 121-2"),
+            ("L1", "PHRASE", "Le délai est de trois mois."),
+            ("L2", "EN_TETE", "Code de commerce"),
+            ("L2", "PHRASE", "Art. L121-1"),  # autre graphie de la même référence
+            ("L2", "PHRASE", "Le contrat est conclu par écrit ou par voie électronique."),  # 9
+            ("L2", "PHRASE", "Il est signé par les parties."),
+            ("L2", "PHRASE", "Article L. 121-2"),
+            ("L2", "PHRASE", "Le délai est de trois mois."),
+            # Même numéro, autre code : pas le même article.
+            ("L3", "PHRASE", "Article L. 121-1 du Code civil"),
+            ("L3", "PHRASE", "Le contrat est oral."),
+            # Sans code lu : ne se compare qu'à un article sans code.
+            ("L4", "PHRASE", "Article L. 121-1"),
+            ("L4", "PHRASE", "Le contrat est tacite."),
+        ],
+        noms={},
+    )
+    assert conflits(con) == [(3, 9)]
 
 
 def _pdf(chemin, lignes):
@@ -123,7 +215,7 @@ def _pdf(chemin, lignes):
     doc.save(chemin)
 
 
-NOMS = ["Talmo Brévaneau", "BRÉVANEAU Talmo", "Brévaneau"]
+NOMS_T8 = ["Talmo Brévaneau", "BRÉVANEAU Talmo", "Brévaneau"]
 CHAINES = ["Brévaneau", "BRÉVANEAU", "brevaneau", "Brevaneau", "Talmo", "talmo"]
 
 
@@ -156,10 +248,10 @@ def test_t8_oubli(tmp_path):
     # Étape 5 (pas encore écrite) : mentions posées à la main, puis index et conflits.
     con = ouvrir_stock(stock)
     for pid, texte in con.execute("SELECT prop_id, texte FROM proposition").fetchall():
-        ajouter_mentions(con, pid, _mentions(texte, NOMS + ["Paul Morel"]))
+        ajouter_mentions(con, pid, _mentions(texte, {n: "PER" for n in NOMS_T8 + ["Paul Morel"]}))
     con.execute(
         "INSERT INTO contrainte VALUES ('c1', 'MEME', ?, ?, NULL, 'u', '2026-10-21')",
-        (norme(NOMS[0], CFG.noms), norme(NOMS[2], CFG.noms)),
+        (norme(NOMS_T8[0], CFG.noms), norme(NOMS_T8[2], CFG.noms)),
     )
     con.execute(
         "INSERT INTO trace (reponse_id, question, revision_base) VALUES "
@@ -174,7 +266,7 @@ def test_t8_oubli(tmp_path):
     con.close()
     assert "brevaneau" in "".join(p.read_text("utf-8", "replace") for p in index.iterdir())
 
-    normes = sorted({norme(n, CFG.noms) for n in NOMS})
+    normes = sorted({norme(n, CFG.noms) for n in NOMS_T8})
     r = CliRunner().invoke(app, ["forget", *normes, "--stock", str(stock)])
     assert r.exit_code == 0, r.output
 
