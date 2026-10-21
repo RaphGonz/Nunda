@@ -45,10 +45,12 @@ def ingest(
     sources: Annotated[list[Path], typer.Argument(help="Fichiers PDF ou dossiers de PDF.")],
     stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (créée si absente).")],
 ) -> None:
-    """Ingère des pièces PDF dans un stock : pièces, propositions, nombres, doublons (§5)."""
+    """Ingère des pièces PDF dans un stock : pièces, propositions, nombres, doublons,
+    conflits (§5) ; reconstruit l'index BM25 (§7)."""
     from ccm.config import load_config
     from ccm.ingest.pipeline import fichiers_pdf, ingerer_fichiers
     from ccm.schema import ouvrir_stock
+    from ccm.search.bm25 import construire_index, dossier_index
 
     cfg = load_config("ingest")
     con = ouvrir_stock(stock)
@@ -56,9 +58,36 @@ def ingest(
         fichiers = fichiers_pdf(sources)
         pieces = ingerer_fichiers(con, fichiers, cfg)
         n = con.execute("SELECT COUNT(*) FROM proposition").fetchone()[0]
+        c = con.execute("SELECT COUNT(*) FROM arete WHERE type = 'CONFLIT'").fetchone()[0] // 2
+        construire_index(con, dossier_index(stock), cfg, load_config("search"))
     finally:
         con.close()
-    typer.echo(f"{len(fichiers)} fichiers, {len(pieces)} pièces ajoutées ; {n} propositions")
+    typer.echo(
+        f"{len(fichiers)} fichiers, {len(pieces)} pièces ajoutées ; {n} propositions, {c} conflits"
+    )
+
+
+@app.command()
+def forget(
+    noms: Annotated[list[str], typer.Argument(help="Noms normalisés à oublier.")],
+    stock: Annotated[Path, typer.Option(help="Base SQLite du dossier.")],
+) -> None:
+    """Oublie des personnes : caviarde leurs mentions, VACUUM, reconstruit l'index (§5)."""
+    from ccm.config import load_config
+    from ccm.graph.oubli import oublier
+    from ccm.schema import ouvrir_stock
+    from ccm.search.bm25 import construire_index, dossier_index
+
+    if not stock.exists():
+        raise typer.BadParameter(f"base absente : {stock}")
+    cfg = load_config("ingest")
+    con = ouvrir_stock(stock)
+    try:
+        n = oublier(con, noms, cfg)
+        construire_index(con, dossier_index(stock), cfg, load_config("search"))
+    finally:
+        con.close()
+    typer.echo(f"{n} propositions caviardées")
 
 
 if __name__ == "__main__":
