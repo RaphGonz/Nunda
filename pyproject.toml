@@ -5,10 +5,12 @@ description = "CCM : modèle de citation amnésique"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "bm25s>=0.2",
     "datasketch>=2.0.0",
     "pydantic>=2.9",
     "pypdfium2>=4.30",
     "pysbd>=0.3.4",
+    "pystemmer>=2.2",
     "pyyaml>=6.0",
     "typer>=0.12",
 ]

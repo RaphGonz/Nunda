@@ -62,3 +62,16 @@ def ajouter_nombres(con: sqlite3.Connection, prop_id: int, nombres) -> None:
             for n in nombres
         ],
     )
+
+
+def ajouter_mentions(
+    con: sqlite3.Connection,
+    prop_id: int,
+    mentions: list[tuple[int, int, str, str, str, str]],
+) -> None:
+    """Mentions d'une proposition : (début, fin, surface, norme, type, détecteurs)."""
+    con.executemany(
+        "INSERT INTO mention (prop_id, debut, fin, surface, norme, type, detecteurs) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [(prop_id, *m) for m in mentions],
+    )

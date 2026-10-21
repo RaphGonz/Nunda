@@ -103,16 +103,47 @@ class DoublonsConfig(_Bloc):
     graine: int
 
 
+class RacinesConfig(_Bloc):
+    """Racines des mots : signature des conflits (SPEC.md §5) et index BM25 (§7)."""
+
+    langue: str  # langue Snowball
+    mots_vides: tuple[str, ...]
+
+
+class NomsConfig(_Bloc):
+    """Norme d'un nom (SPEC.md §6)."""
+
+    titres: tuple[str, ...]  # retirés en tête, comparés après normalisation
+
+
+class ConflitsConfig(_Bloc):
+    """Étape 8 (SPEC.md §5)."""
+
+    permutations: int
+    seuil_jaccard: float
+    seuil_negation: float
+    graine: int
+    negation: tuple[str, ...]  # expressions régulières, sans casse
+
+
 class IngestConfig(ConfigBase):
     extraction: ExtractionConfig
     pieces: PiecesConfig
     segmentation: SegmentationConfig
     nombres: NombresConfig
     doublons: DoublonsConfig
+    racines: RacinesConfig
+    noms: NomsConfig
+    conflits: ConflitsConfig
+
+
+class Bm25Config(_Bloc):
+    k1: float
+    b: float
 
 
 class SearchConfig(ConfigBase):
-    pass
+    bm25: Bm25Config
 
 
 class ModelConfig(ConfigBase):

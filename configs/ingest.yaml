@@ -88,3 +88,35 @@ doublons:
   seuil_jaccard: 0.9
   mots_par_triplet: 3
   graine: 1
+
+# Racines des mots : signature des conflits (étape 8) et index BM25 (SPEC.md §7).
+# Minuscules, mots vides retirés, racines Snowball, puis accents retirés.
+# Mots vides : liste française de Snowball.
+racines:
+  langue: french
+  mots_vides: [au, aux, avec, ce, ces, dans, de, des, du, elle, en, et, eux, il, ils, je, la,
+    le, les, leur, lui, ma, mais, me, même, mes, moi, mon, ne, nos, notre, nous, "on", ou, par,
+    pas, pour, qu, que, qui, sa, se, ses, son, sur, ta, te, tes, toi, ton, tu, un, une, vos,
+    votre, vous, c, d, j, l, à, m, n, s, t, y, été, étée, étées, étés, étant, étante, étants,
+    étantes, suis, es, est, sommes, êtes, sont, serai, seras, sera, serons, serez, seront,
+    serais, serait, serions, seriez, seraient, étais, était, étions, étiez, étaient, fus, fut,
+    fûmes, fûtes, furent, sois, soit, soyons, soyez, soient, fusse, fusses, fût, fussions,
+    fussiez, fussent, ayant, ayante, ayantes, ayants, eu, eue, eues, eus, ai, as, avons, avez,
+    ont, aurai, auras, aura, aurons, aurez, auront, aurais, aurait, aurions, auriez, auraient,
+    avais, avait, avions, aviez, avaient, eut, eûmes, eûtes, eurent, aie, aies, ait, ayons,
+    ayez, aient, eusse, eusses, eût, eussions, eussiez, eussent]
+
+# Norme d'un nom (SPEC.md §6) : titres retirés en tête, comparés après normalisation.
+noms:
+  titres: [m, mm, mme, mmes, mlle, me, maitre, dr, pr, monsieur, madame, mademoiselle,
+    capitaine, lieutenant, commandant, colonel, brigadier, adjudant, major, gendarme]
+
+# Étape 8 : conflits (ingest/conflicts.py).
+conflits:
+  permutations: 128
+  seuil_jaccard: 0.6
+  seuil_negation: 0.8
+  graine: 1
+  # Marques de négation, sans casse (ne … pas, n', aucun, jamais, non).
+  negation: ['\bne\b[^.;:?!]*\bpas\b', '\bn[''’]', '\baucun(?:e|s|es)?\b', '\bjamais\b',
+    '\bnon\b']

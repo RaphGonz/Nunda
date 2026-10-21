@@ -1,9 +1,10 @@
 """Suite des étapes de l'ingestion, d'un fichier PDF au stock (SPEC.md §5).
 
 Étapes faites : 1 (extraction), 2 (pièces et types), 3 et 3 bis (segmentation), 4
-(tableaux et champs), 6 (nombres et dates), 7 (doublons, recalculés sur tout le stock
-après les fichiers). Un fichier déjà ingéré (même SHA-256) est ignoré. La première pièce
-d'un fichier porte le nom du fichier sans extension, les suivantes `<nom>.2`, `<nom>.3`, …
+(tableaux et champs), 6 (nombres et dates), 7 et 8 (doublons puis conflits, recalculés
+sur tout le stock après les fichiers). Un fichier déjà ingéré (même SHA-256) est ignoré.
+La première pièce d'un fichier porte le nom du fichier sans extension, les suivantes
+`<nom>.2`, `<nom>.3`, …
 """
 
 import hashlib
@@ -12,6 +13,7 @@ from pathlib import Path
 
 from ccm.config import IngestConfig
 from ccm.graph.store import ajouter_nombres, ajouter_piece, piece_connue
+from ccm.ingest.conflicts import detecter_conflits
 from ccm.ingest.dedup import dedoublonner
 from ccm.ingest.extract import lire_pdf
 from ccm.ingest.numbers import nombres
@@ -47,9 +49,11 @@ def ingerer_fichier(con: sqlite3.Connection, chemin: Path, cfg: IngestConfig) ->
 
 
 def ingerer_fichiers(con: sqlite3.Connection, fichiers: list[Path], cfg: IngestConfig) -> list[str]:
-    """Ingère les fichiers, puis recalcule les doublons du stock ; rend les pièces ajoutées."""
+    """Ingère les fichiers, puis recalcule les doublons et les conflits du stock ; rend les
+    pièces ajoutées."""
     ajoutees = [p for f in fichiers for p in ingerer_fichier(con, f, cfg)]
     dedoublonner(con, cfg.doublons)
+    detecter_conflits(con, cfg)
     con.commit()
     return ajoutees
 
