@@ -12,6 +12,12 @@ référence (faits PER, ORG, LIEU, REF de la vérité, norme de SPEC.md §6 ; no
 une mention retirés, comme le fera l'exclusion de l'étape 6).
 
     uv run python -m ccm.eval.conflits runs/corpus/niveau0/validation runs/conflits/validation
+    uv run python -m ccm.eval.conflits runs/corpus/niveau0/entrainement runs/conflits/entr 200
+
+Les règles se règlent sur la validation seulement ; un échantillon de l'entraînement, jamais
+regardé pendant le réglage, contrôle qu'elles ne collent pas à la validation. Les deux
+parties partagent les gabarits ; la mesure finale se fait une seule fois sur le test, dont
+les gabarits sont propres.
 """
 
 import json
@@ -135,15 +141,20 @@ def _scores(rs: list[dict], cle: str) -> dict:
         fn=fn,
         precision=round(vp / (vp + fp), 4) if vp + fp else None,
         rappel=round(vp / (vp + fn), 4) if vp + fn else None,
+        rappel_heure_montant=round(
+            sum(par_champ[(c, "vp")] for c in ("HEURE", "MONTANT"))
+            / max(1, sum(par_champ[(c, "ref")] for c in ("HEURE", "MONTANT"))),
+            4,
+        ),
         rappel_par_champ={
             c: f"{par_champ[(c, 'vp')]} / {par_champ[(c, 'ref')]}" for c in GENRE_CHAMP
         },
     )
 
 
-def main(source: Path, sortie: Path, processus: int = 8) -> dict:
+def main(source: Path, sortie: Path, tranche: slice = slice(None), processus: int = 8) -> dict:
     sortie.mkdir(parents=True, exist_ok=True)
-    dossiers = sorted(p for p in source.iterdir() if (p / "verite.json").exists())
+    dossiers = sorted(p for p in source.iterdir() if (p / "verite.json").exists())[tranche]
     with ProcessPoolExecutor(processus) as ex:
         rs = list(ex.map(mesurer_dossier, dossiers, [sortie] * len(dossiers)))
     bilan = dict(
@@ -161,4 +172,11 @@ def main(source: Path, sortie: Path, processus: int = 8) -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(main(Path(sys.argv[1]), Path(sys.argv[2])), ensure_ascii=False, indent=1))
+    # Tranche des dossiers : « 200 » (les 200 premiers) ou « 200:600 ».
+    t = [int(x) if x else None for x in sys.argv[3].split(":")] if len(sys.argv) > 3 else []
+    tranche = slice(*t) if len(t) == 2 else slice(t[0] if t else None)
+    print(
+        json.dumps(
+            main(Path(sys.argv[1]), Path(sys.argv[2]), tranche), ensure_ascii=False, indent=1
+        )
+    )
