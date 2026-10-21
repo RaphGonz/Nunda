@@ -104,7 +104,7 @@ class DoublonsConfig(_Bloc):
 
 
 class RacinesConfig(_Bloc):
-    """Racines des mots : signature des conflits (SPEC.md §5) et index BM25 (§7)."""
+    """Racines des mots : types d'acte des conflits (SPEC.md §5) et index BM25 (§7)."""
 
     langue: str  # langue Snowball
     mots_vides: tuple[str, ...]
@@ -114,16 +114,17 @@ class NomsConfig(_Bloc):
     """Norme d'un nom (SPEC.md §6)."""
 
     titres: tuple[str, ...]  # retirés en tête, comparés après normalisation
+    particules: tuple[str, ...]  # du nom de famille, après normalisation
 
 
 class ConflitsConfig(_Bloc):
-    """Étape 8 (SPEC.md §5)."""
+    """Étape 8 (SPEC.md §5) : conflits établis."""
 
-    permutations: int
-    seuil_jaccard: float
-    seuil_negation: float
-    graine: int
     negation: tuple[str, ...]  # expressions régulières, sans casse
+    unite_euro: str
+    actes: dict[str, tuple[str, ...]]  # type d'acte → mots, comparés par racine
+    motif_article: str  # groupe 1 : numéro de l'article
+    motif_code: str
 
 
 class IngestConfig(ConfigBase):

@@ -110,13 +110,38 @@ racines:
 noms:
   titres: [m, mm, mme, mmes, mlle, me, maitre, dr, pr, monsieur, madame, mademoiselle,
     capitaine, lieutenant, commandant, colonel, brigadier, adjudant, major, gendarme]
+  # Particules du nom de famille, après normalisation (« de la Fontaine », « van Dam »).
+  particules: [de, du, des, la, le, d, van, von, da, di, del, della]
 
-# Étape 8 : conflits (ingest/conflicts.py).
+# Étape 8 : conflits établis (ingest/conflicts.py).
 conflits:
-  permutations: 128
-  seuil_jaccard: 0.6
-  seuil_negation: 0.8
-  graine: 1
-  # Marques de négation, sans casse (ne … pas, n', aucun, jamais, non).
+  # Marques de négation, sans casse (ne … pas, n', aucun, jamais, non), hors des noms.
   negation: ['\bne\b[^.;:?!]*\bpas\b', '\bn[''’]', '\baucun(?:e|s|es)?\b', '\bjamais\b',
     '\bnon\b']
+  unite_euro: "€"
+  # Types d'acte : mots comparés par racine (nom, infinitif, participe : leurs racines
+  # diffèrent souvent). Valeur de départ, vocabulaire pénal courant, à reprendre sur de
+  # vraies pièces. Écartés pour collision : arrêt et arrêté (décision, décret), rendez
+  # (rendre), coup, communication (commune).
+  actes:
+    VIREMENT: [virement, virer, viré, transfert, transférer, transféré, versement, verser,
+      versé, paiement, payer, payé, chèque, prélèvement, prélever, prélevé]
+    SIGNATURE: [signature, signer, signé, contrat, accord, convention, parapher, paraphé,
+      conclure, conclu]
+    ARRESTATION: [arrestation, interpellation, interpeller, interpellé]
+    APPEL: [appel, appeler, appelé, téléphone, téléphoner, téléphoné, téléphonique, courriel,
+      joindre, joint]
+    RENCONTRE: [rencontre, rencontrer, rencontré, réunion, réunir, réuni, entrevue, entretien]
+    VOL: [vol, voler, volé, dérober, dérobé, soustraire, soustrait, cambriolage, cambrioler,
+      cambriolé, escroquerie, escroquer, escroqué, détournement, détourner, détourné]
+    CONTROLE: [contrôle, contrôler, contrôlé, vérification, vérifier, vérifié, inspection,
+      inspecter, inspecté, perquisition, perquisitionner, perquisitionné]
+    DEGRADATION: [dégradation, dégrader, dégradé, dégât, dégâts, dommage, endommager,
+      endommagé, effraction, destruction, détruire, détruit, casser, cassé]
+    AUDITION: [audition, auditionner, auditionné, entendre, entendu]
+    VIOLENCE: [violence, frapper, frappé, agression, agresser, agressé, blesser, blessé,
+      blessure, menace, menacer, menacé]
+  # Cas B : en-tête d'article en tête de proposition (groupe 1 : numéro) ; code cité dans
+  # l'en-tête de l'article ou de la pièce.
+  motif_article: '^(?:Article|ARTICLE|Art\.)\s+((?:[LRDA]\.?\s*)?\d+(?:\s*[-–.]\s*\d+)*)'
+  motif_code: '\b[Cc]ode (?:civil|pénal|général des impôts|de procédure (?:civile|pénale)|(?:de la |de l[''’]|des |du |de )[\w-]+)'
