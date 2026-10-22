@@ -65,6 +65,13 @@ def test_limites_cellules_et_bords_sans_lettre():
         ("SA Mon", "ORG"),
         ("12 rue Haute, Ly le", "LIEU"),
     ]
+    # Un numéro de rue reste dans la zone, quel que soit son type ; une date en sort.
+    t = "au 103 rue de la Poste, le 13 mars 2024 Datorien Corin"
+    zs = [Zone(3, 22, TypeNom.ORG, G), Zone(t.index("13"), len(t), TypeNom.PER, G)]
+    assert surfaces(t, limites(t, zs, CFG.noms, CFG.nombres.mois)) == [
+        ("103 rue de la Poste", "ORG"),
+        ("Datorien Corin", "PER"),
+    ]
 
 
 def test_d3_references():
@@ -88,7 +95,7 @@ def test_d3_references():
 
 @avec_lexiques
 def test_d4_majuscules():
-    t = "Par la présente, je confirme qu'Elodie Bamier et RIBORIER Belcorel ont vu S.M. au Tribunal."
+    t = "Je confirme qu'Elodie Bamier et RIBORIER Belcorel ont vu S.M. au Tribunal."
     assert surfaces(t, d4_majuscules(t, CFG.detection)) == [
         ("Elodie Bamier", "AUTRE"),
         ("RIBORIER Belcorel", "AUTRE"),
@@ -141,7 +148,7 @@ def test_detecter_sans_gliner_ni_spacy():
 @avec_gliner
 @avec_lexiques
 def test_detecter_quatre_detecteurs():
-    t = "Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat avec la SARL Delcoron à Lyon."
+    t = "Je confirme qu'Elodie Bamier a paraphé un contrat avec la SARL Delcoron à Lyon."
     s = surfaces(t, detecter([t], CFG)[0])
     assert ("Elodie Bamier", "PER") in s
     assert ("SARL Delcoron", "ORG") in s

@@ -26,7 +26,8 @@ FICHIERS = [
         ("gliner_multi-v2.1", f, _HF.format(depot=_GLINER[0], rev=_GLINER[1], fichier=f), h)
         for f, h in [
             ("gliner_config.json", None),
-            ("model.safetensors", "2100142f31627531497850659dcb3821c99d5e71c08a8e01a98e4b11ef32a199"),
+            ("model.safetensors",
+             "2100142f31627531497850659dcb3821c99d5e71c08a8e01a98e4b11ef32a199"),
         ]
     ),
     *(

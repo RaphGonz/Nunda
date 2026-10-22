@@ -5,8 +5,9 @@ type est le plus prioritaire (REF, PER, ORG, LIEU, AUTRE). Limites : deux zones 
 seulement par des blancs ou des particules (« Jean de La Fontaine ») forment un seul nom ;
 les titres en tête (M., Mme, Maître, grades) restent du texte, hors de la zone. Une zone
 ne franchit jamais une séparation de cellules « | » (étape 4) ; les mots sans lettre en
-bord d'une zone de nom en sortent (une date, un montant voisins), sauf le numéro en tête
-d'une adresse (LIEU). Une zone de nom sans aucune majuscule n'est pas gardée (un montant
+bord d'une zone de nom en sortent (une date, un montant voisins), sauf un numéro en tête
+suivi d'un mot en minuscules autre qu'un mois (« 103 rue de la Poste ») ou en tête d'une
+zone LIEU. Une zone de nom sans aucune majuscule n'est pas gardée (un montant
 lu MISC par spaCy n'est pas un nom) ; une référence est toujours gardée.
 """
 
@@ -51,31 +52,47 @@ def _sans_titre(texte: str, z: Zone, cfg: NomsConfig) -> Zone | None:
     return Zone(debut, z.fin, z.type, z.detecteurs)
 
 
-def _decouper(texte: str, z: Zone) -> list[Zone]:
-    """Parties de la zone entre les « | », sans les mots sans lettre en bord de zone."""
+def _en_tete_hors_nom(mots: list[str], mois: tuple[str, ...]) -> bool:
+    """Le premier mot sort de la zone : un mois, ou un mot sans lettre qui n'est pas un
+    numéro de rue (« 103 rue … » : suivi d'un mot en minuscules autre qu'un mois)."""
+    if mots[0] in mois:
+        return True
+    suivant = mots[1] if len(mots) > 1 else ""
+    adresse = suivant[:1].islower() and suivant not in mois
+    return not _lettre(mots[0]) and not adresse
+
+
+def _lettre(mot: str) -> bool:
+    return any(c.isalpha() for c in mot)
+
+
+def _decouper(texte: str, z: Zone, mois: tuple[str, ...]) -> list[Zone]:
+    """Parties de la zone entre les « | », sans les mots hors nom en bord de zone."""
     out = []
     for m in re.finditer(r"[^|]+", texte[z.debut : z.fin]):
         d = z.debut + m.start()
         mots = [(d + w.start(), d + w.end()) for w in re.finditer(r"\S+", m.group())]
         if z.type != TypeNom.REF:
-
-            def lettre(w):
-                return any(c.isalpha() for c in texte[w[0] : w[1]])
-
-            while mots and not lettre(mots[-1]):
+            while mots and not _lettre(texte[mots[-1][0] : mots[-1][1]]):
                 mots.pop()
-            while mots and not lettre(mots[0]) and z.type != TypeNom.LIEU:
+            while (
+                mots
+                and z.type != TypeNom.LIEU
+                and _en_tete_hors_nom([texte[a:b] for a, b in mots[:2]], mois)
+            ):
                 mots.pop(0)
         if mots:
             out.append(Zone(mots[0][0], mots[-1][1], z.type, z.detecteurs))
     return out
 
 
-def limites(texte: str, zones: list[Zone], cfg: NomsConfig) -> list[Zone]:
+def limites(
+    texte: str, zones: list[Zone], cfg: NomsConfig, mois: tuple[str, ...] = ()
+) -> list[Zone]:
     particules = "|".join(re.escape(p) for p in cfg.particules if p != "d")
     lien = re.compile(rf"[ \t]+(?:(?:{particules})[ \t]+)*|[ \t]+d['’]", re.IGNORECASE)
     out: list[Zone] = []
-    for z in (p for z in unir(zones) for p in _decouper(texte, z)):
+    for z in (p for u in unir(zones) for p in _decouper(texte, u, mois)):
         if (
             out
             and TypeNom.REF not in (z.type, out[-1].type)
@@ -109,4 +126,4 @@ def detecter(textes: list[str], cfg: IngestConfig) -> list[list[Zone]]:
             par[i] += d3_regles(t, det, cfg.nombres)
         if "majuscules" in det.detecteurs:
             par[i] += d4_majuscules(t, det)
-    return [limites(t, zs, cfg.noms) for t, zs in zip(textes, par, strict=True)]
+    return [limites(t, zs, cfg.noms, cfg.nombres.mois) for t, zs in zip(textes, par, strict=True)]
