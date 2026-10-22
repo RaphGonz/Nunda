@@ -285,3 +285,11 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   2. « Montant » lu comme un nom à l'ingestion, puis masqué dans les questions : le modèle perd le mot « montant » de la question. Corriger les faux positifs d'en-têtes à l'ingestion (déjà dans la suite prévue), ou ne pas chercher dans les messages une norme connue qui est un mot courant du lexique ?
   3. `test_relire_montant` (phase 1) échoue parfois sur son délai, jamais sur le résultat. Lever le délai de ce test (`deadline=None`) ? Le résultat attendu ne change pas.
 - **Suite prévue :** selon les réponses, V2 dans `detecter_message` ; puis la recherche (SPEC.md §7) et `ccm search`.
+
+## 2026-10-22 — Phase 2 — V2 dans la chaîne des messages
+- **Travail fait :** réponses de Raphael : V2 adopté ; délai de `test_relire_montant` levé ; question « montant » à réexpliquer. `ner/propagate.py` : `mots_connus` (code de V2 déplacé depuis `eval/messages.py`), utilisé par `detecter_message`. Test `test_message_utilisateur_mot_d_un_nom` (« eloi », « dupont », « gerard » trouvés ; « société » non). `test_relire_montant` : `@settings(deadline=None)`, résultat attendu inchangé.
+- **Mesures :** `make test` : 187 tests passés. Pas de remesure : le code de V2 est celui mesuré (rappel PER en minuscules 0,9858, 124 messages avec fuite).
+- **Décisions :** aucune règle changée hors V2, validé.
+- **Constat « montant » :** spaCy lit l'en-tête de tableau « Date | Libellé | Montant » comme un nom PER (193 mentions spaCy seul, 67 propagation et spaCy, sur les 200 dossiers de validation). Aucune personne du corpus ne s'appelle Montant.
+- **Écarts avec SPEC.md :** aucun.
+- **Suite prévue :** selon la réponse de Raphael sur « montant » ; puis la recherche (SPEC.md §7) et `ccm search`.
