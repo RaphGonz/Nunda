@@ -6,10 +6,10 @@ la version du monde et une ligne dans la version contradictoire, qui portent tou
 le champ changé (heure, montant ou personne) avec des valeurs différentes (même règle
 que le contrôle des questions CONFLIT). Toute autre arête CONFLIT est un faux positif.
 
-L'étape 5 (noms) n'existe pas encore : la mesure est faite deux fois, sans mentions
-(table `mention` vide, comme à l'ingestion d'aujourd'hui) et avec les mentions de
-référence (faits PER, ORG, LIEU, REF de la vérité, norme de SPEC.md §6 ; nombres lus dans
-une mention retirés, comme le fera l'exclusion de l'étape 6).
+La mesure est faite deux fois : avec les mentions détectées (la vraie chaîne, étape 5)
+et avec les mentions de référence à leur place (faits PER, ORG, LIEU, REF de la vérité,
+norme de SPEC.md §6 ; nombres lus dans une mention retirés ; les nombres déjà retirés par
+une mention détectée restent retirés).
 
     uv run python -m ccm.eval.conflits runs/corpus/niveau0/validation runs/conflits/validation
     uv run python -m ccm.eval.conflits runs/corpus/niveau0/entrainement runs/conflits/entr 200
@@ -82,7 +82,8 @@ def mesurer_dossier(dossier: Path, sortie: Path) -> dict:
     ingerer_fichiers(con, fichiers_pdf([dossier]), cfg)
     props = _lignes_props(con, d)
     ref = _reference(d, props)
-    sans = _predites(con)
+    detectees = _predites(con)
+    con.execute("DELETE FROM mention")
 
     for p in d.pieces:
         for i, ligne in enumerate(p.lignes):
@@ -123,7 +124,7 @@ def mesurer_dossier(dossier: Path, sortie: Path) -> dict:
         champ=d.conflit.champ if d.conflit else None,
         lignes=sum(len(p.lignes) for p in d.pieces),
         retrouvees=len(props),
-        sans_mentions=bilan(sans),
+        mentions_detectees=bilan(detectees),
         mentions_reference=bilan(avec),
     )
 
@@ -162,7 +163,7 @@ def main(source: Path, sortie: Path, tranche: slice = slice(None), processus: in
         a_conflit=sum(r["champ"] is not None for r in rs),
         lignes=sum(r["lignes"] for r in rs),
         retrouvees=sum(r["retrouvees"] for r in rs),
-        sans_mentions=_scores(rs, "sans_mentions"),
+        mentions_detectees=_scores(rs, "mentions_detectees"),
         mentions_reference=_scores(rs, "mentions_reference"),
     )
     (sortie / "bilan.json").write_text(
