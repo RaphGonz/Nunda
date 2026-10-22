@@ -17,5 +17,9 @@ jobs:
         run: choco install make -y
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-fra
+      - uses: actions/cache@v4
+        with:
+          path: runs/modeles
+          key: modeles-${{ runner.os }}-${{ hashFiles('ccm/data/modeles.py') }}
       - run: make setup
       - run: make test
