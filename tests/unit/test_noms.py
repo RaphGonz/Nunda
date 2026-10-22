@@ -136,6 +136,23 @@ def test_message_utilisateur_sans_casse(tmp_path):
 
 
 @avec_lexiques
+def test_message_utilisateur_mot_d_un_nom(tmp_path):
+    cfg = sans_modeles("regle", "majuscules")
+    con = ouvrir_stock(tmp_path / "s.sqlite")
+    texte = "Audition de M. Jean-Éloi Dupont, de la Société Gérard."
+    con.execute("INSERT INTO proposition (prop_id, texte) VALUES (1, ?)", (texte,))
+    ecrire_mentions(
+        con, 1, texte, [Zone(15, 31, TypeNom.PER, G), Zone(39, 53, TypeNom.ORG, G)], cfg
+    )
+    m = "et eloi ? dupont ? la société ? gerard ?"
+    assert surfaces(m, detecter_message(m, con, cfg)) == [
+        ("eloi", "PER"),
+        ("dupont", "PER"),
+        ("gerard", "ORG"),
+    ]
+
+
+@avec_lexiques
 def test_detecter_sans_gliner_ni_spacy():
     cfg = sans_modeles("regle", "majuscules")
     t = "Le 3 mai, M. RIBORIER Belcorel a viré 300 euros (n° 2025/123)."

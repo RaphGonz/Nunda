@@ -3,7 +3,8 @@
 Propagation : une chaîne détectée une fois dans une base est masquée partout dans cette
 base (occurrence exacte, entre deux limites de mot). Message de l'utilisateur : même
 détection, plus une recherche sans casse ni accents des normes déjà connues de la base
-(« dupont » pour « Dupont »).
+(« dupont » pour « Dupont ») et de chacun de leurs mots (« dupont » pour « Jean Dupont »),
+sauf mots courts, titres, particules, mots vides et mots courants des lexiques.
 """
 
 import re
@@ -13,7 +14,7 @@ from ccm.anonymize.names import norme
 from ccm.config import IngestConfig
 from ccm.graph.store import ajouter_mentions
 from ccm.ingest.racines import sans_accents
-from ccm.ner.detectors import Zone
+from ccm.ner.detectors import Zone, _courant
 from ccm.ner.union import _type, detecter, unir
 from ccm.schema import Detecteur, TypeNom
 
@@ -105,6 +106,23 @@ def connus(con: sqlite3.Connection, cfg: IngestConfig) -> dict[str, TypeNom]:
     return types
 
 
+def mots_connus(con: sqlite3.Connection, cfg: IngestConfig, types: dict[str, TypeNom]):
+    """Chaque mot d'au moins 3 lettres des normes connues `types`, sauf titres, particules,
+    mots vides et mots courants. Le lexique se lit sur le mot écrit, avec ses accents
+    (« société », pas « societe »)."""
+    fixes = {*cfg.noms.titres, *cfg.noms.particules, *cfg.racines.mots_vides}
+    out: dict[str, TypeNom] = {}
+    for s, n, t in con.execute("SELECT DISTINCT surface, norme, type FROM mention"):
+        if n not in types:
+            continue
+        for mot in re.split(r"[-‐–\s]+", s):
+            w = norme(mot, cfg.noms)
+            if len(w) < 3 or w in fixes or _courant(mot, cfg.detection.lexiques):
+                continue
+            out[w] = _type(out[w], TypeNom(t)) if w in out else TypeNom(t)
+    return out
+
+
 def chercher_connus(texte: str, types: dict[str, TypeNom], zones: list[Zone]) -> list[Zone]:
     """Zones nouvelles des chaînes `types`, cherchées sans casse ni accents, tirets et
     blancs égaux."""
@@ -126,4 +144,6 @@ def chercher_connus(texte: str, types: dict[str, TypeNom], zones: list[Zone]) ->
 def detecter_message(texte: str, con: sqlite3.Connection, cfg: IngestConfig) -> list[Zone]:
     """Zones de noms d'un message : détecteurs, plus les normes connues de la base."""
     zones = detecter([texte], cfg)[0]
-    return unir(zones + chercher_connus(texte, connus(con, cfg), zones))
+    types = connus(con, cfg)
+    types = {**mots_connus(con, cfg, types), **types}
+    return unir(zones + chercher_connus(texte, types, zones))

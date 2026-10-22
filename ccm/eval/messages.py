@@ -1,10 +1,11 @@
 """Mesure : noms des messages de l'utilisateur (SPEC.md §6), trois variantes de la
 recherche sans casse des noms connus de la base.
 
-- V0 : les normes connues entières (règle actuelle, `ner.propagate.detecter_message`) ;
+- V0 : les normes connues entières (ancienne règle) ;
 - V1 : V0, plus les noms de famille des mentions PER de la base ;
 - V2 : V0, plus chaque mot d'au moins 3 lettres des normes connues, sauf titres,
-  particules, mots vides et mots courants des lexiques de D4.
+  particules, mots vides et mots courants des lexiques de D4 (règle actuelle,
+  `ner.propagate.detecter_message`).
 
 Deux conditions : les messages tels qu'écrits par le générateur (« ecrit »), et les mêmes
 messages dont chaque nom est réécrit en minuscules sans accents (« minuscules », ce que
@@ -21,14 +22,13 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from ccm.anonymize.names import nom_famille, norme
+from ccm.anonymize.names import nom_famille
 from ccm.config import IngestConfig, load_config
 from ccm.data.worldgen.questions import Question, Tour
 from ccm.ingest.pipeline import fichiers_pdf, ingerer_fichiers
 from ccm.ingest.racines import sans_accents
-from ccm.ner.detectors import _courant
-from ccm.ner.propagate import chercher_connus, connus
-from ccm.ner.union import _type, detecter, unir
+from ccm.ner.propagate import chercher_connus, connus, mots_connus
+from ccm.ner.union import detecter, unir
 from ccm.schema import TypeNom, ouvrir_stock
 
 TYPES = ("PER", "ORG", "LIEU", "REF")
@@ -46,16 +46,7 @@ def chaines(con, cfg: IngestConfig, variante: str) -> dict[str, TypeNom]:
             if f and len(f) >= 3:
                 extra[f] = TypeNom.PER
     if variante == "V2":
-        # Le lexique se lit sur le mot écrit, avec ses accents (« société », pas « societe »).
-        fixes = {*cfg.noms.titres, *cfg.noms.particules, *cfg.racines.mots_vides}
-        for s, n, t in con.execute("SELECT DISTINCT surface, norme, type FROM mention"):
-            if n not in types:
-                continue
-            for mot in re.split(r"[-‐–\s]+", s):
-                w = norme(mot, cfg.noms)
-                if len(w) < 3 or w in fixes or _courant(mot, cfg.detection.lexiques):
-                    continue
-                extra[w] = _type(extra[w], TypeNom(t)) if w in extra else TypeNom(t)
+        extra = mots_connus(con, cfg, types)
     return {**extra, **types}
 
 
