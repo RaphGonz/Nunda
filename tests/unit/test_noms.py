@@ -9,7 +9,7 @@ from ccm.config import load_config
 from ccm.ner import detectors
 from ccm.ner.detectors import Zone, d3_regles, d4_majuscules
 from ccm.ner.propagate import detecter_message, ecrire_mentions, propager
-from ccm.ner.union import detecter, limites, unir
+from ccm.ner.union import detecter, en_tete_tableau, limites, unir
 from ccm.schema import Detecteur, TypeNom, ouvrir_stock
 
 CFG = load_config("ingest")
@@ -170,6 +170,23 @@ def test_detecter_quatre_detecteurs():
     assert ("Elodie Bamier", "PER") in s
     assert ("SARL Delcoron", "ORG") in s
     assert ("Lyon", "LIEU") in s
+
+
+@avec_lexiques
+def test_en_tete_tableau():
+    lex = CFG.detection.lexiques
+    assert en_tete_tableau("Date | Libellé | Montant", lex)
+    assert en_tete_tableau("Date de valeur | Opération | Somme", lex)
+    assert not en_tete_tableau("Date Libellé Montant", lex)  # pas un tableau
+    assert not en_tete_tableau("03/05/2024 | Virement Delcoron | 300,00", lex)
+    assert not en_tete_tableau("Nom | Delcoron", lex)
+
+
+@avec_gliner
+@avec_lexiques
+def test_detecter_en_tete_tableau_sans_nom():
+    ts = ["Date | Libellé | Montant", "Date | Opération | Montant"]
+    assert detecter(ts, CFG) == [[], []]
 
 
 def test_modeles_lus_sur_le_disque():

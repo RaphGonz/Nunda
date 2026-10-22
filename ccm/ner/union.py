@@ -8,14 +8,16 @@ ne franchit jamais une séparation de cellules « | » (étape 4) ; les mots san
 bord d'une zone de nom en sortent (une date, un montant voisins), sauf un numéro en tête
 suivi d'un mot en minuscules autre qu'un mois (« 103 rue de la Poste ») ou en tête d'une
 zone LIEU. Une zone de nom sans aucune majuscule n'est pas gardée (un montant
-lu MISC par spaCy n'est pas un nom) ; une référence est toujours gardée.
+lu MISC par spaCy n'est pas un nom) ; une référence est toujours gardée. Une ligne
+d'en-tête de tableau (au moins deux cellules, aucun chiffre, chaque mot courant dans les
+lexiques : « Date | Libellé | Montant ») ne contient aucun nom hors référence.
 """
 
 import re
 
 from ccm.anonymize.names import norme
 from ccm.config import IngestConfig, NomsConfig
-from ccm.ner.detectors import Zone, d1_gliner, d2_spacy, d3_regles, d4_majuscules
+from ccm.ner.detectors import Zone, _courant, d1_gliner, d2_spacy, d3_regles, d4_majuscules
 from ccm.schema import TypeNom
 
 _PRIORITE = {t: k for k, t in enumerate(TypeNom)}
@@ -111,6 +113,13 @@ def limites(
     return gardees
 
 
+def en_tete_tableau(texte: str, lexiques: tuple[str, ...]) -> bool:
+    """Ligne d'en-tête de tableau : au moins deux cellules, aucun chiffre, chaque mot courant."""
+    if texte.count("|") == 0 or re.search(r"\d", texte):
+        return False
+    return all(_courant(m, lexiques) for m in re.findall(r"[^\W\d_]+(?:['’-][^\W\d_]+)*", texte))
+
+
 def detecter(textes: list[str], cfg: IngestConfig) -> list[list[Zone]]:
     """Zones de noms de chaque texte : union des détecteurs choisis, puis limites."""
     det = cfg.detection
@@ -126,4 +135,10 @@ def detecter(textes: list[str], cfg: IngestConfig) -> list[list[Zone]]:
             par[i] += d3_regles(t, det, cfg.nombres)
         if "majuscules" in det.detecteurs:
             par[i] += d4_majuscules(t, det)
-    return [limites(t, zs, cfg.noms, cfg.nombres.mois) for t, zs in zip(textes, par, strict=True)]
+    out = []
+    for t, zs in zip(textes, par, strict=True):
+        zs = limites(t, zs, cfg.noms, cfg.nombres.mois)
+        if en_tete_tableau(t, det.lexiques):
+            zs = [z for z in zs if z.type == TypeNom.REF]
+        out.append(zs)
+    return out
