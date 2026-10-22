@@ -245,8 +245,10 @@ def test_t8_oubli(tmp_path):
     r = CliRunner().invoke(app, ["ingest", str(src), "--stock", str(stock)])
     assert r.exit_code == 0, r.output
 
-    # Étape 5 (pas encore écrite) : mentions posées à la main, puis index et conflits.
+    # Mentions posées à la main à la place de celles de l'étape 5 (le test ne dépend pas
+    # des détecteurs), puis index et conflits.
     con = ouvrir_stock(stock)
+    con.execute("DELETE FROM mention")
     for pid, texte in con.execute("SELECT prop_id, texte FROM proposition").fetchall():
         ajouter_mentions(con, pid, _mentions(texte, {n: "PER" for n in NOMS_T8 + ["Paul Morel"]}))
     con.execute(
