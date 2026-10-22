@@ -55,7 +55,7 @@ detection:
   detecteurs: [gliner, spacy, regle, majuscules]
   gliner:
     modele: runs/modeles/gliner_multi-v2.1
-    seuil: 0.3
+    seuil: 0.6  # 0,3 au départ ; 0,6 mesuré le 2026-10-22 (précision 0,82 → 0,88, rappel PER 0,998)
     lot: 32
     appareil: auto  # cuda si disponible, sinon cpu
     # Étiquette demandée à GLiNER → type de nom.

@@ -230,3 +230,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** aucun.
 - **Questions pour Raphael :** passer le seuil de GLiNER de 0,3 à 0,6 (recommandé : précision +6 points, rappel PER −0,001) ? Le filtre de propagation coûte plus de rappel qu'il ne retire de faux positifs : je ne le recommande pas.
 - **Suite prévue :** selon la réponse, seuil 0,6 dans `configs/ingest.yaml` ; puis faux positifs de spaCy et D4 sur les en-têtes, et étape suivante de la phase 2 (relations et slots, SPEC.md §6).
+
+## 2026-10-22 — Phase 2 — Seuil de GLiNER à 0,6
+- **Travail fait :** `detection.gliner.seuil` passé de 0,3 à 0,6 dans `configs/ingest.yaml` (accord de Raphael).
+- **Mesures :** celles de l'entrée précédente (validation) : rappel PER 0,998, ORG 0,9986, LIEU 0,9996, REF 1,0 ; précision des zones 0,881. `make test` : 147 tests passés.
+- **Décisions :** seuil 0,6 ; pas de filtre de propagation.
+- **Écarts avec SPEC.md :** §6 donne « seuil bas (0,3) » pour D1 ; c'est une valeur de départ, changée sur mesure (§15). SPEC.md non modifié.
+- **Suite prévue :** faux positifs restants (spaCy et D4 sur les en-têtes, « P.V. ») ; puis relations et slots (SPEC.md §6).
