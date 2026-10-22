@@ -217,3 +217,16 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   1. Faux positifs (précision des zones 0,82) : « Je », « Nous », en-têtes de PV masqués, puis propagés. Ils ne touchent pas le seuil, mais ils risquent de nuire aux conflits (nom de famille commun « je ») et à la lecture du modèle. Faut-il relever le seuil de GLiNER, ou ne pas propager une chaîne qui est un mot courant du lexique ? À mesurer avant de décider.
   2. Relancer les mesures avec 2 processus au lieu de 3 (mémoire) ?
 - **Suite prévue :** avec accord, relancer la validation (essai 3), le contrôle sur l'entraînement 0 à 99 et la mesure des conflits avec les mentions détectées (`ccm.eval.conflits`, processus=2) ; puis étape suivante de la phase 2 (relations et slots, SPEC.md §6).
+
+## 2026-10-22 — Phase 2 — Faux positifs des noms : deux pistes mesurées
+- **Travail fait :** à la demande de Raphael, mesure sur la validation (200 dossiers, un seul processus) de deux pistes contre les faux positifs : seuil de GLiNER (0,3 à 0,8) et propagation interdite aux chaînes dont tous les mots sont courants (lexiques de D4 ; la chaîne reste masquée là où elle est détectée). Détecteurs lancés une fois (scores de GLiNER gardés), variantes rejouées sur les textes des lignes ; script hors du dépôt. Mesures relancées : non (décision de Raphael).
+- **Mesures (rappel PER / ORG / LIEU ; précision des zones) :**
+  - Code actuel (seuil 0,3, sans filtre ; inclut l'essai 3) : 0,999 / 0,9995 / **1,0** ; 0,822. L'essai 3 rend le LIEU à 1,0 (0,9914 à l'essai 2).
+  - Seuil seul : 0,4 → 0,999 / 0,9993 / 1,0 ; 0,852. 0,5 → 0,9987 / 0,9986 / 1,0 ; 0,859. **0,6 → 0,998 / 0,9986 / 0,9996 ; 0,881.** 0,7 → 0,9971 / 0,9972 / 0,9996 ; 0,882. 0,8 → 0,9956 / 0,9933 / 0,9952 ; 0,883.
+  - Filtre seul (0,3) : 0,9979 / 0,9993 / 0,9994 ; 0,868. Filtre + 0,6 : 0,9957 / 0,9968 / 0,9986 ; 0,884.
+  - Nombres recouverts : 4 ou 5 sur 21 722 partout.
+  - Au-delà de 0,6, la précision plafonne vers 0,88 : les faux positifs restants ne viennent plus de GLiNER (« P.V. » par le motif d'initiales de D4, en-têtes tout en majuscules « PROCÈS-VERBAL D'AUDITION », « Réf », « Référence » par spaCy). « Nous », « Je », « Date » disparaissent dès 0,6.
+- **Décisions :** aucune appliquée ; `configs/ingest.yaml` inchangé.
+- **Écarts avec SPEC.md :** aucun.
+- **Questions pour Raphael :** passer le seuil de GLiNER de 0,3 à 0,6 (recommandé : précision +6 points, rappel PER −0,001) ? Le filtre de propagation coûte plus de rappel qu'il ne retire de faux positifs : je ne le recommande pas.
+- **Suite prévue :** selon la réponse, seuil 0,6 dans `configs/ingest.yaml` ; puis faux positifs de spaCy et D4 sur les en-têtes, et étape suivante de la phase 2 (relations et slots, SPEC.md §6).
