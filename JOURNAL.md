@@ -293,3 +293,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Constat « montant » :** spaCy lit l'en-tête de tableau « Date | Libellé | Montant » comme un nom PER (193 mentions spaCy seul, 67 propagation et spaCy, sur les 200 dossiers de validation). Aucune personne du corpus ne s'appelle Montant.
 - **Écarts avec SPEC.md :** aucun.
 - **Suite prévue :** selon la réponse de Raphael sur « montant » ; puis la recherche (SPEC.md §7) et `ccm search`.
+
+## 2026-10-22 — Phase 2 — En-têtes de tableaux hors des noms
+- **Travail fait :** réponse de Raphael : option (a), corriger à l'ingestion. `ner/union.py` : `en_tete_tableau` ; dans `detecter`, une ligne d'en-tête de tableau (au moins deux cellules « | », aucun chiffre, chaque mot courant dans les lexiques) ne garde que ses références. Tests `test_en_tete_tableau`, `test_detecter_en_tete_tableau_sans_nom`.
+- **Mesures (validation réingérée, `runs/messages/validation-entetes`) :** rappels inchangés (en minuscules, V2 : PER 0,9858, ORG 0,9969, 124 messages avec fuite). Faux positifs des messages : 641 → **104** (V2, minuscules), 640 → 103 (tels qu'écrits) ; « montant » n'en fait plus partie. Restent : « Additionnés » 46, « le » 32, « même » 18, « petit » 5. Dans le corpus, les lignes de tableau sans chiffre sont les seuls en-têtes (4 formes) et ne contiennent aucun nom. `make test` : 189 tests passés.
+- **Décisions :** règle limitée aux lignes sans chiffre faites de mots courants, pour ne jamais retirer un nom d'une ligne de données.
+- **Écarts avec SPEC.md :** aucun.
+- **Suite prévue :** recherche (SPEC.md §7) : départs par noms et par texte, extension, classement, second tour, contraintes, budget ; `ccm search` ; mesure du rappel des justificatives dans le budget.
