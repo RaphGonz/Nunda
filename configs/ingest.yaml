@@ -140,6 +140,18 @@ noms:
     capitaine, lieutenant, commandant, colonel, brigadier, adjudant, major, gendarme]
   # Particules du nom de famille, après normalisation (« de la Fontaine », « van Dam »).
   particules: [de, du, des, la, le, d, van, von, da, di, del, della]
+  # Genre d'un titre placé devant une mention (relation INCOMPATIBLE, §6).
+  genres: {m: M, mm: M, monsieur: M, mme: F, mmes: F, mlle: F, madame: F, mademoiselle: F}
+  # ALIAS_DECLARE (§6) : texte exact entre deux noms d'une même proposition.
+  alias: ['\s*,\s*dite?\s+', '\s*,?\s*alias\s+', '\s*,\s*surnommée?\s+',
+    '\s*\(\s*ci-après\s+(?:dénommée?\s+)?[«"“]?\s*', '\s*,?\s*épouse\s+', '\s*,\s*née?\s+']
+
+# Anonymiseur (SPEC.md §6, §8) : slots et attributs.
+anonymiseur:
+  reservoir: 256  # K : indices tirés par type de nom, et pour les valeurs
+  grandeur: [-3, 12]  # bornes de l'ordre de grandeur d'un nombre
+  rang_max: 63  # rang dense d'une valeur parmi celles de même unité
+  ocr_bas: 0.85  # marque [OCR_BAS] sous cette confiance (§5, étape 1)
 
 # Étape 8 : conflits établis (ingest/conflicts.py).
 conflits:

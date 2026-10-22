@@ -115,6 +115,17 @@ class NomsConfig(_Bloc):
 
     titres: tuple[str, ...]  # retirés en tête, comparés après normalisation
     particules: tuple[str, ...]  # du nom de famille, après normalisation
+    genres: dict[str, Literal["M", "F"]]  # titre normalisé → genre (INCOMPATIBLE)
+    alias: tuple[str, ...]  # ALIAS_DECLARE : expressions régulières du texte entre deux noms
+
+
+class AnonymiseurConfig(_Bloc):
+    """Slots et attributs (SPEC.md §6)."""
+
+    reservoir: int  # K
+    grandeur: tuple[int, int]
+    rang_max: int
+    ocr_bas: float
 
 
 class ConflitsConfig(_Bloc):
@@ -162,6 +173,7 @@ class IngestConfig(ConfigBase):
     noms: NomsConfig
     detection: DetectionConfig
     conflits: ConflitsConfig
+    anonymiseur: AnonymiseurConfig
 
 
 class Bm25Config(_Bloc):
