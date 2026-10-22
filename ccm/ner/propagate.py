@@ -96,15 +96,20 @@ def _plier(texte: str) -> tuple[str, list[int]]:
     return "".join(plie), pos
 
 
-def detecter_message(texte: str, con: sqlite3.Connection, cfg: IngestConfig) -> list[Zone]:
-    """Zones de noms d'un message : détecteurs, plus les normes connues de la base."""
-    zones = detecter([texte], cfg)[0]
+def connus(con: sqlite3.Connection, cfg: IngestConfig) -> dict[str, TypeNom]:
+    """Normes connues de la base et leur type (le plus prioritaire)."""
     types: dict[str, TypeNom] = {}
     for n, t in con.execute("SELECT DISTINCT norme, type FROM mention"):
         if len(n) >= cfg.detection.propagation_min:
             types[n] = _type(types[n], TypeNom(t)) if n in types else TypeNom(t)
+    return types
+
+
+def chercher_connus(texte: str, types: dict[str, TypeNom], zones: list[Zone]) -> list[Zone]:
+    """Zones nouvelles des chaînes `types`, cherchées sans casse ni accents, tirets et
+    blancs égaux."""
     if not types:
-        return zones
+        return []
     plie, pos = _plier(texte)
     alternatives = "|".join(
         re.escape(n).replace(" ", " +") for n in sorted(types, key=len, reverse=True)
@@ -115,4 +120,10 @@ def detecter_message(texte: str, con: sqlite3.Connection, cfg: IngestConfig) -> 
         debut, fin = pos[m.start()], pos[m.end() - 1] + 1
         if _nouvelle(zones, debut, fin, types[n]):
             trouvees.append(Zone(debut, fin, types[n], _PROPAGATION))
-    return unir(zones + trouvees)
+    return trouvees
+
+
+def detecter_message(texte: str, con: sqlite3.Connection, cfg: IngestConfig) -> list[Zone]:
+    """Zones de noms d'un message : détecteurs, plus les normes connues de la base."""
+    zones = detecter([texte], cfg)[0]
+    return unir(zones + chercher_connus(texte, connus(con, cfg), zones))
