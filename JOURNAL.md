@@ -266,3 +266,22 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   2. Lecture d'INCOMPATIBLE (famille commune exigée aussi pour les titres) : d'accord ?
   3. Indices `nom` par blocs de type (0 à 1 279) : d'accord ?
 - **Suite prévue :** recherche (SPEC.md §7) : départs par noms et par texte, extension, classement, second tour, contraintes, budget ; commande `ccm search` ; mesure du rappel des justificatives dans le budget.
+
+## 2026-10-22 — Phase 2 — Noms partiels dans les messages : mesure
+- **Travail fait :** réponses de Raphael : lecture d'INCOMPATIBLE validée ; indices `nom` par blocs de type validés ; mesurer la recherche des mots des noms connus. `detecter_message` découpé en `connus` et `chercher_connus` (comportement inchangé). `ccm/eval/messages.py` : `uv run python -m ccm.eval.messages runs/corpus/niveau0/validation runs/messages/validation` (validation réingérée avec GLiNER à 0,6, un processus, environ 10 min).
+- **Mesures (validation, 200 dossiers, 8 314 messages de l'utilisateur ; les messages du corpus ne nomment que des PER et des ORG) :**
+  - Variantes de la recherche sans casse : V0 = normes connues entières (règle actuelle) ; V1 = V0 + noms de famille des mentions PER ; V2 = V0 + chaque mot d'au moins 3 lettres des noms connus, sauf titres, particules, mots vides et mots courants des lexiques de D4 (lexique lu sur le mot écrit, avec ses accents).
+  - Conditions : messages tels qu'écrits par le générateur ; mêmes messages, chaque nom réécrit en minuscules sans accents (« dupont »). Les questions du corpus n'écrivent jamais un nom en minuscules : sans la seconde condition, la mesure ne voit pas le cas.
+  - Tels qu'écrits : PER 0,9987 et ORG 1,0 pour les trois variantes ; 12 messages avec fuite (surnoms à article : « le Prof », « le Chat ») ; faux positifs 640 (V0, V2), 649 (V1).
+  - En minuscules : V0 PER **0,9711**, ORG 0,9969, **246** messages avec fuite, 641 faux positifs ; V1 0,9767, 197, 650 ; V2 PER **0,9858**, ORG 0,9969, **124** messages avec fuite, **641** faux positifs.
+  - Premier essai de V2 : 298 faux positifs « société », parce que le lexique était lu sur la norme sans accents (« societe ») ; corrigé, puis remesuré (chiffres ci-dessus).
+  - Manques restants (V2, minuscules) : surnoms à article (« le marseillais », « le belge »), noms qui sont des mots courants (« fontaine », « robert », « morel », « lucas », « clement »), initiales (« l.m. »).
+  - Faux positifs de toutes les variantes, déjà dans V0 : « montant » 537 sur 641. À l'ingestion, « Montant » (en-têtes de tableaux) est lu comme un nom (199 mentions PER, 61 AUTRE) ; la recherche des normes connues le masque ensuite dans « Quel est le montant… ». Aussi « Additionnés » 46, « le » 32 (norme « le » connue, AUTRE), « même » 18.
+  - `make test` : 186 tests passés. `test_relire_montant` a de nouveau dépassé son délai de 200 ms au premier passage (1 s ; 0 ms en isolé : charge de la machine) ; passé au second. Non modifié.
+- **Décisions :** aucune règle changée ; `ner/propagate.py` garde V0.
+- **Écarts avec SPEC.md :** aucun.
+- **Questions pour Raphael :**
+  1. Adopter V2 dans `detecter_message` ? Recommandé : en minuscules, deux fois moins de messages avec fuite (246 → 124), sans faux positif de plus ; neutre sur les messages bien écrits.
+  2. « Montant » lu comme un nom à l'ingestion, puis masqué dans les questions : le modèle perd le mot « montant » de la question. Corriger les faux positifs d'en-têtes à l'ingestion (déjà dans la suite prévue), ou ne pas chercher dans les messages une norme connue qui est un mot courant du lexique ?
+  3. `test_relire_montant` (phase 1) échoue parfois sur son délai, jamais sur le résultat. Lever le délai de ce test (`deadline=None`) ? Le résultat attendu ne change pas.
+- **Suite prévue :** selon les réponses, V2 dans `detecter_message` ; puis la recherche (SPEC.md §7) et `ccm search`.
