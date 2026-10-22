@@ -1,18 +1,27 @@
-"""Norme d'un nom et nom de famille (SPEC.md §6).
+"""Norme d'un nom et analyse d'un nom PER (SPEC.md §6).
 
 Norme : NFKC, minuscules, sans accents, tirets et espaces réduits à une espace, titres
 retirés. Nom de famille d'un nom PER : les mots tout en majuscules (« DUPONT Jean-Pierre »,
-« DA SILVA Ana ») ; sinon le dernier mot, avec ses particules. Un jeu d'initiales
-(« J.-P. », « JP », « L.M. ») n'a pas de nom de famille.
+« DA SILVA Ana ») ; sinon le dernier mot, avec ses particules. Les autres mots sont les
+prénoms. Un mot seul en minuscules a un rôle inconnu. Une chaîne de 1 à 3 majuscules, avec
+ou sans points (« J.-P. », « JP », « L.M. »), est un jeu d'initiales, sans nom de famille.
 """
 
 import re
 import unicodedata
+from dataclasses import dataclass
 
 from ccm.config import NomsConfig
 from ccm.ingest.racines import sans_accents
 
 _INITIALES = re.compile(r"(?:[A-Z]\.?-?){1,3}")
+
+
+@dataclass(frozen=True)
+class AnalyseNom:
+    famille: str | None  # norme du nom de famille
+    prenoms: tuple[str, ...]  # normes des prénoms, sans points
+    initiales: str | None  # jeu d'initiales, en majuscules (« JP »)
 
 
 def norme(nom: str, cfg: NomsConfig) -> str:
@@ -23,22 +32,29 @@ def norme(nom: str, cfg: NomsConfig) -> str:
     return " ".join(mots)
 
 
-def nom_famille(surface: str, cfg: NomsConfig) -> str | None:
-    """Norme du nom de famille d'une mention PER ; None pour un jeu d'initiales."""
+def analyser(surface: str, cfg: NomsConfig) -> AnalyseNom:
+    """Prénoms, nom de famille ou jeu d'initiales d'une mention PER."""
     mots = surface.split()
     while len(mots) > 1 and norme(mots[0], cfg).rstrip(".") in cfg.titres:
         mots.pop(0)
     if len(mots) == 1 and _INITIALES.fullmatch(mots[0]):
-        return None
+        return AnalyseNom(None, (), re.sub(r"[.-]", "", mots[0]))
+    if len(mots) == 1 and mots[0].islower():
+        return AnalyseNom(None, (), None)
     caps = [k for k, m in enumerate(mots) if len(m) > 1 and m.isupper() and _lettres(m)]
     if caps and len(caps) < len(mots):
-        famille = mots[caps[0] : caps[-1] + 1]
+        a, b = caps[0], caps[-1] + 1
     else:
-        k = len(mots) - 1
-        while k > 0 and norme(mots[k - 1], cfg) in cfg.particules:
-            k -= 1
-        famille = mots[k:]
-    return norme(" ".join(famille), cfg) or None
+        a, b = len(mots) - 1, len(mots)
+        while a > 0 and norme(mots[a - 1], cfg) in cfg.particules:
+            a -= 1
+    prenoms = norme(" ".join(mots[:a] + mots[b:]), cfg).replace(".", "").split()
+    return AnalyseNom(norme(" ".join(mots[a:b]), cfg) or None, tuple(prenoms), None)
+
+
+def nom_famille(surface: str, cfg: NomsConfig) -> str | None:
+    """Norme du nom de famille d'une mention PER ; None pour un jeu d'initiales."""
+    return analyser(surface, cfg).famille
 
 
 def _lettres(mot: str) -> bool:
