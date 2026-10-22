@@ -93,6 +93,53 @@ def forget(
 
 
 @app.command()
+def anonymize(
+    question: Annotated[str, typer.Argument(help="Message de l'utilisateur.")],
+    stock: Annotated[Path, typer.Option(help="Base SQLite du dossier.")],
+    prop: Annotated[
+        list[int] | None,
+        typer.Option(help="Propositions du contexte, dans l'ordre (par défaut : toutes)."),
+    ] = None,
+    conv: Annotated[
+        str | None, typer.Option(help="Conversation (contraintes MEME/DIFFERENT).")
+    ] = None,
+    graine: Annotated[int, typer.Option(help="Graine de la table de la conversation.")] = 0,
+    sortie: Annotated[Path | None, typer.Option(help="Fichier JSON (sinon la sortie).")] = None,
+) -> None:
+    """Anonymise une question et des propositions : exemple JSON sans aucun nom (§4, §6)."""
+    import sys
+
+    from ccm.anonymize.exemple import anonymiser, lire_message
+    from ccm.anonymize.table import TableConversation
+    from ccm.config import load_config
+    from ccm.schema import ouvrir_stock
+
+    if not stock.exists():
+        raise typer.BadParameter(f"base absente : {stock}")
+    cfg = load_config("ingest")
+    con = ouvrir_stock(stock)
+    try:
+        ids = prop or [
+            p
+            for (p,) in con.execute(
+                "SELECT prop_id FROM proposition "
+                "WHERE groupe_doublon IS NULL OR groupe_doublon = prop_id ORDER BY prop_id"
+            )
+        ]
+        table = TableConversation(graine, cfg.anonymiseur.reservoir)
+        ex = anonymiser(con, ids, lire_message(question, con, cfg), table, cfg, conv_id=conv)
+    finally:
+        con.close()
+    texte = ex.model_dump_json(indent=1)
+    if sortie:
+        sortie.write_text(texte, encoding="utf-8")
+    else:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")  # console Windows : cp1252 sans « ⟦ »
+        typer.echo(texte)
+
+
+@app.command()
 def modeles() -> None:
     """Télécharge les modèles de la détection des noms dans `runs/modeles/` (§6)."""
     from ccm.data.modeles import MODELES, telecharger
