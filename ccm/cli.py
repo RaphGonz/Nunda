@@ -45,8 +45,8 @@ def ingest(
     sources: Annotated[list[Path], typer.Argument(help="Fichiers PDF ou dossiers de PDF.")],
     stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (créée si absente).")],
 ) -> None:
-    """Ingère des pièces PDF dans un stock : pièces, propositions, nombres, doublons,
-    conflits (§5) ; reconstruit l'index BM25 (§7)."""
+    """Ingère des pièces PDF dans un stock : pièces, propositions, noms (§6), nombres,
+    doublons, conflits (§5) ; reconstruit l'index BM25 (§7)."""
     from ccm.config import load_config
     from ccm.ingest.pipeline import fichiers_pdf, ingerer_fichiers
     from ccm.schema import ouvrir_stock
@@ -58,12 +58,14 @@ def ingest(
         fichiers = fichiers_pdf(sources)
         pieces = ingerer_fichiers(con, fichiers, cfg)
         n = con.execute("SELECT COUNT(*) FROM proposition").fetchone()[0]
+        m = con.execute("SELECT COUNT(*) FROM mention").fetchone()[0]
         c = con.execute("SELECT COUNT(*) FROM arete WHERE type = 'CONFLIT'").fetchone()[0] // 2
         construire_index(con, dossier_index(stock), cfg, load_config("search"))
     finally:
         con.close()
     typer.echo(
-        f"{len(fichiers)} fichiers, {len(pieces)} pièces ajoutées ; {n} propositions, {c} conflits"
+        f"{len(fichiers)} fichiers, {len(pieces)} pièces ajoutées ; {n} propositions, {m} noms, "
+        f"{c} conflits"
     )
 
 
@@ -88,6 +90,15 @@ def forget(
     finally:
         con.close()
     typer.echo(f"{n} propositions caviardées")
+
+
+@app.command()
+def modeles() -> None:
+    """Télécharge les modèles de la détection des noms dans `runs/modeles/` (§6)."""
+    from ccm.data.modeles import MODELES, telecharger
+
+    ecrits = telecharger()
+    typer.echo(f"{len(ecrits)} fichiers écrits dans {MODELES}")
 
 
 if __name__ == "__main__":

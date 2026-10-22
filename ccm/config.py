@@ -11,7 +11,7 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict
 
-from ccm.schema import TypePiece
+from ccm.schema import TypeNom, TypePiece
 
 CONFIGS_DIR = Path(__file__).resolve().parent.parent / "configs"
 
@@ -127,6 +127,31 @@ class ConflitsConfig(_Bloc):
     motif_code: str
 
 
+class GlinerConfig(_Bloc):
+    modele: str  # dossier, relatif à la racine du dépôt
+    seuil: float
+    lot: int
+    appareil: str  # auto, cuda ou cpu
+    etiquettes: dict[str, TypeNom]  # étiquette demandée → type
+
+
+class SpacyConfig(_Bloc):
+    modele: str  # paquet installé
+    etiquettes: dict[str, TypeNom]  # étiquette de spaCy → type ; les autres sont ignorées
+
+
+class DetectionConfig(_Bloc):
+    """Étape 5 (SPEC.md §6) : union des détecteurs D1 à D4."""
+
+    detecteurs: tuple[Literal["gliner", "spacy", "regle", "majuscules"], ...]
+    gliner: GlinerConfig
+    spacy: SpacyConfig
+    regles: tuple[str, ...]  # D3, en plus de `nombres.references`
+    lexiques: tuple[str, ...]  # D4 : dictionnaires Hunspell, sans extension
+    elisions: tuple[str, ...]  # retirées en tête d'un mot (« qu'Elodie »)
+    propagation_min: int  # longueur minimale d'une chaîne propagée
+
+
 class IngestConfig(ConfigBase):
     extraction: ExtractionConfig
     pieces: PiecesConfig
@@ -135,6 +160,7 @@ class IngestConfig(ConfigBase):
     doublons: DoublonsConfig
     racines: RacinesConfig
     noms: NomsConfig
+    detection: DetectionConfig
     conflits: ConflitsConfig
 
 

@@ -49,6 +49,34 @@ segmentation:
   # Étape 4 : paragraphe « Libellé : valeur », libellé de 2 à 40 caractères.
   motif_champ: '[^:]{2,40}:\s+\S'
 
+# Étape 5 : noms (ccm/ner, SPEC.md §6). Fichiers des modèles téléchargés par `ccm modeles`
+# dans `runs/modeles/` (hors de git), chemins relatifs à la racine du dépôt.
+detection:
+  detecteurs: [gliner, spacy, regle, majuscules]
+  gliner:
+    modele: runs/modeles/gliner_multi-v2.1
+    seuil: 0.3
+    lot: 32
+    appareil: auto  # cuda si disponible, sinon cpu
+    # Étiquette demandée à GLiNER → type de nom.
+    etiquettes: {person: PER, organization: ORG, location: LIEU, address: LIEU, product: AUTRE}
+  spacy:
+    modele: fr_core_news_lg
+    etiquettes: {PER: PER, ORG: ORG, LOC: LIEU, MISC: AUTRE}
+  # D3 : les références de l'étape 6 (`nombres.references`), plus celles-ci.
+  regles:
+    - '[\w.+-]+@[\w-]+(?:\.[\w-]+)+'                                  # courriel
+    - '(?:https?://|www\.)\S+[\w/]'                                     # URL
+    - '(?:SIREN|SIRET|RCS)\D{0,20}\d{3}\s?\d{3}\s?\d{3}(?:\s?\d{5})?'  # SIREN, SIRET
+    - '(?:[Dd]ossier|[Aa]ffaire|[Pp]arquet|RG)\s*(?:n°)?\s*:?\s*\d[\w/.-]*'  # dossier
+  # D4 : dictionnaires Hunspell (nom sans extension), français et anglais. Un mot est
+  # courant si sa forme en minuscules y est reconnue.
+  lexiques: [runs/modeles/lexique/fr, runs/modeles/lexique/en_US]
+  # Élisions retirées en tête d'un mot (« qu'Elodie », « d'Ussel »).
+  elisions: [l, d, j, m, n, s, t, c, qu, jusqu, lorsqu, puisqu, quoiqu]
+  # Propagation : chaînes d'au moins tant de caractères.
+  propagation_min: 2
+
 # Étape 6 : nombres et dates (ingest/numbers.py). Motifs sensibles à la casse.
 nombres:
   references:
