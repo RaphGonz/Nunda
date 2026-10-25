@@ -332,3 +332,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** **seuil de précision des conflits (0,9) non atteint sur le test.** Pas d'étiquette `phase-2-ok`, pas de fusion.
 - **Questions pour Raphael :** voir `reports/phase-2.md` (que faire de la précision des conflits : second jeu de validation à gabarits neufs, accepter l'écart, ou changer le seuil).
 - **Suite prévue :** selon la décision de Raphael sur les conflits.
+
+## 2026-10-25 — Phase 2 — Fin de phase
+- **Travail fait :** décision de Raphael sur la précision des conflits du test (0,807 < 0,9) : option (b), écart accepté et écrit dans `reports/phase-2.md`, phase close. Étiquette `phase-2-ok`, fusion de `phase-2` dans `main`.
+- **Mesures :** `make test` sur `phase-2` avant l'étiquette (ci-dessous).
+- **Décisions :** la règle des conflits reste celle réglée sur la validation.
+- **Écarts avec SPEC.md :** précision des conflits établis sur le test 0,807 (seuil 0,9), accepté par Raphael.
+- **Suite prévue :** phase 3 sur `phase-3` (grammaire faite, à rebaser sur `main`) : questions de la grammaire en attente (limite de pas de la synthèse, DATE + DATE, ASK_SAME à trois personnes, opérandes distincts), puis vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.

@@ -9,7 +9,7 @@ Réglage sur la validation (200 dossiers) ; mesure finale une seule fois sur le 
 | Rappel des noms PER ≥ 0,98 | 0,998 | **0,9973** (22 212 mentions) | atteint |
 | Rappel des propositions justificatives dans le budget ≥ 0,95 | 0,998 | **0,9966** (7 123 questions, 11 090 justificatives) | atteint |
 | Test T2 exact | exact (3 dossiers, CI) | — (test de CI) | atteint |
-| Conflits établis, heure et montant : précision ≥ 0,9 | 0,970 (code actuel ; 0,985 le 2026-10-21) | **0,807** (46 VP, 11 FP) | **non atteint** |
+| Conflits établis, heure et montant : précision ≥ 0,9 | 0,970 (code actuel ; 0,985 le 2026-10-21) | **0,807** (46 VP, 11 FP) | **non atteint, écart accepté par Raphael (2026-10-25)** |
 | Conflits établis, heure et montant : rappel ≥ 0,5 | 0,80 | **0,687** (HEURE 38/45, MONTANT 8/22) | atteint |
 
 `make test` : 208 tests passés. Mesures : `runs/final/bilan.json` (`ccm.eval.noms`, `ccm.eval.conflits`, `ccm.eval.recherche`, un processus chacun).
@@ -33,7 +33,7 @@ La règle des conflits (§5) a été réglée sur la validation, qui partage les
 - Surnoms à article non détectés (rappel PER des messages en minuscules 0,986).
 
 ## Questions pour Raphael
-1. **Précision des conflits sur le test : 0,807 < 0,9.** Que faire ?
+1. ~~**Précision des conflits sur le test : 0,807 < 0,9.** Que faire ?~~ Tranché le 2026-10-25 : option (b), écart accepté, phase close.
    (a) Créer un second jeu de validation avec des gabarits nouveaux, ni d'entraînement ni de test, régler la règle dessus, puis refaire une seule mesure sur le test (il faudra alors un nouveau test, celui-ci ayant servi). Recommandé.
    (b) Accepter 0,807 et clore la phase avec cet écart écrit.
    (c) Baisser le seuil (changement de seuil : ta décision).
