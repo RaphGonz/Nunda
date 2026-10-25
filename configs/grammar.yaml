@@ -4,7 +4,7 @@ description: "Grammaire de sortie : automate, masque, algèbre des unités (SPEC
 
 pas_max: 96            # longueur d'une réponse en mode citation (§8 : S ≤ 96)
 # Longueur d'une réponse avec synthèse : 8 phrases de 40 mots ne tiennent pas dans 96 pas.
-# Valeur provisoire, question à Raphael (journal du 2026-10-25).
+# Valeur validée par Raphael le 2026-10-25.
 pas_max_synthese: 512
 calcul_pas: 12         # pas d'un CALCUL entre CALCUL et FIN_CALCUL
 sans_preuve_max: 4     # P d'un bloc CONFLIT SANS_PREUVE

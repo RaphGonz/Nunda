@@ -364,3 +364,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** la règle des conflits reste celle réglée sur la validation.
 - **Écarts avec SPEC.md :** précision des conflits établis sur le test 0,807 (seuil 0,9), accepté par Raphael.
 - **Suite prévue :** phase 3 sur `phase-3` (grammaire faite, à rebaser sur `main`) : questions de la grammaire en attente (limite de pas de la synthèse, DATE + DATE, ASK_SAME à trois personnes, opérandes distincts), puis vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-25 — Phase 3 — Réponses sur la grammaire
+- **Travail fait :** réponses de Raphael aux questions de la grammaire : (1) `pas_max_synthese` = 512 validé ; (2) DATE + DATE interdit, validé ; (3) ASK_SAME à plus de deux personnes : une paire par personne, validé ; (4) **opérandes distincts refusés** : un CALCUL peut reprendre un même nombre. `automaton.py` : réemploi permis ; l'ouverture d'un CALCUL demande toujours deux nombres cités qui se combinent (§10, « Aucune impasse »). Test `test_calcul` : réemploi permis.
+- **Mesures :** `make test` : 235 tests passés. `ccm.eval.grammaire 100000` : 10 054 / 10 054 suites de référence acceptées, 100 540 / 100 540 décodages valides, aucune impasse (507 s).
+- **Décisions :** voir ci-dessus.
+- **Écarts avec SPEC.md :** aucun de plus.
+- **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.

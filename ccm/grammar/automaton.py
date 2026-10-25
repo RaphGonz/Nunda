@@ -324,13 +324,10 @@ class Automate:
         if len(pile) == 1 and b["ops"] >= 1:
             out.add("FIN_CALCUL")
         ops = self._operandes()
-        for pas, v in ops:
-            if pas in b["utilises"]:
-                continue
+        for pas, v in ops:  # un même nombre peut servir plusieurs fois
             if not pile:  # premier opérande : il faut un second opérande et un opérateur
                 besoin = 2
-                ok = any(appliquer(op, v, w) for p2, w in ops if p2 != pas and p2 not in
-                         b["utilises"] for op in OPERATEURS)  # fmt: skip
+                ok = any(appliquer(op, v, w) for _, w in ops for op in OPERATEURS)
             else:  # un opérateur par élément de la pile
                 besoin = len(pile)
                 ok = _reductible([*pile, v])
@@ -421,7 +418,7 @@ class Automate:
 
     def _ouvrir_calcul(self, sources: set[int] | None = None) -> None:
         """`sources` : CALCUL d'une phrase de synthèse (opérandes pris dans ses sources)."""
-        self.bloc = dict(pile=[], utilises=set(), n=0, ops=0, synthese=sources is not None,
+        self.bloc = dict(pile=[], n=0, ops=0, synthese=sources is not None,
                          sources=sources, retour=self.etat, parent=self.bloc)  # fmt: skip
         self.etat = "CALC"
 
@@ -504,7 +501,6 @@ class Automate:
             b["pile"].append(appliquer(pas, x, y))
             b["ops"] += 1
         else:
-            b["utilises"].add(pas)
             b["pile"].append(dict(self._operandes())[pas])
 
     def _av_SY0(self, pas):

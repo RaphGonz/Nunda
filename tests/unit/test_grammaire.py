@@ -123,6 +123,7 @@ def test_calcul():
     a = _apres(["P:0", "ET", "P:1", "DONC", "CALCUL"])
     assert a == {"N:0.1", "N:1.1"}  # nombres des propositions citées seulement
     assert "FIN_CALCUL" not in _apres(["P:0", "ET", "P:1", "DONC", "CALCUL", "N:0.1"])
+    assert "N:0.1" in _apres(["P:0", "ET", "P:1", "DONC", "CALCUL", "N:0.1"])  # réemploi permis
     a = _apres(["P:0", "ET", "P:1", "DONC", "CALCUL", "N:0.1", "N:1.1"])
     assert {"+", "−", "MIN", "MAX", "÷"} <= a and "×" not in a and "FIN_CALCUL" not in a
     a = _apres(["P:0", "ET", "P:1", "DONC", "CALCUL", "N:0.1", "N:1.1", "−"])
