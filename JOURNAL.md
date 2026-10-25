@@ -324,3 +324,11 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   1. Le niveau 0 est trop petit pour juger le classement (65 % du stock dans le contexte). Garder la mesure à 1 000 jetons comme contrôle dans le rapport de phase ?
   2. Plusieurs étapes à budget serré (0,864) : les chaînes de 3 à 5 personnes demandent plus de 2 tours. À regarder plus tard, ou ne rien changer (seuil atteint) ?
 - **Suite prévue :** rapport de phase 2 (`reports/phase-2.md`) : tableau seuils contre mesures (noms PER, rappel de la recherche, T2, conflits), mesures finales sur le test une seule fois, relecture avec Raphael avant `phase-2-ok`.
+
+## 2026-10-25 — Phase 2 — Mesure finale sur le test, rapport
+- **Travail fait :** retour sur `phase-2` (Raphael : clore la phase 2 avant la suite ; la grammaire attend sur `phase-3`). Mesure finale, une seule fois, sur les 200 dossiers de test : `ccm.eval.noms`, `ccm.eval.conflits`, `ccm.eval.recherche` (un processus chacun, `runs/final/`). Conflits remesurés sur la validation avec le code actuel. `reports/phase-2.md`.
+- **Mesures (test) :** rappel PER 0,9973 ; rappel des justificatives dans le budget 0,9966 ; conflits heure et montant : **précision 0,807** (46 VP, 11 FP), rappel 0,687. Validation, code actuel : précision 0,970, rappel 0,80.
+- **Décisions :** aucun réglage sur le test ; faux positifs du test non regardés.
+- **Écarts avec SPEC.md :** **seuil de précision des conflits (0,9) non atteint sur le test.** Pas d'étiquette `phase-2-ok`, pas de fusion.
+- **Questions pour Raphael :** voir `reports/phase-2.md` (que faire de la précision des conflits : second jeu de validation à gabarits neufs, accepter l'écart, ou changer le seuil).
+- **Suite prévue :** selon la décision de Raphael sur les conflits.
