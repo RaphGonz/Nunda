@@ -140,6 +140,70 @@ def anonymize(
 
 
 @app.command()
+def search(
+    question: Annotated[str, typer.Argument(help="Message de l'utilisateur.")],
+    stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (index BM25 à côté).")],
+    precedente: Annotated[
+        list[str] | None, typer.Option(help="Messages précédents, du plus ancien au plus récent.")
+    ] = None,
+    citee: Annotated[list[int] | None, typer.Option(help="Propositions citées avant.")] = None,
+    conv: Annotated[str | None, typer.Option(help="Conversation (contraintes).")] = None,
+    jetons: Annotated[
+        int | None, typer.Option(help="Budget de jetons (config par défaut).")
+    ] = None,
+    sans_trace: Annotated[bool, typer.Option(help="Ne pas écrire la table trace.")] = False,
+    sortie: Annotated[Path | None, typer.Option(help="Fichier JSON (sinon la sortie).")] = None,
+) -> None:
+    """Recherche : propositions du contexte, dans l'ordre, avec leurs raisons (§7)."""
+    import json
+    import sys
+    from dataclasses import asdict
+
+    from ccm.config import load_config
+    from ccm.schema import ouvrir_stock
+    from ccm.search import retrieve as r
+    from ccm.search.bm25 import charger_index, dossier_index
+
+    if not stock.exists():
+        raise typer.BadParameter(f"base absente : {stock}")
+    cfg, cfg_s = load_config("ingest"), load_config("search")
+    con = ouvrir_stock(stock)
+    try:
+        res = r.chercher(
+            con,
+            charger_index(dossier_index(stock)),
+            r.lire_message(question, con, cfg),
+            cfg_s,
+            cfg,
+            precedentes=[r.lire_message(m, con, cfg) for m in precedente or []],
+            conv_id=conv,
+            citees=frozenset(citee or []),
+            jetons_max=jetons,
+        )
+        rid = None if sans_trace else r.ecrire_trace(con, res, question, conv)
+        con.commit()
+        pieces = dict(con.execute("SELECT prop_id, piece_id FROM proposition"))
+    finally:
+        con.close()
+    texte = json.dumps(
+        dict(
+            reponse_id=rid,
+            noms=res.noms,
+            jetons=res.jetons,
+            propositions=[dict(asdict(res.raisons[p]), piece_id=pieces[p]) for p in res.prop_ids],
+        ),
+        ensure_ascii=False,
+        indent=1,
+    )
+    if sortie:
+        sortie.write_text(texte, encoding="utf-8")
+    else:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        typer.echo(texte)
+
+
+@app.command()
 def modeles() -> None:
     """Télécharge les modèles de la détection des noms dans `runs/modeles/` (§6)."""
     from ccm.data.modeles import MODELES, telecharger

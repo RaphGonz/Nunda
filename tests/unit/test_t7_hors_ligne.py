@@ -85,3 +85,27 @@ def test_t7_detection_des_noms_hors_ligne(sans_reseau):
         f.cache_clear()
     zones = detecter(["Elodie Bamier a vu la SARL Delcoron."], cfg)[0]
     assert len(zones) == 2
+
+
+def test_t7_recherche_hors_ligne(sans_reseau, tmp_path):
+    """Index BM25, recherche et trace (§7), réseau coupé."""
+    from ccm.anonymize.exemple import Message
+    from ccm.config import load_config
+    from ccm.graph.store import ajouter_mentions
+    from ccm.schema import TypeNom
+    from ccm.search.bm25 import charger_index, construire_index
+    from ccm.search.retrieve import chercher, ecrire_trace
+
+    cfg, cfg_s = load_config("ingest"), load_config("search")
+    con = ouvrir_stock(tmp_path / "d.sqlite")
+    con.execute("INSERT INTO piece (piece_id, type, rang) VALUES ('P1', 'RAPPORT', 0)")
+    con.execute(
+        "INSERT INTO proposition (piece_id, page, ordre, texte, genre, ocr_conf) "
+        "VALUES ('P1', 1, 0, 'Jean Rival a signé le bail.', 'PHRASE', 1.0)"
+    )
+    ajouter_mentions(con, 1, [(0, 10, "Jean Rival", "jean rival", "PER", "regle")])
+    construire_index(con, tmp_path / "i", cfg, cfg_s)
+    q = Message("Qui a signé, Jean Rival ?", ((13, 23, TypeNom.PER),), ())
+    res = chercher(con, charger_index(tmp_path / "i"), q, cfg_s, cfg)
+    assert res.prop_ids == [1]
+    ecrire_trace(con, res, q.texte)

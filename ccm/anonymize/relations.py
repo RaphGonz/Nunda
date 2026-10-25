@@ -165,6 +165,12 @@ def relations_noms(
     return out
 
 
+def relations_entre(a: Nom, b: Nom, cfg: IngestConfig) -> set[Relation]:
+    """Relations 2 à 10 entre deux noms, dans un sens ou dans l'autre (recherche, §7)."""
+    la, lb = _Lu(a, cfg), _Lu(b, cfg)
+    return {*_orientees(la, lb), *_orientees(lb, la), *_symetriques(la, lb)}
+
+
 def alias_declares(
     texte: str, mentions: list[tuple[int, int, int]], cfg: NomsConfig
 ) -> set[tuple[int, int]]:

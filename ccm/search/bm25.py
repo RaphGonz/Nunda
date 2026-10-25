@@ -12,7 +12,7 @@ from pathlib import Path
 
 import bm25s
 
-from ccm.config import IngestConfig, SearchConfig
+from ccm.config import IngestConfig, RacinesConfig, SearchConfig
 from ccm.ingest.racines import racines
 
 
@@ -37,3 +37,23 @@ def construire_index(
         bm.save(dossier, show_progress=False)
     (dossier / "prop_ids.json").write_text(json.dumps([p for p, _ in lignes]), encoding="utf-8")
     return len(lignes)
+
+
+class Index:
+    """Index BM25 chargé : score de chaque proposition gardée pour un texte."""
+
+    def __init__(self, dossier: Path):
+        self.prop_ids: list[int] = json.loads((dossier / "prop_ids.json").read_text("utf-8"))
+        self.bm = bm25s.BM25.load(dossier) if self.prop_ids else None
+
+    def scores(self, texte: str, cfg: RacinesConfig) -> dict[int, float]:
+        """Scores non nuls, par prop_id."""
+        mots = [m for m in racines(texte, cfg) if self.bm and m in self.bm.vocab_dict]
+        if not mots:
+            return {}
+        s = self.bm.get_scores(mots)
+        return {self.prop_ids[i]: float(s[i]) for i in s.nonzero()[0]}
+
+
+def charger_index(dossier: Path) -> Index:
+    return Index(dossier)

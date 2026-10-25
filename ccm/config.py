@@ -11,7 +11,7 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict
 
-from ccm.schema import TypeNom, TypePiece
+from ccm.schema import Relation, TypeNom, TypePiece
 
 CONFIGS_DIR = Path(__file__).resolve().parent.parent / "configs"
 
@@ -181,8 +181,41 @@ class Bm25Config(_Bloc):
     b: float
 
 
+class DepartsConfig(_Bloc):
+    par_nom: int
+    par_texte: int
+    relations: list[Relation]
+
+
+class ClassementConfig(_Bloc):
+    poids_noms: float
+    bonus_depart: float
+
+
+class SecondTourConfig(_Bloc):
+    meilleures: int
+    noms_max: int
+    tours: int
+
+
+class BudgetConfig(_Bloc):
+    propositions: int
+    jetons: int
+    jetons_a: int
+
+
+class JetonsConfig(_Bloc):
+    par_proposition: int
+    par_mot: float
+
+
 class SearchConfig(ConfigBase):
     bm25: Bm25Config
+    departs: DepartsConfig
+    classement: ClassementConfig
+    second_tour: SecondTourConfig
+    budget: BudgetConfig
+    jetons: JetonsConfig
 
 
 class ModelConfig(ConfigBase):
