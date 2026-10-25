@@ -5,9 +5,21 @@ description = "CCM : modèle de citation amnésique"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "bm25s>=0.2",
+    "datasketch>=2.0.0",
+    "fr-core-news-lg",
+    "gliner>=0.2.29",
+    "protobuf>=7.36.2",
     "pydantic>=2.9",
-    "pymupdf>=1.24",
+    "pypdfium2>=4.30",
+    "pysbd>=0.3.4",
+    "pystemmer>=2.2",
     "pyyaml>=6.0",
+    "rapidfuzz>=3.14.6",
+    "spacy>=3.8.16",
+    "spylls>=0.1.7",
+    "torch>=2.14.1",
+    "transformers>=4.51,<5",
     "typer>=0.12",
 ]
 
@@ -19,6 +31,9 @@ dev = [
     "hypothesis>=6.100",
     "pytest>=8.3",
     "ruff>=0.8",
+]
+interne = [
+    "pymupdf>=1.24,<2",
 ]
 
 [build-system]
@@ -38,3 +53,24 @@ select = ["E", "F", "W", "I", "B", "UP"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+[tool.uv]
+default-groups = ["dev", "interne"]
+
+# PyTorch CUDA sous Windows (GTX 1660 Ti, sm_75) ; roue CPU sous Linux (CI).
+[tool.uv.sources]
+fr-core-news-lg = { url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_lg-3.8.0/fr_core_news_lg-3.8.0-py3-none-any.whl" }
+torch = [
+    { index = "pytorch-cu126", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

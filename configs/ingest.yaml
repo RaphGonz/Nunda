@@ -1,3 +1,187 @@
-# Champs ajoutés avec la phase qui les utilise.
+# Champs ajoutés avec la phase qui les utilise. Valeurs de départ (SPEC.md §5).
 version: 1
 description: "Ingestion : extraction, segmentation, nombres, doublons, conflits (SPEC.md §5)."
+
+# Étape 1 : extraction (ingest/extract.py). Distances en points typographiques.
+extraction:
+  # Étape 4 : cellules tracées (rectangles) ; une rangée a au moins 2 cellules.
+  tableaux: {cote_min: 2, tolerance: 1, cellules_min: 2}
+  ocr_caracteres_min: 20
+  ocr_dpi: 300
+  ocr_langue: fra
+  tesseract: [tesseract, "C:/Program Files/Tesseract-OCR/tesseract.exe"]
+  tessdata: runs/modeles/tessdata
+  gouttiere_min: 15
+  largeur_min_colonne: 150
+  ecart_bloc: 1.5
+  facteur_paragraphe: 0.2
+  facteur_paragraphe_ocr: 0.65
+
+# Étape 2 : pièces et types (ingest/piece_type.py). Le premier motif trouvé donne le type ;
+# tous sont des motifs d'en-tête.
+pieces:
+  lignes_en_tete: 15
+  motifs:
+    - {motif: "PROCÈS-VERBAL D'AUDITION", type: PV_AUDITION}
+    - {motif: "PROCÈS-VERBAL DE CONSTAT", type: PV_CONSTATATION}
+    - {motif: "RAPPORT", type: RAPPORT}
+    - {motif: "CONTRAT", type: CONTRAT}
+    - {motif: "RELEVÉ DE COMPTE", type: RELEVE}
+    - {motif: "RÉQUISITION", type: AUTRE}
+    - {motif: "PROCÈS-VERBAL", type: AUTRE}
+    - {motif: "P\\.V\\. n°", type: AUTRE}
+    - {motif: "Article L\\.", type: LOI}
+  rang: {LOI: 1}
+
+# Étapes 3 et 3 bis : segmentation (ingest/segment.py).
+segmentation:
+  dependance_mots: [Toutefois, Cependant, Dans ce cas, En effet, Ainsi, Par conséquent,
+    Il, Elle, Ils, Elles, Celui-ci, Celle-ci, Ce dernier, Cette dernière]
+  mots_min: 4
+  motif_question: "(?:Q|QUESTION|Question)\\s*[:.–-]"
+  motif_reponse: "(?:R|RÉPONSE|Réponse)\\s*[:.–-]"
+  # Points qui ne finissent pas une phrase (les initiales « J. », « P.V. » aussi).
+  abreviations: [M, MM, Mme, Mmes, Mlle, Me, Mes, Dr, Pr, art, Art, al, cf, chap, p, pp,
+    réf, Réf, n, "no", vol, éd, c, Cass, crim, civ, com, soc, ass, plén, ch, av, bd, boul,
+    janv, févr, avr, juil, sept, oct, nov, déc, env, ex, St, Ste]
+  # 128 jetons du tokenizer quand il existera (phase 5).
+  mots_max: 80
+  # Étape 4 : paragraphe « Libellé : valeur », libellé de 2 à 40 caractères.
+  motif_champ: '[^:]{2,40}:\s+\S'
+
+# Étape 5 : noms (ccm/ner, SPEC.md §6). Fichiers des modèles téléchargés par `ccm modeles`
+# dans `runs/modeles/` (hors de git), chemins relatifs à la racine du dépôt.
+detection:
+  detecteurs: [gliner, spacy, regle, majuscules]
+  gliner:
+    modele: runs/modeles/gliner_multi-v2.1
+    seuil: 0.6  # 0,3 au départ ; 0,6 mesuré le 2026-10-22 (précision 0,82 → 0,88, rappel PER 0,998)
+    lot: 32
+    appareil: auto  # cuda si disponible, sinon cpu
+    # Étiquette demandée à GLiNER → type de nom.
+    etiquettes: {person: PER, organization: ORG, location: LIEU, address: LIEU, product: AUTRE}
+  spacy:
+    modele: fr_core_news_lg
+    etiquettes: {PER: PER, ORG: ORG, LOC: LIEU, MISC: AUTRE}
+  # D3 : les références de l'étape 6 (`nombres.references`), plus celles-ci.
+  regles:
+    - '[\w.+-]+@[\w-]+(?:\.[\w-]+)+'                                  # courriel
+    - '(?:https?://|www\.)\S+[\w/]'                                     # URL
+    - '(?:SIREN|SIRET|RCS)\D{0,20}\d{3}\s?\d{3}\s?\d{3}(?:\s?\d{5})?'  # SIREN, SIRET
+    - '(?:[Dd]ossier|[Aa]ffaire|[Pp]arquet|RG)\s*(?:n°)?\s*:?\s*\d[\w/.-]*'  # dossier
+  # D4 : dictionnaires Hunspell (nom sans extension), français et anglais. Un mot est
+  # courant si sa forme en minuscules y est reconnue.
+  lexiques: [runs/modeles/lexique/fr, runs/modeles/lexique/en_US]
+  # Élisions retirées en tête d'un mot (« qu'Elodie », « d'Ussel »).
+  elisions: [l, d, j, m, n, s, t, c, qu, jusqu, lorsqu, puisqu, quoiqu]
+  # Propagation : chaînes d'au moins tant de caractères.
+  propagation_min: 2
+
+# Étape 6 : nombres et dates (ingest/numbers.py). Motifs sensibles à la casse.
+nombres:
+  references:
+    - '\d{4}/\d{3,}'                                   # numéro de PV, de compte
+    - '(?:[Aa]rticles?|[Aa]rt\.)\s+(?:[LRDA]\.?\s*)?\d+(?:[-–.]\d+)*'
+    - '[LRD]\.\s?\d+(?:-\d+)*'                         # article L. 121-1
+    - 'n°\s*:?\s*[\w/.-]*\d[\w/.-]*'                     # n° 12, n° 2025/123
+    - '(?:\+33\s?|0)[1-9](?:[\s.-]?\d{2}){4}'             # téléphone
+    - '[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){3,7}(?:\s?[A-Z0-9]{1,3})?'  # IBAN
+    - '[A-Z]{2}-\d{3}-[A-Z]{2}'                          # plaque
+  mois: [janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre,
+    novembre, décembre]
+  annee_min: 1900
+  annee_max: 2100
+  unites:
+    - {unite: "€", formes: ["€", "euros?", "EUR"]}
+    - {unite: "%", formes: ["%", "pour ?cent"]}
+    - {unite: km, formes: [km, "kilomètres?"]}
+    - {unite: kg, formes: [kg, "kilos?(?:grammes?)?"]}
+    - {unite: mois, formes: [mois]}
+    - {unite: m, formes: [m, "mètres?"]}
+    - {unite: g, formes: [g, "grammes?"]}
+    - {unite: an, formes: ["ans?", "années?"]}
+    - {unite: jour, formes: ["jours?"]}
+    - {unite: heure, formes: ["heures?"]}
+    - {unite: minute, formes: ["minutes?", min]}
+  unite_heure_du_jour: heure du jour
+  avant_heure_du_jour: [à, À, vers, Vers, dès, Dès, jusqu'à]
+  lettres: {zéro: 0, un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7,
+    huit: 8, neuf: 9, dix: 10, onze: 11, douze: 12, treize: 13, quatorze: 14, quinze: 15,
+    seize: 16, vingt: 20, vingts: 20, trente: 30, quarante: 40, cinquante: 50, soixante: 60,
+    cent: 100, cents: 100, mille: 1000}  # 100 et plus : multiplicateurs
+
+# Étape 7 : doublons (ingest/dedup.py).
+doublons:
+  permutations: 128
+  seuil_jaccard: 0.9
+  mots_par_triplet: 3
+  graine: 1
+
+# Racines des mots : signature des conflits (étape 8) et index BM25 (SPEC.md §7).
+# Minuscules, mots vides retirés, racines Snowball, puis accents retirés.
+# Mots vides : liste française de Snowball.
+racines:
+  langue: french
+  mots_vides: [au, aux, avec, ce, ces, dans, de, des, du, elle, en, et, eux, il, ils, je, la,
+    le, les, leur, lui, ma, mais, me, même, mes, moi, mon, ne, nos, notre, nous, "on", ou, par,
+    pas, pour, qu, que, qui, sa, se, ses, son, sur, ta, te, tes, toi, ton, tu, un, une, vos,
+    votre, vous, c, d, j, l, à, m, n, s, t, y, été, étée, étées, étés, étant, étante, étants,
+    étantes, suis, es, est, sommes, êtes, sont, serai, seras, sera, serons, serez, seront,
+    serais, serait, serions, seriez, seraient, étais, était, étions, étiez, étaient, fus, fut,
+    fûmes, fûtes, furent, sois, soit, soyons, soyez, soient, fusse, fusses, fût, fussions,
+    fussiez, fussent, ayant, ayante, ayantes, ayants, eu, eue, eues, eus, ai, as, avons, avez,
+    ont, aurai, auras, aura, aurons, aurez, auront, aurais, aurait, aurions, auriez, auraient,
+    avais, avait, avions, aviez, avaient, eut, eûmes, eûtes, eurent, aie, aies, ait, ayons,
+    ayez, aient, eusse, eusses, eût, eussions, eussiez, eussent]
+
+# Norme d'un nom (SPEC.md §6) : titres retirés en tête, comparés après normalisation.
+noms:
+  titres: [m, mm, mme, mmes, mlle, me, maitre, dr, pr, monsieur, madame, mademoiselle,
+    capitaine, lieutenant, commandant, colonel, brigadier, adjudant, major, gendarme]
+  # Particules du nom de famille, après normalisation (« de la Fontaine », « van Dam »).
+  particules: [de, du, des, la, le, d, van, von, da, di, del, della]
+  # Genre d'un titre placé devant une mention (relation INCOMPATIBLE, §6).
+  genres: {m: M, mm: M, monsieur: M, mme: F, mmes: F, mlle: F, madame: F, mademoiselle: F}
+  # ALIAS_DECLARE (§6) : texte exact entre deux noms d'une même proposition.
+  alias: ['\s*,\s*dite?\s+', '\s*,?\s*alias\s+', '\s*,\s*surnommée?\s+',
+    '\s*\(\s*ci-après\s+(?:dénommée?\s+)?[«"“]?\s*', '\s*,?\s*épouse\s+', '\s*,\s*née?\s+']
+
+# Anonymiseur (SPEC.md §6, §8) : slots et attributs.
+anonymiseur:
+  reservoir: 256  # K : indices tirés par type de nom, et pour les valeurs
+  grandeur: [-3, 12]  # bornes de l'ordre de grandeur d'un nombre
+  rang_max: 63  # rang dense d'une valeur parmi celles de même unité
+  ocr_bas: 0.85  # marque [OCR_BAS] sous cette confiance (§5, étape 1)
+
+# Étape 8 : conflits établis (ingest/conflicts.py).
+conflits:
+  # Marques de négation, sans casse (ne … pas, n', aucun, jamais, non), hors des noms.
+  negation: ['\bne\b[^.;:?!]*\bpas\b', '\bn[''’]', '\baucun(?:e|s|es)?\b', '\bjamais\b',
+    '\bnon\b']
+  unite_euro: "€"
+  # Types d'acte : mots comparés par racine (nom, infinitif, participe : leurs racines
+  # diffèrent souvent). Valeur de départ, vocabulaire pénal courant, à reprendre sur de
+  # vraies pièces. Écartés pour collision : arrêt et arrêté (décision, décret), rendez
+  # (rendre), coup, communication (commune).
+  actes:
+    VIREMENT: [virement, virer, viré, transfert, transférer, transféré, versement, verser,
+      versé, paiement, payer, payé, chèque, prélèvement, prélever, prélevé]
+    SIGNATURE: [signature, signer, signé, contrat, accord, convention, parapher, paraphé,
+      conclure, conclu]
+    ARRESTATION: [arrestation, interpellation, interpeller, interpellé]
+    APPEL: [appel, appeler, appelé, téléphone, téléphoner, téléphoné, téléphonique, courriel,
+      joindre, joint]
+    RENCONTRE: [rencontre, rencontrer, rencontré, réunion, réunir, réuni, entrevue, entretien]
+    VOL: [vol, voler, volé, dérober, dérobé, soustraire, soustrait, cambriolage, cambrioler,
+      cambriolé, escroquerie, escroquer, escroqué, détournement, détourner, détourné]
+    CONTROLE: [contrôle, contrôler, contrôlé, vérification, vérifier, vérifié, inspection,
+      inspecter, inspecté, perquisition, perquisitionner, perquisitionné]
+    DEGRADATION: [dégradation, dégrader, dégradé, dégât, dégâts, dommage, endommager,
+      endommagé, effraction, destruction, détruire, détruit, casser, cassé]
+    AUDITION: [audition, auditionner, auditionné, entendre, entendu]
+    VIOLENCE: [violence, frapper, frappé, agression, agresser, agressé, blesser, blessé,
+      blessure, menace, menacer, menacé]
+  # Cas B : en-tête d'article en tête de proposition (groupe 1 : numéro) ; code cité dans
+  # l'en-tête de l'article ou de la pièce.
+  motif_article: '^(?:Article|ARTICLE|Art\.)\s+((?:[LRDA]\.?\s*)?\d+(?:\s*[-–.]\s*\d+)*)'
+  motif_code: '\b[Cc]ode (?:civil|pénal|général des impôts|de procédure (?:civile|pénale)|(?:de la |de l[''’]|des |du |de )[\w-]+)'

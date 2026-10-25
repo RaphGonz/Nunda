@@ -48,6 +48,7 @@ class Detecteur(StrEnum):
     GLINER = "gliner"
     SPACY = "spacy"
     REGLE = "regle"
+    MAJUSCULES = "majuscules"
     PROPAGATION = "propagation"
 
 

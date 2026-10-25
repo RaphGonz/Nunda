@@ -2,6 +2,7 @@
 
 setup:
 	uv sync --locked
+	uv run --locked ccm modeles
 
 lint:
 	uv run --locked ruff check .

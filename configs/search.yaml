@@ -1,3 +1,27 @@
 # Champs ajoutés avec la phase qui les utilise.
 version: 1
 description: "Recherche : BM25, expansion par le graphe, budget (SPEC.md §7)."
+
+# Index BM25 (search/bm25.py) : texte des propositions gardées, racines de l'ingestion.
+bm25: {k1: 1.5, b: 0.75}
+
+# Étapes 1 et 1 bis : départs. Un nom de la question part de sa norme, puis des noms
+# reliés par ces relations (dans un sens ou dans l'autre).
+departs:
+  par_nom: 40
+  par_texte: 30
+  relations: [MEME_FAMILLE, INITIALES_DE, INCLUS_DANS, PROCHE, SIGLE_DE]
+
+# Étape 3 : score = BM25 normalisé + poids_noms × noms couverts + bonus_depart.
+classement: {poids_noms: 0.5, bonus_depart: 0.25}
+
+# Étape 4 : second tour.
+second_tour: {meilleures: 10, noms_max: 5, tours: 2}
+
+# Étape 6 : budget (jetons_a : variantes A0 et A1).
+budget: {propositions: 150, jetons: 3500, jetons_a: 6000}
+
+# Jetons d'une proposition en attendant le tokenizer (phases 4 et 5) : jetons de
+# structure ([P], pièce, rang, [/P]) + par_mot × mots, arrondi au-dessus. Même rapport
+# que `segmentation.mots_max` (80 mots pour 128 jetons).
+jetons: {par_proposition: 4, par_mot: 1.6}

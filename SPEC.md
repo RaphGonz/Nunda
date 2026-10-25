@@ -35,7 +35,7 @@ Le projet se construit en 8 phases. Les phases 0 à 3 sont du code sans GPU : el
 | --- | --- | --- | --- |
 | 0 | Dépôt, configuration, CI, schémas de données | Dépôt qui s'installe avec une commande ; CI verte | `make test` passe sur une machine neuve |
 | 1 | Générateur de monde et corpus synthétique niveau 0, pièces rédigées par gabarits (sans LLM) | 2 000 dossiers d'entraînement, 200 de validation, 200 de test, avec vérité terrain | Le contrôle (noms, nombres, dates de chaque phrase dans ses faits) passe à 100 % ; même graine, mêmes fichiers |
-| 2 | Ingestion, graphe, anonymiseur, recherche | Commandes `ingest`, `search`, `anonymize` | Sur le niveau 0 : rappel des noms PER ≥ 0,98 ; rappel des propositions justificatives dans le budget ≥ 0,95 ; test T2 exact |
+| 2 | Ingestion, graphe, anonymiseur, recherche | Commandes `ingest`, `search`, `anonymize` | Sur le niveau 0 : rappel des noms PER ≥ 0,98 ; rappel des propositions justificatives dans le budget ≥ 0,95 ; test T2 exact ; conflits établis : précision ≥ 0,9 et rappel ≥ 0,5 sur les versions contradictoires d'heure et de montant (réglage sur la validation, mesure finale une seule fois sur le test) |
 | 3 | Grammaire, automate, vérificateur, rendu, modèle oracle | Commande `answer --oracle` de bout en bout | 100 % des suites de référence acceptées par l'automate ; 100 000 décodages aléatoires sous masque, tous valides ; aucun nom, nombre ou date affiché hors du contexte |
 | 4 | Prototype A0, puis A1, sur un modèle pré-entraîné | Points de contrôle A0 et A1, rapport de mesures | A0 sur le niveau 0 : F1 de citation ≥ 0,90, abstention ≥ 0,85 ; HotpotQA (distracteurs) : F1 des faits justificatifs ≥ 0,75 |
 | 5 | Pré-entraînement de B : corpus anonymisé, tokenizer, modèle de zéro | Point de contrôle B pré-entraîné, taux de canaris | Test T1 exact ; perte de validation stable ; taux d'extraction des canaris naturels mesuré et rapporté |
@@ -56,7 +56,7 @@ Tout le projet est en Python, dans un seul dépôt, et tourne hors ligne après 
 | Réseau de neurones | PyTorch 2.5 ou plus, `transformers`, `peft`, `tokenizers`, `safetensors` | PyTorch 2.5 est le minimum pour FlexAttention |
 | Stock et graphe | SQLite (bibliothèque standard) | Un fichier par base de dossiers |
 | Exemples d'entraînement | Parquet (`pyarrow`), un fichier par lot de 10 000 exemples |  |
-| PDF natif | PyMuPDF | Texte et position de chaque mot |
+| PDF natif | pypdfium2 (Apache 2.0 / BSD) | Texte et position de chaque caractère. PyMuPDF (AGPL) reste dans `worldgen`, outil interne non distribué (décision de Raphael, 2026-10-18 : code fermé, poids ouverts) |
 | OCR | Tesseract 5, modèle `fra` | Donne une confiance par mot. Option : docTR |
 | Phrases | Découpeur à règles (`pysbd`, français) et liste d'abréviations juridiques | Option pour les niveaux 2 et plus : `wtpsplit` |
 | Détection de noms | Union de GLiNER multilingue, spaCy `fr_core_news_lg` et règles | Modèles encodeurs, non génératifs. Vérifier chaque licence au téléchargement |
@@ -175,11 +175,11 @@ L'ingestion est une suite de 9 étapes de code, sans modèle génératif. Chaque
 
 | Étape | Algorithme | Paramètres de départ |
 | --- | --- | --- |
-| 1. Extraction | PyMuPDF, mot par mot, ordre de lecture par blocs (haut vers bas, colonnes détectées par groupes d'abscisses). Une page sans texte natif passe à l'OCR. Le code recolle les lignes et les mots coupés en fin de ligne ; il ne change rien d'autre. | OCR si la page a moins de 20 caractères natifs ; 300 dpi ; `ocr_conf` = moyenne des confiances des mots ; `ocr_bas` si < 0,85 |
+| 1. Extraction | pypdfium2, mot par mot, ordre de lecture par blocs (haut vers bas, colonnes détectées par groupes d'abscisses). Une page sans texte natif passe à l'OCR. Le code recolle les lignes et les mots coupés en fin de ligne ; il ne change rien d'autre. | OCR si la page a moins de 20 caractères natifs ; 300 dpi ; `ocr_conf` = moyenne des confiances des mots ; `ocr_bas` si < 0,85 |
 | 2. Pièces et types | Un fichier est une pièce. Dans un fichier, une nouvelle pièce commence à chaque page dont les 15 premières lignes contiennent un motif d'en-tête. Le type vient d'une table de motifs ; le rang vient d'une table type → rang. | Motifs : « PROCÈS-VERBAL », « P.V. n° », « RAPPORT », « RÉQUISITION », « CONTRAT », « RELEVÉ DE COMPTE », « Article L. ». Rang : loi et règlement 1, circulaire 2, doctrine 3, pédagogique 4, autre 0 (non classé) |
 | 3. Segmentation | Une proposition par phrase. Une phrase reçoit DÉPEND_DE vers la précédente si elle commence par un mot de la liste, si elle a moins de 4 mots, ou si elle est une réponse dans un motif question-réponse d'audition. | Liste : Toutefois, Cependant, Dans ce cas, En effet, Ainsi, Par conséquent, Il, Elle, Ils, Elles, Celui-ci, Celle-ci, Ce dernier, Cette dernière |
 | 3 bis. Phrases longues | Une phrase trop longue est coupée aux points-virgules et aux deux-points. Les parties ont le genre PARTIE et dépendent les unes des autres : citer une partie affiche la phrase entière. | Limite : 128 jetons du tokenizer du modèle (80 mots avant que le tokenizer existe) |
-| 4. Tableaux et formulaires | `find_tables()` de PyMuPDF. Une ligne devient une proposition « cellule \| cellule \| … », avec DÉPEND_DE vers la ligne d'en-tête. Une ligne « Libellé : valeur » devient une proposition CHAMP. | Motif de champ : libellé de 2 à 40 caractères avant « : » |
+| 4. Tableaux et formulaires | Détection des tableaux sans PyMuPDF : cellules tracées (rectangles) lues par pypdfium2, sans autre bibliothèque. Une ligne devient une proposition « cellule \| cellule \| … », avec DÉPEND_DE vers la ligne d'en-tête. Une ligne « Libellé : valeur » devient une proposition CHAMP. | Motif de champ : libellé de 2 à 40 caractères avant « : » |
 | 5. Noms | Voir section 6. |  |
 | 6. Nombres et dates | Expressions régulières pour les formats français. Les références (articles, numéros de PV, téléphones, IBAN, plaques) sont détectées avant et ne sont jamais des nombres. Un nombre en lettres est un slot seulement devant une unité connue. | Unités : €, %, km, m, kg, g, an, mois, jour, heure, minute, heure du jour. Une année seule (1900 à 2100) est une date de précision ANNEE |
 | 7. Doublons | Hachage SHA-1 du texte normalisé pour les copies exactes. MinHash sur des triplets de mots pour les quasi-copies. La copie de meilleure confiance OCR est la version gardée ; la recherche ignore les autres ; le rendu les liste (« aussi dans la pièce X, page Y »). | 128 permutations ; seuil de Jaccard 0,9 |
@@ -187,15 +187,21 @@ L'ingestion est une suite de 9 étapes de code, sans modèle génératif. Chaque
 | 9. Arbre | Seulement pour les codes en XML de Légifrance. Non requis avant la phase 7. |  |
 
 ### Détection des conflits (remplace la « clé d'obligation »)
+Il y a deux niveaux de conflit (décision de Raphael, 2026-10-21). Le **conflit établi** est trouvé par le code à l'ingestion : c'est une arête CONFLIT, et le vérificateur affiche toujours l'autre version (section 11). Le **conflit supposé** est signalé par le modèle à la réponse (`CONFLIT SANS_PREUVE`, section 10) et affiché comme hypothèse, à vérifier par l'humain. Cette section décrit le premier. Le code ne comprend pas le texte : il ne crée une arête que dans deux cas précis.
 
-Deux propositions sont en conflit quand elles disent la même chose avec une valeur différente. Le code le détecte sans comprendre le texte.
+**A. Même fait, valeur différente.** Deux propositions de pièces différentes.
 
-1. **Signature.** Remplacer chaque nom par son type, chaque nombre par `NUM:unité`, chaque date par `DATE`. Raciniser les mots, retirer les mots vides. La signature est l'ensemble des racines.
-2. **Candidats.** Garder les paires dont les signatures ont un Jaccard ≥ 0,6 (recherche par MinHash LSH), qui ne sont pas des doublons, et dont les noms normalisés de l'une sont inclus dans ceux de l'autre.
-3. **Comparaison.** Aligner les nombres et les dates des deux propositions par unité et par ordre. Si une paire alignée a deux valeurs différentes, créer l'arête CONFLIT. Si toutes les valeurs sont égales, ne rien créer.
-4. **Négation.** Si le Jaccard est ≥ 0,8 et qu'une seule des deux propositions contient une marque de négation (ne … pas, n', aucun, jamais, non), créer l'arête CONFLIT.
+1. **Même fait.** Elles ont une date de précision JOUR en commun ; un nom en commun (nom de famille d'une mention PER, section 6, ou norme d'une mention ORG) ; un lieu en commun si les deux ont une mention LIEU ; un type d'acte en commun si les deux en ont un. Le type d'acte vient d'une liste de mots par type dans `configs/ingest.yaml` (virement, signature, arrestation, appel…), comparés par racine.
+2. **Valeur différente.** Les heures du jour, alignées par ordre, diffèrent ; ou les montants en euros se recouvrent en partie (au moins un montant commun et un montant propre à chacune). Les valeurs se comparent en décimal exact.
+3. **Négation.** Même fait, et une marque de négation (ne … pas, n', aucun, jamais, non) dans une seule des deux, cherchée hors des mentions de noms.
 
-**Limite écrite.** Deux sources qui se contredisent avec des mots très différents ne sont pas détectées en v1. C'est le cas de l'entretien du juriste n° 1 (livre blanc contre Code). Deux pistes pour plus tard, à mesurer sur le rappel : un encodeur de phrases non génératif pour proposer des candidats, ou une action « conflit supposé » du modèle, affichée comme hypothèse. Le corpus synthétique contient des versions contradictoires avec vérité terrain : il mesure la précision et le rappel de cette étape. Cible de précision : 0,9.
+Une date différente veut dire un autre fait : jamais de conflit établi. Un montant différent sans montant commun non plus : un événement a souvent plusieurs montants, et chaque pièce peut en citer un autre.
+
+**B. Versions d'un même article.** Un article est la suite des propositions d'une pièce qui commence à une ligne d'en-tête d'article (« Article L. 121-1 ») et va jusqu'au prochain en-tête. Sa clé est le numéro normalisé et le code cité dans l'en-tête de l'article ou de la pièce (« Code de commerce ») ; sans code lu, la clé est le numéro seul, et deux articles ne se comparent que si aucun des deux n'a de code. Deux articles de même clé, dans deux pièces, dont les textes normalisés diffèrent, sont deux versions : chaque proposition de l'une sans copie exacte dans l'autre reçoit une arête CONFLIT vers chaque proposition de l'autre sans copie exacte. Le rendu affiche la source, le rang et la date de chaque version : c'est sur eux que le lecteur choisit.
+
+L'arête CONFLIT est écrite dans les deux sens ; seules les versions gardées des doublons entrent dans la détection.
+
+**Limite écrite.** Le code ne trouve ni les reformulations, ni les contradictions logiques (une règle qui implique le contraire d'une autre, le livre blanc contre le Code de l'entretien du juriste n° 1). Le même fait raconté à deux ou trois dates différentes, qu'il s'agisse d'une répétition ou d'un problème d'alibi ou de témoin, n'est pas un conflit établi : le code ne peut pas savoir si c'est le même fait. Le conflit sur une personne (« c'est Martin » contre « c'est Joly ») n'est pas un conflit établi en v1 : les formes d'un même nom (« L.M. », « Mme Rot ») le rendent trop peu sûr. Tous ces cas relèvent du conflit supposé. La liste des types d'acte est une valeur de départ, à reprendre sur de vraies pièces. Le corpus synthétique contient des versions contradictoires avec vérité terrain : il mesure la précision et le rappel du cas A. Le cas B se mesure sur les textes de Légifrance.
 
 ### Suppression d'une personne
 
@@ -433,6 +439,7 @@ CITE(p)                  →  P
 CALCUL(expr)             →  CALCUL  (N | op)+  FIN_CALCUL              expression postfixe
 CONFLIT(p, p′, …)        →  CONFLIT  P  P+  FIN_CONFLIT
 CONFLIT(déclaration, p)  →  CONFLIT  DECLARATION  M  M  P+  FIN_CONFLIT
+CONFLIT_SUPPOSE(p, p′, …) →  CONFLIT  SANS_PREUVE  P  P+  FIN_CONFLIT
 SAME(a, b, p)            →  SAME  M  M  P
 SAME(a, b)               →  SAME  M  M  SANS_PREUVE
 NOTE_SAME(a, b)          →  NOTE_SAME  M  M
@@ -456,10 +463,11 @@ Réponse  →  ABSTENTION FIN   |   segment (connecteur segment)* FIN
 | CONFLIT, premier P | Une proposition qui a une arête CONFLIT dans le contexte |
 | CONFLIT, P suivants | Une proposition reliée au premier P par une arête CONFLIT |
 | CONFLIT DECLARATION | Deux mentions dont les noms ont une contrainte de l'utilisateur, puis une proposition ou plus |
+| CONFLIT SANS_PREUVE | Premier P : toute proposition du contexte. P suivants : une autre proposition du contexte, absente du bloc ; 4 P au plus |
 | SAME, ASK_SAME | Deux mentions de noms différents et de même type, sans contrainte DIFFERENT. Pour SAME, la preuve P contient une mention de l'un des deux noms |
 | NOTE_SAME, NOTE_DIFF | Deux mentions du dernier message de l'utilisateur, de noms différents |
 
-- **Aucune impasse.** L'automate n'ouvre un segment que s'il peut le finir : CALCUL demande deux nombres cités d'unités compatibles ; CONFLIT demande une arête ou une contrainte ; SAME demande deux noms du même type.
+- **Aucune impasse.** L'automate n'ouvre un segment que s'il peut le finir : CALCUL demande deux nombres cités d'unités compatibles ; CONFLIT demande une arête ou une contrainte, CONFLIT SANS_PREUVE deux propositions dans le contexte ; SAME demande deux noms du même type.
 - **Le masque connaît les vraies valeurs.** Il tourne dans le code, hors du modèle. Il interdit par exemple ÷ quand le diviseur vaut zéro.
 
 ### Algèbre des unités
@@ -483,7 +491,7 @@ Plusieurs suites peuvent dire la même chose. Les données d'entraînement en ga
 1. NOTE_SAME et NOTE_DIFF d'abord, si le message de l'utilisateur déclare une identité.
 2. Les citations dans l'ordre de la chaîne de raisonnement du jeu de données ; sinon dans l'ordre du contexte.
 3. Chaque SAME juste avant la première citation qui en a besoin (règle d'ancrage, section 11).
-4. Un bloc CONFLIT à la place d'un CITE quand la proposition a un conflit dans le contexte.
+4. Un bloc CONFLIT à la place d'un CITE quand la proposition a un conflit établi dans le contexte ; un bloc CONFLIT SANS_PREUVE quand l'exemple porte un conflit supposé.
 5. CALCUL après ses citations, précédé de DONC.
 6. Connecteur ET par défaut. MAIS ou EN_REVANCHE devant un segment opposé ; PAR_AILLEURS devant un segment sans nom commun avec le précédent. Seuls les gabarits du corpus synthétique et l'enseignant produisent ces trois connecteurs.
 
@@ -558,7 +566,7 @@ Le vérificateur est du code pur. Il reçoit la suite de pas du modèle et rend 
 1. **Relecture.** Repasser la suite dans l'automate. Une suite refusée ne peut pas arriver sous masque ; si elle arrive, afficher une erreur et l'écrire dans la trace.
 2. **Dépendances.** Pour chaque proposition citée, ajouter toute la fermeture DEPEND_DE, affichée avant la citation, dans le style « contexte ».
 3. **Calculs.** Contrôler que chaque opérande vient d'une proposition citée. Calculer en décimal exact. Afficher la formule entière.
-4. **Conflits.** Pour chaque proposition citée, lire ses arêtes CONFLIT dans toute la base, pas seulement dans le contexte. Si un autre côté n'est pas affiché, ajouter le bloc CONFLIT. Les sources ignorées par l'utilisateur restent exclues.
+4. **Conflits.** Pour chaque proposition citée, lire ses arêtes CONFLIT dans toute la base, pas seulement dans le contexte. Si un autre côté n'est pas affiché, ajouter le bloc CONFLIT. Les sources ignorées par l'utilisateur restent exclues. Un conflit supposé (CONFLIT SANS_PREUVE) n'entraîne aucun ajout.
 5. **Ancrage** (ci-dessous).
 6. **Passages non cités.** Ajouter le bloc « Autres passages pertinents » : propositions de probabilité de sélection ≥ seuil, non citées, 10 au plus, avec leurs dépendances. Le seuil est réglé sur la validation pour un rappel de 0,95.
 7. **Rendu.** Lire chaque texte original dans le stock par `prop_id`. Afficher la pièce et la page. Sous le seuil de confiance OCR : « à vérifier sur la page X ».
@@ -592,7 +600,8 @@ Les gabarits sont des chaînes fixes dans `verify/render.py`. Les noms entre gui
 | NOTE_SAME, NOTE_DIFF | « Noté : « A » et « B » sont la même personne (votre déclaration). » ; de même pour « des personnes différentes » |
 | ASK_SAME | « « A » et « B » sont-ils la même personne ? » |
 | CALCUL | « Calcul : 1 200 € + 300 € = 1 500 € », chaque opérande relié à sa citation |
-| CONFLIT | « Conflit entre sources. » puis chaque source avec son extrait ; puis « Rang : … » si les deux rangs sont connus et différents |
+| CONFLIT | « Conflit entre sources. » puis chaque source avec son extrait, sa pièce et sa date ; puis « Rang : … » si les deux rangs sont connus et différents |
+| CONFLIT SANS_PREUVE | « Contradiction possible entre ces passages (lecture du modèle, à vérifier). » puis chaque source avec son extrait, sa pièce et sa date ; puis « Rang : … » si les rangs sont connus et différents |
 | CONFLIT DECLARATION | « Vous avez dit que « A » et « B » sont la même personne. » puis les citations |
 
 Pour un type autre que PER, « la même personne » devient « la même organisation », « le même lieu » ou « la même chose ».
@@ -622,7 +631,7 @@ Il y a trois jeux de données : le corpus synthétique (phase 1), les données d
 | Plusieurs étapes | 25 % | 2 à 4 CITE en chaîne |
 | Identité | 15 % | SAME avec preuve, ou sans preuve, puis CITE |
 | Fait absent | 10 % | ABSTENTION |
-| Conflit | 10 % | Bloc CONFLIT |
+| Conflit | 10 % | Moitié bloc CONFLIT (conflit établi), moitié bloc CONFLIT SANS_PREUVE (versions contradictoires que le code ne trouve pas : autre formulation, autre date, autre personne) |
 | Calcul | 10 % | CITE puis CALCUL : somme, écart, durée entre deux dates, minimum, maximum |
 | Dialogue | 10 % | Question de suite avec pronom ; correction juste ou fausse de l'utilisateur (NOTE_SAME, NOTE_DIFF, CONFLIT DECLARATION) ; ASK_SAME quand deux personnes sont possibles sans preuve |
 
@@ -649,6 +658,8 @@ Environ 40 questions par dossier, soit 80 000 exemples d'entraînement pour 2 00
 - **Contexte réel.** Le contexte de chaque exemple vient de la vraie recherche de la section 7. Dans 80 % des exemples, le code ajoute les justificatives manquantes. Dans les 20 % restants, si une justificative manque, la cible devient ABSTENTION.
 - **Abstention.** 10 à 15 % des exemples : le code retire les justificatives et leurs doublons.
 - **Conflit injecté.** Le code copie une justificative dans une nouvelle pièce d'un autre rang et change une valeur. La cible devient un bloc CONFLIT.
+- **Conflit supposé.** Versions successives d'un article ; paires règle et exception contradictoires ; questions de l'enseignant (phase 4). Cible : un bloc CONFLIT SANS_PREUVE.
+- **Faux conflit.** Autant d'exemples que de conflits supposés : deux passages compatibles (règle générale et règle spéciale, même fait dit deux fois avec les mêmes valeurs, deux actes différents le même jour). La cible n'a aucun bloc conflit.
 - **Contrefactuel.** 5 % des exemples : le code change une valeur ou inverse une règle dans la justificative. La cible reste la citation de cette proposition. Une proposition de forme « habituelle » est ajoutée dans une pièce sans rapport.
 - **Tirage des indices.** Les indices de noms et de valeurs sont tirés de nouveau à chaque époque.
 
@@ -752,7 +763,8 @@ T1 trouve une fuite d'étiquette dans le modèle, par exemple un vecteur indexé
 | Citation | Précision, rappel et F1 de l'ensemble des propositions citées contre les justificatives ; part des réponses exactes |
 | Abstention | Exactitude sur les faits absents ; taux d'abstention à tort sur les questions qui ont une réponse |
 | Identité | Précision et rappel des SAME contre les alias de référence ; **taux de fusion à tort** sur les dossiers avec homonymes ; taux de ASK_SAME |
-| Conflit | Précision et rappel de la détection à l'ingestion ; taux d'affichage des conflits détectés (100 % par construction) |
+| Conflit établi | Précision et rappel de la détection à l'ingestion, cas A et B séparés ; taux d'affichage des conflits détectés (100 % par construction) |
+| Conflit supposé | Précision jugée par un humain sur 200 réponses ; rappel sur les conflits injectés et sur les versions contradictoires que le code ne trouve pas ; taux de conflits supposés sur les faux conflits |
 | Calcul | Part des résultats exacts |
 | Omission | 1 − rappel de (citées + « autres passages ») contre les justificatives ; rappel de la recherche dans le budget |
 | Détection | Rappel par type de nom |
@@ -821,7 +833,7 @@ Ces 9 points ne bloquent pas les phases 0 à 3. Les trois premiers bloquent la p
 - [ ] **Modèle de base de A.** Qwen ou SmolLM. KLLM utilise les architectures SmolLM et LLaMA : SmolLM rend la comparaison plus directe.
 - [ ] **Modèle enseignant.** Quel LLM pour les questions sur Légifrance (phase 4) et pour la rédaction des pièces (phase 7) ; local ou par API.
 - [ ] **Homonymes exacts.** En v1, deux personnes qui portent exactement la même chaîne (un père et un fils, par exemple) sont un seul nom. Option : limiter un nom à sa pièce et laisser le modèle relier les pièces par SAME. C'est plus sûr en pénal, mais chaque réponse affiche plus d'hypothèses.
-- [ ] **Conflits reformulés.** Les garder hors de la v1, ajouter un encodeur de phrases non génératif à l'ingestion, ou donner au modèle une action « conflit supposé ».
+- [x] **Conflits reformulés.** Tranché le 2026-10-21 : action « conflit supposé » du modèle (`CONFLIT SANS_PREUVE`), affichée comme hypothèse ; le code ne crée que les conflits établis (section 5).
 - [ ] **Langues.** Pré-entraînement bilingue 70/30, ou français seul avec HotpotQA traduit.
 - [ ] **Licences.** Accepter des jeux à licence non commerciale pour la recherche.
 - [ ] **Types de pièces.** Faire valider la table des types et des motifs d'en-tête par un praticien.

@@ -6,7 +6,7 @@ from datetime import date, time
 from decimal import Decimal
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from ccm.config import load_config
@@ -292,6 +292,7 @@ def test_fait_type():
 # --- Les analyseurs du contrôle relisent ce que le rédacteur écrit ---------------------
 
 
+@settings(deadline=None)
 @given(st.integers(1, 10**9), st.randoms(use_true_random=False))
 def test_relire_montant(centimes, rng):
     v = Decimal(centimes) / 100

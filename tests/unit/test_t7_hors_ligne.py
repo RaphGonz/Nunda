@@ -13,7 +13,7 @@ import pytest
 import ccm
 from ccm.schema import Exemple, ouvrir_stock
 
-INFERENCE = ["ingest", "search", "anonymize", "model", "verify"]
+INFERENCE = ["ingest", "ner", "search", "anonymize", "model", "verify"]
 INTERDITS = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "requests", "httpx", "aiohttp"}
 EXEMPLE = Path(__file__).parent.parent / "golden" / "exemple_spec.json"
 
@@ -70,3 +70,42 @@ def test_t7_aucun_import_reseau():
                     continue
                 fautes += [f"{fichier}: {n}" for n in noms if n.split(".")[0] in INTERDITS]
     assert not fautes
+
+
+def test_t7_detection_des_noms_hors_ligne(sans_reseau):
+    """Les modèles de l'étape 5 se chargent depuis le disque, réseau coupé."""
+    from ccm.config import load_config
+    from ccm.ner import detectors
+    from ccm.ner.union import detecter
+
+    cfg = load_config("ingest")
+    if not (detectors.RACINE / cfg.detection.gliner.modele / "model.safetensors").exists():
+        pytest.skip("modèles absents : `ccm modeles`")
+    for f in (detectors._gliner, detectors._spacy, detectors._lexiques):
+        f.cache_clear()
+    zones = detecter(["Elodie Bamier a vu la SARL Delcoron."], cfg)[0]
+    assert len(zones) == 2
+
+
+def test_t7_recherche_hors_ligne(sans_reseau, tmp_path):
+    """Index BM25, recherche et trace (§7), réseau coupé."""
+    from ccm.anonymize.exemple import Message
+    from ccm.config import load_config
+    from ccm.graph.store import ajouter_mentions
+    from ccm.schema import TypeNom
+    from ccm.search.bm25 import charger_index, construire_index
+    from ccm.search.retrieve import chercher, ecrire_trace
+
+    cfg, cfg_s = load_config("ingest"), load_config("search")
+    con = ouvrir_stock(tmp_path / "d.sqlite")
+    con.execute("INSERT INTO piece (piece_id, type, rang) VALUES ('P1', 'RAPPORT', 0)")
+    con.execute(
+        "INSERT INTO proposition (piece_id, page, ordre, texte, genre, ocr_conf) "
+        "VALUES ('P1', 1, 0, 'Jean Rival a signé le bail.', 'PHRASE', 1.0)"
+    )
+    ajouter_mentions(con, 1, [(0, 10, "Jean Rival", "jean rival", "PER", "regle")])
+    construire_index(con, tmp_path / "i", cfg, cfg_s)
+    q = Message("Qui a signé, Jean Rival ?", ((13, 23, TypeNom.PER),), ())
+    res = chercher(con, charger_index(tmp_path / "i"), q, cfg_s, cfg)
+    assert res.prop_ids == [1]
+    ecrire_trace(con, res, q.texte)
