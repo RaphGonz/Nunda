@@ -9,7 +9,8 @@ corpus synthétique, sur le stock de référence (`eval.equivariance.stock_de_re
    vers chacune des autres dans le contexte ; sinon une citation par étape.
 5. CALCUL après les citations, précédé de DONC. 6. Connecteur ET entre les segments.
 Synthèse (mode synthèse) : après les segments, une phrase par phrase de référence.
-ASK_SAME : les deux faits ambigus. Abstention : ABSTENTION FIN.
+ASK_SAME : les faits ambigus (plus de deux : un ASK_SAME par paire avec le premier, liés par
+ET). Abstention : ABSTENTION FIN.
 """
 
 import sqlite3
@@ -111,8 +112,9 @@ def cible_de_reference(
         a, b = q.declaration.faits
         genre = "NOTE_SAME" if q.declaration.genre == "MEME" else "NOTE_DIFF"
         segments.append([genre, question(a), question(b)])
-    if q.ambigus:
-        segments.append(["ASK_SAME", *(f"M:{marque(f)}" for f in q.ambigus)])
+    if q.ambigus:  # ASK_SAME M M : une paire par personne possible après la première
+        premier, *autres = (f"M:{marque(f)}" for f in q.ambigus)
+        segments += [["ASK_SAME", premier, m] for m in autres]
     conflits = {(a, b) for a, b, r in ex.relations_props if r == Relation.CONFLIT}
     conflits |= {(b, a) for a, b in conflits}
     preuves = {i.preuve for i in q.identites if i.preuve}

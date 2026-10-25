@@ -325,6 +325,31 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   2. Plusieurs étapes à budget serré (0,864) : les chaînes de 3 à 5 personnes demandent plus de 2 tours. À regarder plus tard, ou ne rien changer (seuil atteint) ?
 - **Suite prévue :** rapport de phase 2 (`reports/phase-2.md`) : tableau seuils contre mesures (noms PER, rappel de la recherche, T2, conflits), mesures finales sur le test une seule fois, relecture avec Raphael avant `phase-2-ok`.
 
+## 2026-10-25 — Phase 3 — Grammaire (§10, §10 bis) et T4
+- **Travail fait :** **accord de Raphael ce soir pour commencer la phase 3 avant la clôture de la phase 2** (rapport, mesure sur le test et `phase-2-ok` restent à faire). Branche `phase-3` créée depuis `phase-2` (et non `main`) : la grammaire lit les exemples de l'anonymiseur, pas encore fusionnés. Tests écrits avant le code : `tests/unit/test_grammaire.py` (20 : lexique, algèbre des unités, chaque règle du masque, budget de pas, synthèse, décodages au hasard) et `tests/unit/test_t4_automate.py` (T4 et T10 : suites de référence de 4 dossiers générés, chaque pas dans son masque, en mode citation et en mode synthèse ; 2 × 1 000 décodages au hasard). Code : `schema.py` (`LEXIQUE_SYNTHESE` : 25 + 5 = 30 jetons), `grammar/lexicon.py`, `grammar/units.py` (algèbre des unités, décimal exact), `grammar/automaton.py` (`Contexte`, `Automate`, `masques`, `accepter`, `decoder_au_hasard`), `anonymize/table.py` (`valeurs` : valeur_id → valeur, pour le masque, hors du modèle), `data/worldgen/cibles.py` (suites de référence de §10 depuis la vérité terrain), `eval/grammaire.py` (mesure). `configs/grammar.yaml` (`GrammarConfig`).
+- **Mesures :**
+  - `uv run python -m ccm.eval.grammaire 100000 runs/grammaire/bilan.json` (126 dossiers d'entraînement générés, mentions de référence) : **10 054 / 10 054 suites de référence acceptées** (5 027 questions, en mode citation et en mode synthèse) ; **100 540 / 100 540 décodages au hasard valides**, aucune impasse, fin par FIN, relus par l'automate ; longueur maximale 96 (citation) et 512 (synthèse), les limites. 457 s.
+  - Premier passage : 4 suites refusées (2 questions ASK_SAME du dossier 50, trois personnes possibles, écrites `ASK_SAME M M M`). Corrigé dans `cibles.py` (grammaire inchangée), dossier 50 ajouté à T4.
+  - Longueur des suites de référence en mode citation : 14 pas au plus sur 6 dossiers.
+  - `make test` : 235 tests passés.
+- **Décisions :**
+  - Pas : `P:k`, `M:t.j`, `N:t.j` (format de `cible`, §4), mot de synthèse `W:mot`. Un mot = `\w+['’]?` ou un signe de ponctuation (« l'heure. » → « l' », « heure », « . »). Les 40 mots d'une phrase ne comptent pas la ponctuation.
+  - Aucune impasse et limite de pas : un pas n'est permis que si la réponse peut encore finir dans la limite (longueur minimale de chaque segment, de la fermeture d'un bloc, de la synthèse).
+  - CALCUL : opérandes distincts (« deux nombres cités », §10) ; une pile n'accepte un opérande ou un opérateur que si elle reste réductible par des opérateurs seuls (unité, précision, valeur non nulle connue pour ÷, durée entière pour DATE ± durée) ; 12 pas entre CALCUL et FIN_CALCUL. Ouverture : deux nombres cités qui se combinent.
+  - Algèbre : un nombre sans unité est un rapport sans unité ; % vaut sa valeur / 100 ; DATE − DATE donne l'unité « jour », et DATE ± durée n'accepte que « jour ». Une date ne se calcule qu'à la précision JOUR ; MIN et MAX de dates de même précision. **DATE + DATE interdit** (la ligne « +, −, MIN, MAX : même unité » le permettrait à la lettre).
+  - CONFLIT : P du bloc sans condition « non citée » ; ils deviennent cités, comme la preuve d'un SAME. DECLARATION : contrainte MEME_UTILISATEUR ou DIFFERENT_UTILISATEUR entre les deux noms ; P suivants : toute proposition hors du bloc, sans maximum. SAME, ASK_SAME : mentions de tous les textes (question, historique, propositions). NOTE_SAME, NOTE_DIFF : mentions de la question.
+  - Synthèse : une seule par réponse ; une source sans marque n'est permise que si une source marquée peut suivre ; dépendances DEPEND_DE en fermeture transitive. Majuscule : forme `Mot` d'un mot de V, au premier élément après DEBUT. La synthèse vient avant FIN.
+  - Suites de référence : NOTE_* d'abord ; étape PREUVE portée par le P du SAME ; bloc CONFLIT seulement si la première ligne a une arête CONFLIT vers les autres (sinon des citations) ; DECLARATION_FAUSSE : NOTE_SAME puis la citation (le corpus ne donne pas de preuve contraire) ; ASK_SAME à plus de deux personnes : un ASK_SAME par paire avec la première, liés par ET.
+  - Liste V absente (phase 5) : les tests prennent comme V les mots des synthèses de référence du dossier ; pas d'arbre de préfixes BPE (pas de tokenizer).
+- **Écarts avec SPEC.md :**
+  - **Limite de pas de la synthèse.** S ≤ 96 (§8) ne tient pas avec la synthèse (8 phrases de 40 mots) : 12 suites de référence sur 2 008 de la validation dépasseraient 96 pas (toutes CALCUL), en mots entiers. T4 garde 96 pour le mode citation ; la synthèse a sa limite, `pas_max_synthese` = 512, provisoire.
+- **Questions pour Raphael :**
+  1. Limite de pas d'une réponse avec synthèse : 512 ? (En jetons BPE, il en faudra plus que des mots.)
+  2. DATE + DATE interdit : d'accord ?
+  3. ASK_SAME à trois personnes possibles : un ASK_SAME par paire avec la première, d'accord ? Ou ajouter une forme à la grammaire ?
+  4. Opérandes distincts dans un CALCUL : d'accord ?
+- **Suite prévue :** retour à la phase 2 : rapport `reports/phase-2.md`, mesure finale sur le test, relecture avant `phase-2-ok`. Puis, en phase 3 : vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
 ## 2026-10-25 — Phase 2 — Mesure finale sur le test, rapport
 - **Travail fait :** retour sur `phase-2` (Raphael : clore la phase 2 avant la suite ; la grammaire attend sur `phase-3`). Mesure finale, une seule fois, sur les 200 dossiers de test : `ccm.eval.noms`, `ccm.eval.conflits`, `ccm.eval.recherche` (un processus chacun, `runs/final/`). Conflits remesurés sur la validation avec le code actuel. `reports/phase-2.md`.
 - **Mesures (test) :** rappel PER 0,9973 ; rappel des justificatives dans le budget 0,9966 ; conflits heure et montant : **précision 0,807** (46 VP, 11 FP), rappel 0,687. Validation, code actuel : précision 0,970, rappel 0,80.

@@ -37,7 +37,7 @@ def _verifier(ctx, suite, synthese):
     assert a.fini
 
 
-@pytest.mark.parametrize("i", range(3))
+@pytest.mark.parametrize("i", [0, 1, 2, 50])  # 50 : ASK_SAME à trois personnes possibles
 def test_t4_suites_de_reference(i):
     d, questions, con = _dossier(i)
     v = frozenset(m.lower() for q in questions for ph in q.synthese for e in ph.elements
