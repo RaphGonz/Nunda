@@ -135,6 +135,8 @@ LEXIQUE: tuple[str, ...] = (
     "SAME", "SANS_PREUVE", "NOTE_SAME", "NOTE_DIFF", "ASK_SAME",
     "OUVRIR", "RETOUR",
 )  # fmt: skip
+# Synthèse raisonnée (SPEC.md §10 bis) : 30 jetons avec ceux-ci.
+LEXIQUE_SYNTHESE: tuple[str, ...] = ("SYNTHESE", "FIN_SYNTHESE", "SOURCES", "DEBUT", "FIN_PHRASE")
 
 # --- Stock et graphe (SQLite) -----------------------------------------------------
 

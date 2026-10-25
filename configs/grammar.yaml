@@ -1,0 +1,14 @@
+# Grammaire, automate et masque (SPEC.md §10, §10 bis). Valeurs de la spec.
+version: 1
+description: "Grammaire de sortie : automate, masque, algèbre des unités (SPEC.md §10, §10 bis)."
+
+pas_max: 96            # longueur d'une réponse en mode citation (§8 : S ≤ 96)
+# Longueur d'une réponse avec synthèse : 8 phrases de 40 mots ne tiennent pas dans 96 pas.
+# Valeur provisoire, question à Raphael (journal du 2026-10-25).
+pas_max_synthese: 512
+calcul_pas: 12         # pas d'un CALCUL entre CALCUL et FIN_CALCUL
+sans_preuve_max: 4     # P d'un bloc CONFLIT SANS_PREUVE
+sources_max: 4         # P d'une phrase de synthèse
+phrases_max: 8
+mots_phrase: 40
+negations: [ne, "n'", "n’", pas, aucun, aucune, jamais, non, ni, nullement, sans]

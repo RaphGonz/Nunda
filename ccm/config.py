@@ -218,6 +218,17 @@ class SearchConfig(ConfigBase):
     jetons: JetonsConfig
 
 
+class GrammarConfig(ConfigBase):
+    pas_max: int
+    pas_max_synthese: int
+    calcul_pas: int
+    sans_preuve_max: int
+    sources_max: int
+    phrases_max: int
+    mots_phrase: int
+    negations: list[str]
+
+
 class ModelConfig(ConfigBase):
     pass
 
@@ -333,6 +344,7 @@ class WorldgenConfig(ConfigBase):
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
     "ingest": IngestConfig,
     "search": SearchConfig,
+    "grammar": GrammarConfig,
     "model_a0": ModelConfig,
     "model_a1": ModelConfig,
     "model_b_s": ModelConfig,
