@@ -5,8 +5,9 @@ corpus synthétique, sur le stock de référence (`eval.equivariance.stock_de_re
 2. Citations dans l'ordre des étapes de la vérité terrain (première ligne de chaque étape).
 3. Chaque SAME juste avant la citation de la ligne qui porte le fait relié ; sa preuve P
    est la ligne « X, dit S » (sinon SANS_PREUVE). L'étape PREUVE est cette preuve.
-4. Étapes CONFLIT consécutives : un bloc CONFLIT si la première ligne a une arête CONFLIT
-   vers chacune des autres dans le contexte ; sinon une citation par étape.
+4. Étapes CONFLIT consécutives (versions contradictoires de la vérité terrain) : un bloc
+   CONFLIT si la première ligne a une arête CONFLIT vers chacune des autres dans le
+   contexte (conflit établi) ; sinon un bloc CONFLIT SANS_PREUVE (conflit supposé).
 5. CALCUL après les citations, précédé de DONC. 6. Connecteur ET entre les segments.
 Synthèse (mode synthèse) : après les segments, une phrase par phrase de référence.
 ASK_SAME : les faits ambigus (plus de deux : un ASK_SAME par paire avec le premier, liés par
@@ -130,11 +131,10 @@ def cible_de_reference(
             while etapes and etapes[0].role == "CONFLIT":
                 bloc.append(etapes.pop(0).lignes[0])
             k0 = local[lignes[ref]]
-            if len(bloc) >= 2 and all((k0, local[lignes[r]]) in conflits for r in bloc[1:]):
-                segments.append(["CONFLIT", *map(P, bloc), "FIN_CONFLIT"])
-                vues |= set(bloc)
-                continue
-            etapes[:0] = [e.model_copy(update={"role": "CITE", "lignes": (r,)}) for r in bloc]
+            etabli = all((k0, local[lignes[r]]) in conflits for r in bloc[1:])
+            segments.append(["CONFLIT", *([] if etabli else ["SANS_PREUVE"]), *map(P, bloc),
+                             "FIN_CONFLIT"])  # fmt: skip
+            vues |= set(bloc)
             continue
         for i in q.identites:
             if i.fait.rsplit(":", 1)[0] == ref:
