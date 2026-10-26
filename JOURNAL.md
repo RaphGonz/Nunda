@@ -371,3 +371,17 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** voir ci-dessus.
 - **Écarts avec SPEC.md :** aucun de plus.
 - **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-26 — Phase 3 — Suites de référence du corpus et T10
+- **Travail fait :** tâche donnée par Raphael : suites de référence (§10, « Ordre des suites de référence ») pour toutes les questions de la phase 1, et T10. `ccm/data/worldgen/suites.py` : lit le corpus écrit (`verite.json`, `questions.json`), construit stock de référence, exemple et cible de chaque question, en mode citation et en mode synthèse (si la question en a une), contrôle chaque pas dans son masque (`premier_refus`), écrit `cibles.json` dans chaque dossier (pas et jetons, aucune chaîne de nom ; dans `runs/`, hors de git) et le bilan `runs/corpus/niveau0/cibles.json`. `uv run python -m ccm.data.worldgen.suites runs/corpus/niveau0 8`. Test `tests/unit/test_t10_masque_reference.py` (T10) : 10 dossiers générés, chaque pas de chaque suite dans son masque ; couverture des 7 types, des 5 sous-types de dialogue, des deux blocs de conflit, d'ABSTENTION, SAME, NOTE_*, ASK_SAME, DONC CALCUL, SYNTHESE ; un pas hors du masque est refusé.
+- **Mesures :**
+  - Entraînement (2 000 dossiers) : **79 953 / 79 953** suites citation, **71 158 / 71 158** suites synthèse acceptées. Validation (200) : 8 000 / 8 000 et 7 141 / 7 141. Test (200) : 7 982 / 7 982 et 7 123 / 7 123. **0 refus**, 0 erreur de construction. 544 s, 8 processus.
+  - Longueur maximale : 14 pas (citation, limite 96) ; 107 pas (synthèse, limite 512).
+  - Conflits : entraînement 3 610 blocs CONFLIT (établis), 3 364 CONFLIT SANS_PREUVE ; validation 466 / 233 ; test 361 / 371.
+  - `make test` : 247 tests passés.
+- **Décisions :**
+  - **Conflit supposé** : une question CONFLIT (versions contradictoires de la vérité terrain) sans arête CONFLIT dans le contexte s'écrit `CONFLIT SANS_PREUVE P P FIN_CONFLIT` (§10, règle 4 ; §12 : moitié CONFLIT, moitié SANS_PREUVE). Avant, `cibles.py` l'écrivait en citations : aucune suite de référence n'avait de CONFLIT SANS_PREUVE. Corrigé dans `cibles.py` ; grammaire et automate inchangés.
+  - Vocabulaire V provisoire de la synthèse : mots des synthèses de référence du dossier (comme T4), en attendant la liste V de la phase 5.
+  - Les suites du test sont construites (pour l'évaluation) ; aucun réglage fait d'après elles : toutes acceptées au premier passage.
+- **Écarts avec SPEC.md :** aucun de plus. DIALOGUE/DECLARATION_FAUSSE reste NOTE_SAME puis la citation (décision du 2026-10-25) : sans contrainte de l'utilisateur dans l'exemple, CONFLIT DECLARATION est masqué.
+- **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
