@@ -606,7 +606,7 @@ Les gabarits sont des chaînes fixes dans `verify/render.py`. Les noms entre gui
 
 Pour un type autre que PER, « la même personne » devient « la même organisation », « le même lieu » ou « la même chose ».
 
-**Test de propriété.** Pour toute suite tirée au hasard sous masque, chaque caractère affiché vient de l'un de ces quatre ensembles : texte original d'une proposition du contexte ou de ses dépendances et conflits, gabarit fixe, nom d'une mention du contexte ou de la question, résultat d'un calcul sur des nombres cités.
+**Test de propriété.** Pour toute suite tirée au hasard sous masque, chaque caractère affiché vient de l'un de ces quatre ensembles : texte original d'une proposition du contexte ou de ses dépendances et conflits, gabarit fixe, nom d'une mention du contexte ou de la question, résultat d'un calcul sur des nombres cités. S'y ajoutent les références lues dans le stock : pièce, page, rang et numéro de citation (décision de Raphael, 2026-10-27).
 
 ## 12. Données d'entraînement
 
