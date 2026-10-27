@@ -74,6 +74,36 @@ def _zones(texte: str, noms, nbs, cfg: IngestConfig) -> list[_Zone]:
     return sorted(zs, key=lambda z: z.debut)
 
 
+def zones_message(m: Message, cfg: IngestConfig) -> list[_Zone]:
+    """Zones d'un message : la zone j est la marque j de son texte anonymisé."""
+    return _zones(m.texte, m.noms, [(n.debut, n.fin, n.genre, n.valeur, n.unite, n.precision)
+                                    for n in m.nombres], cfg)  # fmt: skip
+
+
+def zones_propositions(
+    con: sqlite3.Connection, prop_ids: Sequence[int], cfg: IngestConfig
+) -> dict[int, tuple[str, list[_Zone]]]:
+    """prop_id → (texte original, zones) ; la zone j est la marque j de la proposition."""
+    marques = ",".join("?" * len(prop_ids))
+    textes = dict(con.execute(
+        f"SELECT prop_id, texte FROM proposition WHERE prop_id IN ({marques})", list(prop_ids)
+    ))  # fmt: skip
+    noms: dict[int, list] = {p: [] for p in textes}
+    for p, d, f, t in con.execute(
+        f"SELECT prop_id, debut, fin, type FROM mention WHERE prop_id IN ({marques})",
+        list(prop_ids),
+    ):
+        noms[p].append((d, f, t))
+    nbs: dict[int, list] = {p: [] for p in textes}
+    for p, *n in con.execute(
+        "SELECT prop_id, debut, fin, genre, valeur, unite, precision_date FROM nombre "
+        f"WHERE prop_id IN ({marques})",
+        list(prop_ids),
+    ):
+        nbs[p].append(tuple(n))
+    return {p: (t, _zones(t, noms[p], nbs[p], cfg)) for p, t in textes.items()}
+
+
 def _contraintes(con, conv_id, hypotheses) -> Iterable[tuple[str, str, Relation]]:
     if conv_id is not None:
         for g, a, b in con.execute(
@@ -111,26 +141,9 @@ def anonymiser(
             list(prop_ids),
         )
     }
-    noms_props: dict[int, list] = {p: [] for p in prop_ids}
-    for p, d, f, t in con.execute(
-        f"SELECT prop_id, debut, fin, type FROM mention WHERE prop_id IN ({marques})",
-        list(prop_ids),
-    ):
-        noms_props[p].append((d, f, t))
-    nbs_props: dict[int, list] = {p: [] for p in prop_ids}
-    for p, *n in con.execute(
-        "SELECT prop_id, debut, fin, genre, valeur, unite, precision_date FROM nombre "
-        f"WHERE prop_id IN ({marques})",
-        list(prop_ids),
-    ):
-        nbs_props[p].append(tuple(n))
-
+    zp = zones_propositions(con, prop_ids, cfg)
     textes = [m.texte for m in (*historique, question)] + [lignes[p][2] for p in prop_ids]
-    zones = [
-        _zones(m.texte, m.noms, [(n.debut, n.fin, n.genre, n.valeur, n.unite, n.precision)
-                                 for n in m.nombres], cfg)
-        for m in (*historique, question)
-    ] + [_zones(lignes[p][2], noms_props[p], nbs_props[p], cfg) for p in prop_ids]  # fmt: skip
+    zones = [zones_message(m, cfg) for m in (*historique, question)] + [zp[p][1] for p in prop_ids]
 
     # Noms et valeurs dans l'ordre de première apparition.
     locaux: dict[tuple, int] = {}

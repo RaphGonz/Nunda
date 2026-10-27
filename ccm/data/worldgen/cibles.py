@@ -16,7 +16,7 @@ ET). Abstention : ABSTENTION FIN.
 
 import sqlite3
 
-from ccm.anonymize.exemple import Message, _zones, anonymiser
+from ccm.anonymize.exemple import Message, _zones, anonymiser, zones_message
 from ccm.anonymize.table import TableConversation
 from ccm.config import IngestConfig
 from ccm.data.worldgen.pieces import Dossier
@@ -68,9 +68,7 @@ def exemple_de_reference(
 
 
 def _rang_zone(m: Message, debut: int, cfg: IngestConfig) -> int:
-    zs = _zones(m.texte, m.noms, [(n.debut, n.fin, n.genre, n.valeur, n.unite, n.precision)
-                                  for n in m.nombres], cfg)  # fmt: skip
-    return next(j for j, z in enumerate(zs) if z.debut == debut)
+    return next(j for j, z in enumerate(zones_message(m, cfg)) if z.debut == debut)
 
 
 def cible_de_reference(
