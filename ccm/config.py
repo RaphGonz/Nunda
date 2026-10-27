@@ -229,6 +229,14 @@ class GrammarConfig(ConfigBase):
     negations: list[str]
 
 
+class VerifyConfig(ConfigBase):
+    """Vérificateur et rendu (SPEC.md §11)."""
+
+    seuil_selection: float  # « Autres passages pertinents » : réglage (rappel 0,95)
+    passages_max: int
+    decimales: int  # arrondi affiché d'un résultat sans écriture décimale finie
+
+
 class ModelConfig(ConfigBase):
     pass
 
@@ -345,6 +353,7 @@ CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
     "ingest": IngestConfig,
     "search": SearchConfig,
     "grammar": GrammarConfig,
+    "verify": VerifyConfig,
     "model_a0": ModelConfig,
     "model_a1": ModelConfig,
     "model_b_s": ModelConfig,
