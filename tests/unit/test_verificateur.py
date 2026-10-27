@@ -280,6 +280,26 @@ def test_trace_de_la_recherche_completee(stock):
     assert con.execute("SELECT COUNT(*), MAX(modele) FROM trace").fetchone() == (1, "oracle")
 
 
+def test_doublons_listes_et_plafonnes(stock):
+    con, ids = stock
+    # Copies de a1 dans les pièces D à G ; a1 est la version gardée.
+    copies = [ajouter_piece(con, x, f"{x}.pdf", x, TypePiece.PV_AUDITION, 1, 2,
+                            [(2, TEXTES["A"][1], GenreProposition.PHRASE, 0.7)], [])[0]
+              for x in "DEFG"]  # fmt: skip
+    con.executemany("UPDATE proposition SET groupe_doublon = ? WHERE prop_id = ?",
+                    [(ids["a1"], p) for p in [ids["a1"], *copies]])  # fmt: skip
+    e = _entree(con, ids, "Combien Jean Martin a-t-il payé ?")
+    rep = _verifier(con, e, ["P:0", "ET", "P:1", "FIN"])
+    textes = [b.texte for b in rep.blocs]
+    attendu = ("Aussi dans : pièce D, page 2 ; pièce E, page 2 ; pièce F, page 2, "
+               "et 1 autre endroit.")  # fmt: skip
+    assert textes[2] == attendu  # sous [1], une seule fois (pas dans le bloc conflit ajouté)
+    assert textes.count(attendu) == 1 and "pièce G" not in rep.texte
+    con.execute("UPDATE proposition SET groupe_doublon = NULL WHERE prop_id = ?", (copies[-1],))
+    rep = _verifier(con, e, ["P:0", "FIN"])
+    assert "Aussi dans : pièce D, page 2 ; pièce E, page 2 ; pièce F, page 2." in rep.texte
+
+
 # --- Suites de référence du corpus synthétique ------------------------------------------
 
 

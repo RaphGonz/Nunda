@@ -234,6 +234,7 @@ class VerifyConfig(ConfigBase):
 
     seuil_selection: float  # « Autres passages pertinents » : réglage (rappel 0,95)
     passages_max: int
+    doublons_max: int  # endroits des copies listés sous un passage affiché
     decimales: int  # arrondi affiché d'un résultat sans écriture décimale finie
 
 

@@ -44,10 +44,13 @@ RANG_PIECE = "pièce {piece} : {rang}"
 LIEN = "Lien non confirmé : « {y} » (cette citation) et « {x} ». Ressemblance : {relation}."
 AUCUN_NOM = "Cette citation ne nomme aucune personne ni entité de la question."
 AUTRES = "Autres passages pertinents :"
+DOUBLONS = "Aussi dans : {lieux}."
+DOUBLONS_UN_DE_PLUS = "Aussi dans : {lieux}, et {n} autre endroit."
+DOUBLONS_PLUS = "Aussi dans : {lieux}, et {n} autres endroits."
 SYNTHESE = "Synthèse du modèle :"
 LIEN_SOURCE = " ※ ({ref})"
 ERREUR = "Erreur : {raison}"
-SEPARATEURS = (", ", " ")
+SEPARATEURS = (", ", " ", " ; ")
 
 MEME = {"PER": "la même personne", "ORG": "la même organisation", "LIEU": "le même lieu"}
 MEME_AUTRE = "la même chose"
@@ -70,7 +73,8 @@ PARENTHESES = ("(", ")", ", ")
 _GABARITS = (INFERENCE, ABSTENTION, CITATION, CONTEXTE, REF, REF_OCR, SOURCE_DATEE, SAME_PREUVE,
              SAME_SANS, NOTE_SAME, NOTE_DIFF, ASK_SAME, CALCUL, OPERANDE, CONFLIT,
              CONFLIT_SANS_PREUVE, DECLARATION, RANG, RANG_PIECE, LIEN, AUCUN_NOM, AUTRES,
-             SYNTHESE, LIEN_SOURCE, ERREUR)  # fmt: skip
+             SYNTHESE, LIEN_SOURCE, ERREUR, DOUBLONS, DOUBLONS_UN_DE_PLUS,
+             DOUBLONS_PLUS)  # fmt: skip
 
 
 def _morceaux(modele: str) -> list[str]:
@@ -97,7 +101,7 @@ class Frag:
 @dataclass
 class Bloc:
     style: str  # citation, contexte, connecteur, identite, note, calcul, conflit, ancrage,
-    #             abstention, autres, synthese, erreur
+    #             abstention, autres, synthese, doublons, erreur
     frags: list[Frag] = field(default_factory=list)
 
     @property

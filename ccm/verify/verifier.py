@@ -11,7 +11,8 @@ Code pur, sans modèle. Étapes :
 5. Ancrage : liens sûrs (même nom, contrainte MEME, SAME de la réponse) depuis la
    question ; sinon note « Lien non confirmé » (relations 2 à 11) ou « aucune personne ».
 6. Passages non cités : probabilité de sélection ≥ seuil, 10 au plus, avec dépendances.
-7. Rendu : texte original lu dans le stock par `prop_id`, pièce, page, OCR bas.
+7. Rendu : texte original lu dans le stock par `prop_id`, pièce, page, OCR bas ; sous chaque
+   passage, les endroits de ses copies (§5, étape 7), `doublons_max` au plus.
 8. Contraintes : NOTE_SAME, NOTE_DIFF enregistrées, puis une seule relance.
 9. Trace : ligne de la table `trace`.
 """
@@ -207,6 +208,7 @@ class _Verif:
         }
         self.numeros: dict[int, int] = {}  # prop_id → numéro affiché
         self.affichees: set[int] = set()  # prop_id déjà affichés (citations, contexte, conflits)
+        self.copies_vues: set[int] = set()  # passages dont les copies sont déjà listées
         self.blocs: list[Bloc] = []
         self.contraintes: list[tuple[str, str, str]] = []
 
@@ -230,6 +232,32 @@ class _Verif:
 
     def _texte(self, p: int) -> Frag:
         return Frag("texte", self._ligne(p)[0])
+
+    def _doublons(self, p: int) -> list[Bloc]:
+        """« Aussi dans : … » : copies du passage (même groupe de doublons), une fois par
+        réponse ; au-delà de `doublons_max` endroits, seulement leur nombre."""
+        if p in self.copies_vues:
+            return []
+        self.copies_vues.add(p)
+        lieux = list(dict.fromkeys(self.con.execute(
+            "SELECT piece_id, page FROM proposition WHERE groupe_doublon = (SELECT groupe_doublon "
+            "FROM proposition WHERE prop_id = ?) AND prop_id != ? ORDER BY piece_id, page",
+            (p, p),
+        )))  # fmt: skip
+        if not lieux:
+            return []
+        montres, reste = lieux[: self.vcfg.doublons_max], len(lieux) - self.vcfg.doublons_max
+        parties = [gabarit(R.REF, piece=Frag("ref", pc), page=Frag("ref", str(pg)))
+                   for pc, pg in montres]  # fmt: skip
+        modele = (
+            R.DOUBLONS if reste <= 0 else R.DOUBLONS_UN_DE_PLUS if reste == 1 else R.DOUBLONS_PLUS
+        )
+        f = gabarit(modele, lieux=R.joindre(parties, " ; "), n=Frag("ref", str(reste)))
+        return [Bloc("doublons", f)]
+
+    def _bloc(self, style: str, frags: list[Frag], p: int) -> list[Bloc]:
+        """Un passage affiché, suivi des endroits de ses copies."""
+        return [Bloc(style, frags), *self._doublons(p)]
 
     def _citation(self, p: int) -> list[Frag]:
         self.affichees.add(p)
@@ -301,7 +329,7 @@ class _Verif:
             if not autres:
                 continue
             out.append(Bloc("conflit", [fixe(R.CONFLIT)]))
-            out += [Bloc("conflit", self._source(x)) for x in [p, *autres]]
+            out += [b for x in [p, *autres] for b in self._bloc("conflit", self._source(x), x)]
             out += self._rangs([p, *autres])
         return out
 
@@ -438,7 +466,7 @@ class _Verif:
         for _, k in cands:
             p = self.prop_id[k]
             out += self._dependances([p])
-            out.append(Bloc("autres", self._citation(p)))
+            out += self._bloc("autres", self._citation(p), p)
         return out
 
     # --- Rendu des segments ---------------------------------------------------------------
@@ -459,7 +487,7 @@ class _Verif:
             elif g == "ABSTENTION":
                 self.blocs.append(Bloc("abstention", [fixe(R.ABSTENTION)]))
             elif g == "CITE":
-                self.blocs.append(Bloc("citation", self._citation(props[0])))
+                self.blocs += self._bloc("citation", self._citation(props[0]), props[0])
             elif g == "SAME":
                 a, b = self._nom(s[1]), self._nom(s[2])
                 if s[3] is None:
@@ -470,7 +498,8 @@ class _Verif:
                     f = gabarit(R.SAME_PREUVE, a=a, b=b, meme=R.meme(self._type(s[1])),
                                 n=self._numero(p), texte=self._texte(p),
                                 ref=self._ref(p))  # fmt: skip
-                self.blocs.append(Bloc("identite", f))
+                blocs = self._bloc("identite", f, props[0]) if props else [Bloc("identite", f)]
+                self.blocs += blocs
             elif g in ("NOTE_SAME", "NOTE_DIFF", "ASK_SAME"):
                 t = self._type(s[1])
                 f = gabarit(_IDENTITE[g], a=self._nom(s[1]), b=self._nom(s[2]), meme=R.meme(t),
@@ -481,13 +510,15 @@ class _Verif:
             elif g in ("CONFLIT", "CONFLIT_SANS_PREUVE"):
                 tete = R.CONFLIT if g == "CONFLIT" else R.CONFLIT_SANS_PREUVE
                 self.blocs.append(Bloc("conflit", [fixe(tete)]))
-                self.blocs += [Bloc("conflit", self._source(p)) for p in props]
+                self.blocs += [b for p in props for b in self._bloc("conflit", self._source(p), p)]
                 self.blocs += self._rangs(props)
             elif g == "DECLARATION":
                 f = gabarit(R.DECLARATION, a=self._nom(s[1]), b=self._nom(s[2]),
                             meme=R.meme(self._type(s[1])))  # fmt: skip
                 self.blocs.append(Bloc("conflit", f))
-                self.blocs += [Bloc("conflit", self._citation(p)) for p in props]
+                self.blocs += [
+                    b for p in props for b in self._bloc("conflit", self._citation(p), p)
+                ]
             elif g == "CALCUL":
                 self.blocs.append(Bloc("calcul", self.calcul(s[1], permises)))
             elif g == "SYNTHESE":

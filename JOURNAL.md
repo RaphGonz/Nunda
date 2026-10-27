@@ -399,5 +399,5 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - SAME avec preuve : « Source [n] : » au lieu de « Source : », pour relier les opérandes d'un calcul à cette citation.
 - **Écarts avec SPEC.md :**
   - T5 : la pièce, la page, le rang et le numéro de citation sont une cinquième origine (« ref », lue dans le stock), hors des quatre ensembles de §11. Les gabarits de §11 les demandent. **Validé par Raphael le 2026-10-27** ; SPEC.md §11 (test de propriété) mis à jour.
-  - Non fait : la liste des doublons « aussi dans la pièce X, page Y » (§5, étape 7) dans le rendu.
+  - Doublons (§5, étape 7), demande de Raphael : sous chaque passage affiché, « Aussi dans : pièce X, page Y ; … », une fois par réponse ; au plus `doublons_max` = 3 endroits (valeur de départ, `configs/verify.yaml`), puis « et N autres endroits », pour ne pas manger le budget d'affichage. `make test` : 285 tests passés.
 - **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
