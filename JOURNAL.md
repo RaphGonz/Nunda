@@ -385,3 +385,19 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Les suites du test sont construites (pour l'évaluation) ; aucun réglage fait d'après elles : toutes acceptées au premier passage.
 - **Écarts avec SPEC.md :** aucun de plus. DIALOGUE/DECLARATION_FAUSSE reste NOTE_SAME puis la citation (décision du 2026-10-25) : sans contrainte de l'utilisateur dans l'exemple, CONFLIT DECLARATION est masqué.
 - **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-27 — Phase 3 — Vérificateur (§11, étapes 1 à 9)
+- **Travail fait :** tâche donnée par Raphael : vérificateur avec la règle d'ancrage et le calcul en décimal exact. `ccm/verify/verifier.py` (étapes 1 à 9, `verifier(con, Entree, suite, …)` → `Reponse` : blocs, citations, erreur, ligne de trace), `ccm/verify/render.py` (gabarits fixes de §11, écriture des nombres ; chaque fragment affiché porte son origine), `ccm/verify/trace.py`, `configs/verify.yaml`. `anonymize/exemple.py` : `zones_message` et `zones_propositions`, appelées par l'anonymiseur et par le vérificateur (une marque ⟦j⟧ = la zone j ; aucune copie). Tests : `tests/unit/test_verificateur.py` (petit stock écrit à la main pour chaque étape ; suites de référence des dossiers 0, 10, 50, résultats des calculs contre la vérité terrain) ; `tests/property/test_t5_rendu_ferme.py` (T5 : décodages au hasard sous masque, mode citation et synthèse, dossiers 0, 1, 2, 10, 50 ; chaque fragment dans son ensemble ; un fragment étranger est refusé).
+- **Mesures :** `make test` : 284 tests passés (247 avant), 171 s. T5 : 0 fragment hors des ensembles, 0 erreur de vérification sur les décodages au hasard et sur les suites de référence.
+- **Décisions :**
+  - Décimal exact : `fractions.Fraction` (aucune perte, même pour 1/3). Un résultat sans écriture décimale finie s'affiche arrondi à `decimales` = 2, précédé de « ≈ ». Dates JJ/MM/AAAA ; heure du jour « 21 h 59 » ; pourcentage × 100 suivi de « % » ; durée « N jours ».
+  - Ancrage : « même nom » = même indice de nom de la table (même norme, même type). Question sans nom : les noms du message le plus récent de l'historique qui en a (comme la recherche, §7). Relations 2 à 11 prises à la lettre (MEME_FAMILLE, INITIALES_DE, PROCHE, INCOMPATIBLE, SIGLE_DE, INCLUS_DANS, ALIAS_DECLARE). Propositions citées : CITE, preuve d'un SAME, propositions des blocs CONFLIT, SANS_PREUVE et DECLARATION.
+  - Conflits (étape 4) : contrôlés pour toutes les propositions citées, y compris celles d'un bloc CONFLIT SANS_PREUVE ; le bloc supposé lui-même n'ajoute rien. « Sa date » : les dates lues dans la phrase (la table `piece` n'a pas de date).
+  - Passages non cités : `seuil_selection` = 0,5, valeur de départ, à régler sur la validation (rappel 0,95) quand le modèle donnera des probabilités (phase 4).
+  - Étape 8 : la relance est une fonction `relancer` fournie par l'appelant (`ccm answer`), appelée une fois ; les notes de la première réponse restent en tête.
+  - Étape 9 : si la recherche a déjà écrit la ligne de trace (`reponse_id`), le vérificateur la complète (`actions`, `modele`) ; sinon il en écrit une.
+  - SAME avec preuve : « Source [n] : » au lieu de « Source : », pour relier les opérandes d'un calcul à cette citation.
+- **Écarts avec SPEC.md :**
+  - T5 : la pièce, la page, le rang et le numéro de citation sont une cinquième origine (« ref », lue dans le stock), hors des quatre ensembles de §11. Les gabarits de §11 les demandent ; à confirmer par Raphael.
+  - Non fait : la liste des doublons « aussi dans la pièce X, page Y » (§5, étape 7) dans le rendu.
+- **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
