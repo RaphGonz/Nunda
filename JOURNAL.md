@@ -401,3 +401,13 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - T5 : la pièce, la page, le rang et le numéro de citation sont une cinquième origine (« ref », lue dans le stock), hors des quatre ensembles de §11. Les gabarits de §11 les demandent. **Validé par Raphael le 2026-10-27** ; SPEC.md §11 (test de propriété) mis à jour.
   - Doublons (§5, étape 7), demande de Raphael : sous chaque passage affiché, « Aussi dans : pièce X, page Y ; … », une fois par réponse ; au plus `doublons_max` = 3 endroits (valeur de départ, `configs/verify.yaml`), puis « et N autres endroits », pour ne pas manger le budget d'affichage. `make test` : 285 tests passés.
 - **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
+
+## 2026-10-28 — Phase 3 — T9, T11 et 100 000 décodages sous masque
+- **Travail fait :** tâche donnée par Raphael : rendu et gabarits (§11), T5, T9, T11, test des 100 000 décodages aléatoires sous masque. Rendu, gabarits et T5 faits le 2026-10-27 ; chaque ligne du tableau de §11 a son gabarit dans `verify/render.py` (contrôlé). `tests/unit/test_t9_determinisme.py` (T9) : deux processus neufs, `PYTHONHASHSEED` différents, écrivent le dossier de graine 7 (PDF, `verite.json`, `questions.json`, `cibles.json`) puis décodent chaque question (glouton et au hasard, citation et synthèse) et vérifient ; fichiers égaux octet pour octet, réponses égales. `tests/property/test_t11_synthese.py` (T11) : 100 000 décodages au hasard en mode synthèse ; chacun valide (FIN, `pas_max_synthese`, `accepter`), vérifié sans erreur, rendu contrôlé comme T5 ; chaque phrase : aucun chiffre, aucun mot hors de V, chaque nom et nombre affiché pris dans les sources de la phrase et leur fermeture DEPEND_DE lue dans le stock, chaque pointeur vers l'une d'elles.
+- **Mesures :** T11 : **100 925 / 100 925 décodages valides**, 47 219 avec synthèse, 94 257 phrases contrôlées, 0 erreur (104 dossiers). T5 + T9 + T11 ensemble : 14 passés, 437 s. `make test` : **287 tests passés**, 552 s.
+- **Décisions :**
+  - T9, décodage glouton : le modèle n'existe pas ; le score d'un jeton est une fonction fixe du préfixe et du jeton (crc32). Le modèle oracle puis A0 la remplaceront.
+  - T11 en 4 processus au plus : à 12 processus, `make test` a été arrêté faute de mémoire.
+  - V provisoire : mots des synthèses de référence du dossier (comme T4, T5).
+- **Écarts avec SPEC.md :** aucun de plus. `make test` passe de 171 s à 552 s (T11).
+- **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
