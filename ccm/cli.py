@@ -204,6 +204,61 @@ def search(
 
 
 @app.command()
+def answer(
+    question: Annotated[str | None, typer.Argument(help="Message de l'utilisateur.")] = None,
+    stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (index BM25 à côté).")] = ...,
+    oracle: Annotated[
+        Path | None,
+        typer.Option(help="Dossier du corpus synthétique (vérité terrain) : modèle oracle."),
+    ] = None,
+    id: Annotated[str | None, typer.Option(help="Question du dossier (et historique).")] = None,
+    synthese: Annotated[bool, typer.Option(help="Mode synthèse (§10 bis).")] = False,
+    conv: Annotated[str | None, typer.Option(help="Conversation (contraintes).")] = None,
+    graine: Annotated[int, typer.Option(help="Graine de la table de la conversation.")] = 0,
+    suite: Annotated[bool, typer.Option(help="Affiche aussi les pas du modèle.")] = False,
+) -> None:
+    """Répond de bout en bout : recherche, anonymiseur, modèle, vérificateur (§2, §11)."""
+    import sys
+    import uuid
+
+    from ccm.answer import repondre
+    from ccm.config import load_config
+    from ccm.model.oracle import Oracle
+    from ccm.schema import ouvrir_stock
+    from ccm.search.bm25 import charger_index, dossier_index
+
+    if oracle is None:
+        raise typer.BadParameter("seul le modèle oracle existe (phase 3) : --oracle DOSSIER")
+    if not stock.exists():
+        raise typer.BadParameter(f"base absente : {stock}")
+    if question is None and id is None:
+        raise typer.BadParameter("donner la question ou --id")
+    o = Oracle(oracle)
+    try:
+        q = o.question(question, id)
+    except KeyError as e:
+        raise typer.BadParameter(e.args[0]) from None
+    cfgs = (load_config(x) for x in ("ingest", "search", "grammar", "verify"))
+    con = ouvrir_stock(stock)
+    try:
+        index = charger_index(dossier_index(stock))
+        conv = conv or uuid.uuid4().hex
+        r = repondre(con, index, o, q, *cfgs, conv_id=conv, synthese=synthese, graine=graine)
+    finally:
+        con.close()
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    for t in r.tours:
+        if suite:
+            typer.echo(f"pas du modèle : {' '.join(t.suite)}", err=True)
+        if t.raison:
+            typer.echo(f"oracle : abstention ({t.raison})", err=True)
+    typer.echo(r.reponse.texte)
+    if r.reponse.erreur:
+        raise typer.Exit(1)
+
+
+@app.command()
 def modeles() -> None:
     """Télécharge les modèles de la détection des noms dans `runs/modeles/` (§6)."""
     from ccm.data.modeles import MODELES, telecharger

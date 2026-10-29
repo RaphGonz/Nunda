@@ -67,17 +67,27 @@ def exemple_de_reference(
     return ex, table.valeurs()
 
 
+def _rang(zs, debut: int, quoi: str) -> int:
+    j = next((j for j, z in enumerate(zs) if z.debut == debut), None)
+    if j is None:
+        raise KeyError(f"{quoi} non détecté")
+    return j
+
+
 def _rang_zone(m: Message, debut: int, cfg: IngestConfig) -> int:
-    return next(j for j, z in enumerate(zones_message(m, cfg)) if z.debut == debut)
+    return _rang(zones_message(m, cfg), debut, f"fait de la question en {debut}")
 
 
 def cible_de_reference(
     d: Dossier, q: Question, con: sqlite3.Connection, ex: Exemple, cfg: IngestConfig,
-    synthese: bool = False,
+    synthese: bool = False, lignes: dict[str, int] | None = None, msg: Message | None = None,
 ) -> list[str]:  # fmt: skip
+    """`lignes` (« P03:4 » → prop_id) et `msg` (message lu) : ceux du stock de référence par
+    défaut ; ceux d'un vrai stock pour le modèle oracle (`model.oracle`). KeyError : une
+    ligne ou un fait de la référence manque au contexte."""
     if q.abstention:
         return ["ABSTENTION", "FIN"]
-    lignes = _lignes(con, d)
+    lignes = _lignes(con, d) if lignes is None else lignes
     local = {p.prop_id: p.local for p in ex.propositions}
     pieces = {p.id: p for p in d.pieces}
 
@@ -95,9 +105,9 @@ def cible_de_reference(
                           "WHERE prop_id = ?", (pid,))  # fmt: skip
         texte = con.execute("SELECT texte FROM proposition WHERE prop_id = ?", (pid,)).fetchone()
         zs = _zones(texte[0], list(noms), list(nbs), cfg)
-        return f"{local[pid]}.{next(j for j, z in enumerate(zs) if z.debut == debut)}"
+        return f"{local[pid]}.{_rang(zs, debut, f'fait {fait}')}"
 
-    msg = message_de_reference(q.message, cfg)
+    msg = msg or message_de_reference(q.message, cfg)
 
     def question(rang: int) -> str:
         return f"M:q.{_rang_zone(msg, q.message.faits[rang].debut, cfg)}"
