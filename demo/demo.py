@@ -135,7 +135,11 @@ def main(args: list[str]) -> None:
     oracle = Oracle(DOSSIER)
     pieces = con.execute("SELECT COUNT(*) FROM piece").fetchone()[0]
     props = con.execute("SELECT COUNT(*) FROM proposition").fetchone()[0]
-    print(f"{GRIS}Dossier : {pieces} pièces PDF, {props} passages dans le stock.{FIN}\n")
+    print(f"{GRIS}Dossier : {pieces} pièces PDF, {props} passages dans le stock.{FIN}")
+    print(
+        f"{GRIS}« Contexte : » = phrase dont dépend la citation (elle commence par « Il », "
+        f"« Ainsi »…), affichée avant elle.{FIN}\n"
+    )
 
     for n in choix:
         titre, but, qid, synthese = SCENES[n - 1]
