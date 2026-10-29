@@ -16,14 +16,13 @@ import re
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 
-from test_t5_rendu_ferme import _controler, _fermes
-
 from ccm.config import load_config
 from ccm.data.worldgen.cibles import exemple_de_reference
 from ccm.data.worldgen.monde import generer_monde
 from ccm.data.worldgen.pieces import rediger_dossier
 from ccm.data.worldgen.questions import poser_questions
 from ccm.eval.equivariance import message_de_reference, stock_de_reference
+from ccm.eval.rendu import controler, fermes
 from ccm.grammar.automaton import Contexte, accepter, decoder_au_hasard
 from ccm.grammar.lexicon import mots
 from ccm.verify.verifier import Entree, decouper, verifier
@@ -97,14 +96,14 @@ def _dossier(i: int) -> Counter:
         ex, valeurs = exemple_de_reference(d, q, con, CFG)
         hist = tuple(message_de_reference(t, CFG) for t in q.historique if t.texte)
         entree = Entree(ex, valeurs, message_de_reference(q.message, CFG), hist)
-        textes, noms, refs = _fermes(con, ex, entree)
+        textes, noms, refs = fermes(con, ex, entree)
         ctx = Contexte.depuis_exemple(ex, valeurs, CFG.conflits.negation, v)
         for g in range(PAR_QUESTION):
             suite = decoder_au_hasard(ctx, GCFG, f"{i}:{q.id}:{g}", synthese=True)
             assert suite[-1] == "FIN" and len(suite) <= GCFG.pas_max_synthese, suite
             assert accepter(ctx, suite, GCFG, True), suite
             rep = verifier(con, entree, suite, CFG, GCFG, VCFG, synthese=True, vocabulaire=v)
-            _controler(rep, textes, noms, refs, v)
+            controler(rep, textes, noms, refs, v)
             n["phrases"] += _t11(con, ex, suite, rep, v)
             n["decodages"] += 1
             n["avec_synthese"] += "SYNTHESE" in suite
