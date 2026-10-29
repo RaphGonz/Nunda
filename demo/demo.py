@@ -8,7 +8,7 @@ fois, puis chaque scène pose une question et montre :
 
     uv run python demo/demo.py            (toutes les scènes)
     uv run python demo/demo.py --pause    (Entrée entre deux scènes, pour la vidéo)
-    uv run python demo/demo.py 2 5        (scènes 2 et 5)
+    uv run python demo/demo.py 2          (scène 2 seule)
 """
 
 import os
@@ -24,47 +24,6 @@ STOCK = RACINE / "runs" / "demo" / "stock.sqlite"
 
 # (titre, ce que la scène montre, question, mode synthèse)
 SCENES = [
-    (
-        "Raisonnement en deux étapes",
-        "La question ne nomme pas la personne cherchée : il faut d'abord trouver qui a fait les "
-        "constatations avec ROLLAND Tel, puis la date de son arrestation.",
-        "syn-1000000-q21",
-        False,
-    ),
-    (
-        "Calcul exact",
-        "Deux montants dans deux pièces différentes ; le modèle désigne les opérandes, le code "
-        "calcule en décimal exact. Le modèle n'écrit aucun chiffre.",
-        "syn-1000000-q36",
-        False,
-    ),
-    (
-        "Sources contradictoires",
-        "Trois pièces donnent deux heures différentes pour le même contrôle : la réponse montre "
-        "le conflit au lieu de choisir.",
-        "syn-1000000-q00",
-        False,
-    ),
-    (
-        "Même personne ? Hypothèse signalée",
-        "La question dit « Chloé Fet », la pièce dit « Mme Fet ». Le lien n'est pas prouvé : "
-        "la réponse le dit.",
-        "syn-1000000-q27",
-        False,
-    ),
-    (
-        "Dialogue",
-        "« il » et « alors » renvoient à la question précédente.",
-        "syn-1000000-q39",
-        False,
-    ),
-    (
-        "Déclaration de l'utilisateur, puis relance",
-        "L'utilisateur affirme que deux noms désignent deux personnes. La contrainte est notée "
-        "dans le stock, la recherche est relancée avec elle.",
-        "syn-1000000-q38",
-        False,
-    ),
     (
         "Nom ambigu : le modèle demande",
         "Deux personnes du dossier s'appellent Lanard. Le modèle ne devine pas.",
@@ -135,11 +94,7 @@ def main(args: list[str]) -> None:
     oracle = Oracle(DOSSIER)
     pieces = con.execute("SELECT COUNT(*) FROM piece").fetchone()[0]
     props = con.execute("SELECT COUNT(*) FROM proposition").fetchone()[0]
-    print(f"{GRIS}Dossier : {pieces} pièces PDF, {props} passages dans le stock.{FIN}")
-    print(
-        f"{GRIS}« Contexte : » = phrase dont dépend la citation (elle commence par « Il », "
-        f"« Ainsi »…), affichée avant elle.{FIN}\n"
-    )
+    print(f"{GRIS}Dossier : {pieces} pièces PDF, {props} passages dans le stock.{FIN}\n")
 
     for n in choix:
         titre, but, qid, synthese = SCENES[n - 1]
