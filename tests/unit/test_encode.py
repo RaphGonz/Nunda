@@ -89,7 +89,7 @@ def test_sequence_a0_exemple_de_la_spec():
         "[P]", "⟨PIECE:PV_AUDITION⟩", "⟨RANG:1⟩",
         "⟨PER_5⟩", ", dit ", "⟨PER_3⟩", ", a signé le contrat avec ", "⟨ORG_9⟩", " le ",
         "⟨DATE_12⟩", ".", "[/P]",
-        "[SORTIE]", "⟨PT:P⟩", "SAME", "⟨PT:M⟩", "⟨PT:M⟩", "⟨PT:P⟩", "FIN",
+        "[SORTIE]", "⟨PT:P⟩", "ET", "SAME", "⟨PT:M⟩", "⟨PT:M⟩", "⟨PT:P⟩", "FIN",
     ]  # fmt: skip
 
 
@@ -365,10 +365,13 @@ def test_masque_des_suites_de_reference(i):
 
 
 def test_pas_interdit_refuse_au_masque():
-    # L'exemple de §4 n'a pas de connecteur entre P:0 et SAME : l'automate le refuse.
     ctx = Contexte.depuis_exemple(SPEC, {12: "2024-05-01"}, ())
+    e = encode(SPEC, _voc(), _car, ctx=ctx, gcfg=GCFG)  # l'exemple de §4 est accepté
+    assert e.masque[np.arange(len(SPEC.cible)), e.cible].all()
+    # Sans connecteur entre P:0 et SAME : refusé.
+    sans_et = SPEC.model_copy(update=dict(cible=[p for p in SPEC.cible if p != "ET"]))
     with pytest.raises(ValueError, match="pas interdit"):
-        encode(SPEC, _voc(), _car, ctx=ctx, gcfg=GCFG)
+        encode(sans_et, _voc(), _car, ctx=ctx, gcfg=GCFG)
 
 
 def test_masque_pas():

@@ -160,7 +160,7 @@ L'anonymiseur produit cette structure à l'inférence. Les fichiers d'entraînem
   ],
   "relations_noms": [[3, 5, "INITIALES_DE"], [3, 5, "ALIAS_DECLARE"]],
   "relations_props": [],
-  "cible": ["P:0", "SAME", "M:q.0", "M:0.0", "P:0", "FIN"],
+  "cible": ["P:0", "ET", "SAME", "M:q.0", "M:0.0", "P:0", "FIN"],
   "justificatives": [0]
 }
 ```

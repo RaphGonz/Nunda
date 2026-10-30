@@ -444,7 +444,7 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - [DEPEND] : sur la proposition qui dépend (a de (a, b)), pas sur b. [CONFLIT] : sur les deux.
   - [REL] : triplets triés par ordre d'apparition puis identifiant, coupés à `rel_max` ; indépendant du tirage. ⟨R:nom⟩ : 10 jetons (un par relation, le sens est donné par l'ordre a, b).
   - Limites dépassées : erreur, aucune coupe silencieuse.
-- **Écarts avec SPEC.md :** synthèse hors de `encode` : `Exemple.cible` refuse `W:` et S ≤ 96 ; à reprendre en phase 4 bis. Observation : la cible de l'exemple de §4 (`P:0 SAME …`) n'a pas de connecteur, l'automate la refuse (§10) ; test ajouté, aucune règle changée. Question pour Raphael : corriger l'exemple de §4 ?
+- **Écarts avec SPEC.md :** synthèse hors de `encode` : `Exemple.cible` refuse `W:` et S ≤ 96 ; à reprendre en phase 4 bis. Observation : la cible de l'exemple de §4 (`P:0 SAME …`) n'avait pas de connecteur, l'automate la refusait (§10). **Corrigé avec l'accord de Raphael le 2026-10-30** : `P:0 ET SAME …` dans SPEC.md §4 et `tests/golden/exemple_spec.json` ; aucune règle changée ; `SAME` reste un segment, pas un connecteur.
 - **Phase :** `encode` n'est pas un livrable de la phase 3 (§2), mais du code `anonymize` sans poids ni GPU. Tâche demandée explicitement ; la phase 3 reste non close (`reports/phase-3.md` non écrit) et la phase 4 n'est pas ouverte.
 - **Suite prévue :** `reports/phase-3.md` et relecture avec Raphael, avec `make test-complet` avant la clôture.
 
