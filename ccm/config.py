@@ -123,6 +123,7 @@ class AnonymiseurConfig(_Bloc):
     """Slots et attributs (SPEC.md §6)."""
 
     reservoir: int  # K
+    unites_max: int  # cases d'unité de `num_attr`, sans compter « autre »
     grandeur: tuple[int, int]
     rang_max: int
     ocr_bas: float
@@ -239,7 +240,11 @@ class VerifyConfig(ConfigBase):
 
 
 class ModelConfig(ConfigBase):
-    pass
+    variante: Literal["A0", "A1", "B"]
+    t_max: int  # limites de la séquence (SPEC.md §8)
+    p_max: int
+    s_max: int
+    rel_max: int  # triplets de l'en-tête [REL], A0 seulement
 
 
 class PretrainConfig(ConfigBase):

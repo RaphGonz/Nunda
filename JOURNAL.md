@@ -429,3 +429,21 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Seuil interne du test figé : au moins 90 % des réponses rejouées sans abstention de l'oracle (mesure, pas un seuil de SPEC).
 - **Écarts avec SPEC.md :** `ccm/answer.py` et `demo/` ne sont pas dans l'arbre de §3 (orchestration de la chaîne, démo). Observation : « Il ressort de nos constatations… », « Il est établi que… » reçoivent DEPEND_DE vers la phrase précédente (mot « Il » de la liste de SPEC §5, étape 3) ; le vérificateur affiche donc cette phrase en « Contexte : » (§11, étape 2), même quand elle parle d'un autre événement (démo, scènes 1, 5, 6). Conforme à SPEC, et dans les textes permis par T5 (dépendances) : pas une fuite. Question pour Raphael : exclure les « il » impersonnels (« Il ressort », « Il est établi », « Il apparaît ») de la liste ?
 - **Suite prévue :** les trois seuils de phase 3 semblent atteints (suites de référence 100 %, 100 925 décodages valides, rendu fermé contrôlé) : `reports/phase-3.md` et relecture avec Raphael avant `phase-3-ok` et la fusion (ne pas étiqueter sans son accord).
+
+## 2026-10-30 — Phase 3 — `anonymize.encode` (§8)
+- **Travail fait :** tâche donnée par Raphael. `ccm/anonymize/encode.py` : `encode(ex, voc, decouper, ctx=, gcfg=)` → `Encodage` (toutes les tables de §8) ; `Vocabulaire` (jetons spéciaux par variante, identifiants après ceux du tokenizer) ; `masque_pas` (pas permis → vecteur, servira au décodage). `ModelConfig` : `variante`, `t_max`, `p_max`, `s_max`, `rel_max` ; `anonymiseur.unites_max` = 16. Tests écrits avant le code : `tests/unit/test_encode.py` ; T2 étendu à l'encodage entier (B : tables égales sans mise en ordre ; A0 : après mise en ordre), résultat attendu inchangé.
+- **Mesures :** 40 dossiers d'entraînement, 1 596 exemples à 150 propositions, A0, tokenizer de test (un jeton par mot : T n'est qu'un ordre de grandeur) : T 1 017 à 2 301, M 89 à 213, K 47 à 128, S 2 à 14, triplets 27 à 78 (la coupe à 200 n'est jamais atteinte) ; chaque pas de référence est dans son masque. Lint OK. **`make test` complet non terminé** : arrêté par le système, faute de mémoire. Passés seulement : encode, T2, anonymiseur, config, T7. Non relancés : T5, T9, T11, tests figés et le reste.
+- **Décisions :**
+  - Tokenizer passé en paramètre (`decouper`) : ni BPE (phase 5) ni tokenizer de base (phase 4) n'existent encore.
+  - [SORTIE] est en segment 2 ; [REL] en segment 1 ; [BOS] en segment 0.
+  - Héritage : un pointeur copie **tous** les indices de sa position cible (`prop_idx`, `name_idx`, `val_idx`, `num_attr`) : [/P] pour P, le slot pour M et N. Une mention d'une proposition donne donc aussi `prop_idx`.
+  - Pointeurs : trois jetons ⟨PT:P⟩ ⟨PT:N⟩ ⟨PT:M⟩ (« vecteur du genre », §9).
+  - Réservoir des valeurs en A : jetons ⟨NUM_i⟩ et ⟨DATE_i⟩, i = `valeur_id` ; aucune table de plus (512 vecteurs en plus des 1 280).
+  - `num_attr` a 4 colonnes et §6 demande la précision d'une date : elle occupe la colonne unité (cases 18 à 20). Une unité vide ou inconnue va dans « autre » (17) ; 12 unités en config sur 16 cases.
+  - Espace de sortie : L = 30 dès le mode citation (jetons de synthèse masqués), pour garder les mêmes indices en phase 4 bis.
+  - [DEPEND] : sur la proposition qui dépend (a de (a, b)), pas sur b. [CONFLIT] : sur les deux.
+  - [REL] : triplets triés par ordre d'apparition puis identifiant, coupés à `rel_max` ; indépendant du tirage. ⟨R:nom⟩ : 10 jetons (un par relation, le sens est donné par l'ordre a, b).
+  - Limites dépassées : erreur, aucune coupe silencieuse.
+- **Écarts avec SPEC.md :** synthèse hors de `encode` : `Exemple.cible` refuse `W:` et S ≤ 96 ; à reprendre en phase 4 bis. Observation : la cible de l'exemple de §4 (`P:0 SAME …`) n'a pas de connecteur, l'automate la refuse (§10) ; test ajouté, aucune règle changée. Question pour Raphael : corriger l'exemple de §4 ?
+- **Phase :** `encode` n'est pas un livrable de la phase 3 (§2), mais du code `anonymize` sans poids ni GPU. Tâche demandée explicitement ; la phase 3 reste non close (`reports/phase-3.md` non écrit) et la phase 4 n'est pas ouverte.
+- **Suite prévue :** relancer `make test` complet quand la mémoire le permet, puis pousser `phase-3`. Ensuite `reports/phase-3.md` et relecture avec Raphael.

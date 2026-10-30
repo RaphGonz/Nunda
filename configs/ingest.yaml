@@ -149,6 +149,7 @@ noms:
 # Anonymiseur (SPEC.md §6, §8) : slots et attributs.
 anonymiseur:
   reservoir: 256  # K : indices tirés par type de nom, et pour les valeurs
+  unites_max: 16  # §6 : 16 unités et « autre »
   grandeur: [-3, 12]  # bornes de l'ordre de grandeur d'un nombre
   rang_max: 63  # rang dense d'une valeur parmi celles de même unité
   ocr_bas: 0.85  # marque [OCR_BAS] sous cette confiance (§5, étape 1)
