@@ -446,11 +446,11 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Limites dépassées : erreur, aucune coupe silencieuse.
 - **Écarts avec SPEC.md :** synthèse hors de `encode` : `Exemple.cible` refuse `W:` et S ≤ 96 ; à reprendre en phase 4 bis. Observation : la cible de l'exemple de §4 (`P:0 SAME …`) n'a pas de connecteur, l'automate la refuse (§10) ; test ajouté, aucune règle changée. Question pour Raphael : corriger l'exemple de §4 ?
 - **Phase :** `encode` n'est pas un livrable de la phase 3 (§2), mais du code `anonymize` sans poids ni GPU. Tâche demandée explicitement ; la phase 3 reste non close (`reports/phase-3.md` non écrit) et la phase 4 n'est pas ouverte.
-- **Suite prévue :** lancer `make test` (hors T11), puis pousser `phase-3`. Ensuite `reports/phase-3.md` et relecture avec Raphael, avec `make test-complet` avant la clôture.
+- **Suite prévue :** `reports/phase-3.md` et relecture avec Raphael, avec `make test-complet` avant la clôture.
 
 ## 2026-10-30 — Phase 3 — T11 hors de `make test`
 - **Travail fait :** demande de Raphael, `make test` s'arrêtant faute de mémoire. Marque pytest `couteux` sur T11, exclue par défaut (`addopts`). `make test` : lint et pytest sans T11 ; `make test-t11` : T11 seul ; `make test-complet` : les deux, en deux processus l'un après l'autre. CI : `make test-complet`, car SPEC §10 bis place T11 en CI. T11 lui-même n'est pas modifié (mêmes 100 000 décodages, mêmes contrôles). `CLAUDE.md` et `README.md` mis à jour.
-- **Mesures :** à la demande de Raphael, aucune suite relancée. Contrôlés seulement : lint, sélection pytest à la collecte, `make -n`. Ces cibles et `encode` n'ont donc pas encore eu de `make test` entier.
+- **Mesures :** nouveau `make test` : lint OK, **310 passés, 1 désélectionné (T11)**, 179 s (552 s avec T11 le 2026-10-28), sans arrêt mémoire. Sélection de `-m couteux` et `make -n test-complet` contrôlés, sans les exécuter. T11 n'a pas tourné depuis `encode` ; aucun code qu'il lit n'a changé, seulement `configs/ingest.yaml` (`unites_max`, nouvelle clé) ; la CI le lancera.
 - **Décisions :** `make test-complet` obligatoire si le travail touche `grammar`, `verify`, `anonymize` (hors `encode`), `ingest` ou `worldgen`, et avant de clore une phase. Un `pytest` nu exclut aussi T11 ; un chemin explicite vers son fichier le désélectionne : passer par `make test-t11` ou `-m couteux`.
 - **Écarts avec SPEC.md :** aucun : T11 reste en CI.
 - **Suite prévue :** celle de l'entrée précédente.
