@@ -52,7 +52,8 @@ select = ["E", "F", "W", "I", "B", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not couteux'"
+markers = ["couteux: test long et gourmand en mémoire, hors de `make test` (make test-t11)"]
 
 [tool.uv]
 default-groups = ["dev", "interne"]

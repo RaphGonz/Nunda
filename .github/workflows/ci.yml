@@ -22,4 +22,4 @@ jobs:
           path: runs/modeles
           key: modeles-${{ runner.os }}-${{ hashFiles('ccm/data/modeles.py') }}
       - run: make setup
-      - run: make test
+      - run: make test-complet

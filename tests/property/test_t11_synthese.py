@@ -16,6 +16,8 @@ import re
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 
+import pytest
+
 from ccm.config import load_config
 from ccm.data.worldgen.cibles import exemple_de_reference
 from ccm.data.worldgen.monde import generer_monde
@@ -33,6 +35,8 @@ VCFG = load_config("verify")
 WCFG = load_config("worldgen")
 TOTAL = 100_000
 PAR_QUESTION = 25
+
+pytestmark = pytest.mark.couteux
 
 
 def _sources(con, ex, sources: list[int]) -> tuple[set[int], list[str], set[str]]:
