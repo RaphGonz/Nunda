@@ -267,5 +267,60 @@ def modeles() -> None:
     typer.echo(f"{len(ecrits)} fichiers écrits dans {MODELES}")
 
 
+@app.command()
+def jeux() -> None:
+    """Télécharge les jeux publics de réglage fin (§12) ; affiche tailles et empreintes."""
+    from ccm.config import load_config
+    from ccm.data.jeux import telecharger
+
+    for jeu, nom, taille, empreinte in telecharger(load_config("donnees").racine):
+        typer.echo(f"{jeu}\t{nom}\t{taille}\t{empreinte}")
+
+
+@app.command()
+def convertir(
+    jeu: Annotated[str, typer.Argument(help="hotpot, squad ou finqa")],
+    limite: Annotated[int, typer.Option(help="Questions par partie (0 : toutes).")] = 0,
+) -> None:
+    """Convertit un jeu public en exemples Parquet (§12), dans `racine/converti/<jeu>/`."""
+    import json
+    from itertools import islice
+
+    from ccm.config import load_config
+    from ccm.data import finqa, hotpot, squad_fr
+    from ccm.data.publics import convertir_partie, remplir_cache, textes_de
+
+    cfg = load_config("donnees")
+    brut = cfg.racine / "brut" / jeu
+    ecartes: dict[str, dict[str, int]] = {}
+    if jeu == "hotpot":
+        parties = {p: hotpot.lire(brut, p) for p in ("train", "validation")}
+    elif jeu == "squad":
+        parties = {"train": squad_fr.sans_reponse(brut / "train-v2.0.json"),
+                   "validation": squad_fr.sans_reponse(brut / "dev-v2.0.json")}  # fmt: skip
+    elif jeu == "finqa":
+        parties = {}
+        for p, f in (("train", "train"), ("validation", "dev"), ("test", "test")):
+            parties[p], ecartes[p] = finqa.lire(brut / f"{f}.json")
+    else:
+        raise typer.BadParameter(f"jeu inconnu : {jeu}")
+    lus = {p: list(islice(b, limite or None)) for p, b in parties.items()}
+    cache = cfg.racine / "cache-zones.sqlite"
+    icfg = load_config("ingest")
+    det = icfg.detection.model_copy(
+        update={"gliner": icfg.detection.gliner.model_copy(update={"lot": cfg.lot_gliner})}
+    )
+    remplir_cache((t for b in lus.values() for x in b for t in textes_de(x)), cache,
+                  icfg.model_copy(update={"detection": det}), cfg.lot_detection)  # fmt: skip
+    sortie = cfg.racine / "converti" / jeu
+    bilan = {p: convertir_partie(b, sortie / p, cache, cfg, cfg.processus)
+             | {"ecartes": ecartes.get(p, {})}
+             for p, b in lus.items()}  # fmt: skip
+    (sortie / "bilan.json").write_text(
+        json.dumps(bilan, indent=1, ensure_ascii=False), encoding="utf-8"
+    )
+    typer.echo(json.dumps(bilan))
+
+
 if __name__ == "__main__":
     app()

@@ -141,9 +141,12 @@ def chercher_connus(texte: str, types: dict[str, TypeNom], zones: list[Zone]) ->
     return trouvees
 
 
-def detecter_message(texte: str, con: sqlite3.Connection, cfg: IngestConfig) -> list[Zone]:
-    """Zones de noms d'un message : détecteurs, plus les normes connues de la base."""
-    zones = detecter([texte], cfg)[0]
+def detecter_message(
+    texte: str, con: sqlite3.Connection, cfg: IngestConfig, zones: list[Zone] | None = None
+) -> list[Zone]:
+    """Zones de noms d'un message : détecteurs (ou `zones`, déjà détectées), plus les normes
+    connues de la base."""
+    zones = detecter([texte], cfg)[0] if zones is None else zones
     types = connus(con, cfg)
     types = {**mots_connus(con, cfg, types), **types}
     return unir(zones + chercher_connus(texte, types, zones))

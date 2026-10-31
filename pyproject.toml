@@ -10,6 +10,7 @@ dependencies = [
     "fr-core-news-lg",
     "gliner>=0.2.29",
     "protobuf>=7.36.2",
+    "pyarrow>=17",
     "pydantic>=2.9",
     "pypdfium2>=4.30",
     "pysbd>=0.3.4",

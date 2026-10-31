@@ -1,0 +1,10 @@
+version: 1
+description: Jeux publics de réglage fin (SPEC.md §12) ; les données restent hors du dépôt.
+
+racine: D:/Nunda-donnees  # brut/<jeu>/, converti/<jeu>/<partie>/, cache-zones.sqlite
+graine: 0
+lot_parquet: 10000  # SPEC.md §3
+lot_detection: 20000  # textes par passage des détecteurs ; un passage écrit le cache
+lot_gliner: 128  # RTX 3090 ; la configuration d'ingestion garde 32
+distracteurs: 3  # FQuAD, PIAF : paragraphes du même article (SPEC.md §12)
+processus: 8  # valeur de départ

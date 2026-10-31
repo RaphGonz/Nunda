@@ -355,7 +355,20 @@ class WorldgenConfig(ConfigBase):
     questions: QuestionsConfig
 
 
+class DonneesConfig(ConfigBase):
+    """Jeux publics de réglage fin (SPEC.md §12)."""
+
+    racine: Path
+    graine: int
+    lot_parquet: int
+    lot_detection: int
+    lot_gliner: int
+    distracteurs: int
+    processus: int
+
+
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
+    "donnees": DonneesConfig,
     "ingest": IngestConfig,
     "search": SearchConfig,
     "grammar": GrammarConfig,

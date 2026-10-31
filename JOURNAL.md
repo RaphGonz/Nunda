@@ -454,3 +454,36 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** `make test-complet` obligatoire si le travail touche `grammar`, `verify`, `anonymize` (hors `encode`), `ingest` ou `worldgen`, et avant de clore une phase. Un `pytest` nu exclut aussi T11 ; un chemin explicite vers son fichier le désélectionne : passer par `make test-t11` ou `-m couteux`.
 - **Écarts avec SPEC.md :** aucun : T11 reste en CI.
 - **Suite prévue :** celle de l'entrée précédente.
+
+## 2026-10-31 — Phase 3 — Jeux publics de réglage fin (§12) : téléchargement, licences, conversion arrêtée
+- **Tailles (en-tête `Content-Length`, requêtes HEAD, avant tout téléchargement) :**
+  - HotpotQA, réglage « distracteurs » (Parquet, `hotpotqa/hotpot_qa`, révision `1908d6af`) : `train-00000-of-00002` 165 624 177 ; `train-00001-of-00002` 166 162 479 ; `validation-00000-of-00001` 27 452 575. L'hôte d'origine (`curtis.ml.cmu.edu`, JSON) ne résout plus.
+  - PIAF v1.2 (`piaf-v1.2.json`, data.gouv) : 4 744 747.
+  - SQuAD 2.0 : `train-v2.0.json` 42 123 633 ; `dev-v2.0.json` 4 370 528.
+  - FinQA : `train.json` 78 216 616 ; `dev.json` 10 954 658 ; `test.json` 14 395 143 ; `LICENSE` 1 067.
+  - TAB : `echr_train.json` 47 503 662 ; `echr_dev.json` 12 643 092 ; `echr_test.json` 13 103 290 ; `LICENSE.txt` 1 089.
+  - FQuAD : taille inconnue (HTTP 401 sur `illuin/fquad`, `fquad.illuin.tech` ne résout pas).
+  - **Total : 587 296 756 octets (0,587 Go), PIAF compris**, pour environ 1 Go attendu. Écart surtout dû à HotpotQA en Parquet compressé (0,36 Go) plutôt qu'en JSON.
+- **Travail fait :** demande de Raphael : télécharger et convertir les jeux publics du §12. Sur `phase-3` (non close ; phase 4 non ouverte). `ccm jeux` (`ccm/data/jeux.py`, versions et SHA-256 figés), `ccm convertir` (`ccm/data/publics.py`, `hotpot.py`, `squad_fr.py`, `finqa.py`), `configs/donnees.yaml`, `tests/unit/test_donnees_publiques.py`. Données dans `D:/Nunda-donnees/` (`brut/`, `converti/`, `cache-zones.sqlite`, `conversion.log`). `uv`, `make`, `.venv` (5,1 Go) et `runs/modeles` (1,1 Go) installés : ils manquaient sur cette machine.
+- **ARRÊT : cas 3 (PIAF), licence pas claire.** data.gouv : « License Not Specified » ; Hugging Face : étiquette MIT, section licence vide ; article LREC 2020 : « CC-BY-SA ». PIAF n'est ni téléchargé ni converti.
+- **Mesures :**
+  - **Téléchargés (0,582 Go, tailles égales aux `Content-Length`, SHA-256 figés) :** HotpotQA, SQuAD 2.0, FinQA, TAB.
+  - **FQuAD sauté :** pas d'accès (HTTP 401 sur `illuin/fquad`, `fquad.illuin.tech` ne résout pas). Aucun miroir utilisé. Licence non lue.
+  - **SQuAD converti, mais inutilisable :** 48 712 exemples écrits sur 49 443 questions sans réponse (731 rejetés, titre d'article resté en clair).
+  - **FinQA et HotpotQA non convertis.** Claude Code a arrêté la conversion pour manque de mémoire pendant la détection de FinQA ; pas relancée. Le cache garde 183 237 textes détectés et sert à la reprise. Essai sur 300 questions par partie, avant l'ajout du rejet des titres, supprimé ensuite : HotpotQA 600 gardées sur 600 (29 titres sur 5 941 restés en clair). FinQA à 300 questions : cibles lues et correctes sur 3 exemples, bilan non relu.
+  - **Détection sur l'anglais (cache) :** SQuAD 53,4 % des questions écrites entièrement masquées ; caractères masqués : SQuAD 74,9 % (questions), 40,2 % (phrases) ; HotpotQA 63,2 % et 55,0 %, sur 300 questions. Sans les zones de spaCy seul : 42,8 %, 30,1 %, 55,9 %, 47,7 %. **FinQA (`dev`) : 0 caractère masqué** sur 661 questions et 7 325 phrases : le texte est en minuscules et une zone sans majuscule n'est pas gardée (§6), donc tout nom y resterait en clair.
+  - Débit de la détection : 123 textes/s avec `lot` 32, sur 12 277 textes, chargement compris. `lot_gliner` 128 non mesuré à part.
+  - `make test` : 324 passés, 1 ignoré, 1 désélectionné (T11). `make test-complet` non lancé : aucun module de sa liste touché (`ner/propagate.py` : paramètre `zones` facultatif).
+- **Décisions :**
+  - HotpotQA vient du Parquet de `hotpotqa/hotpot_qa`, l'hôte d'origine ne résolvant plus.
+  - TAB : aucune conversion (§12), fichiers bruts seulement, jamais en entraînement.
+  - Anglais : `nombres_en` dans `data/publics.py`, car `ingest.numbers` lit « 5,829 » comme 5,829. Colonne `valeurs` à côté de `exemple` dans le Parquet (nombres seulement, pour le masque).
+  - Un exemple dont le texte contient encore un titre d'article est rejeté (§15). Cela ne prouve pas l'absence d'autres noms.
+  - `squad` converti laissé sur le disque, avec `A_NE_PAS_UTILISER.txt`.
+- **Écarts avec SPEC.md :** conversion demandée non terminée. PIAF et FQuAD absents : plus aucune source de citation en français (poids 15 %). Total réel 0,587 Go pour environ 1 Go attendu.
+- **Questions pour Raphael :**
+  1. PIAF : quelle licence retenir ? Proposition : traiter comme CC BY-SA (la plus stricte déclarée par les auteurs) après confirmation d'Etalab.
+  2. Détection sur l'anglais : §6 ne la prévoit pas. Proposition : GLiNER et règles seuls pour `en`, sans spaCy français ni D4, mesurés sur TAB avant toute reconversion.
+  3. FinQA en minuscules : garder le jeu (noms en clair, contraire au §15), ou chercher une autre détection ?
+  4. CC BY-SA 4.0 (HotpotQA, SQuAD) : le partage à l'identique est-il compatible avec des poids ouverts sous une autre licence ?
+- **Suite prévue :** selon les réponses ; reprise avec `ccm convertir finqa`, puis `ccm convertir hotpot`, sous surveillance de la mémoire. `reports/phase-3.md` reste à écrire.
