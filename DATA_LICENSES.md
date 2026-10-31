@@ -18,3 +18,12 @@ Une ligne par jeu de données ou modèle téléchargé, vérifiée au téléchar
 | TAB, Text Anonymization Benchmark (`echr_train`, `echr_dev`, `echr_test`) | github.com/NorskRegnesentral/text-anonymization-benchmark (branche `master`), `ccm jeux` | MIT (`LICENSE.txt` et README : « TAB is released under an MIT License », Norsk Regnesentral). **Contient de vrais noms** (arrêts publics de la CEDH) | Évaluation seulement : rappel de la détection ; jamais d'entraînement | 2026-10-31 |
 | PIAF v1.2 | data.gouv.fr (Etalab), `ccm jeux` | **CC BY-SA, retenue par Raphael le 2026-10-31.** Sources contradictoires : data.gouv « License Not Specified » ; Hugging Face étiquette MIT, section licence vide ; article LREC 2020 (note 6) « CC-BY-SA », seule déclaration des auteurs. Attribution et partage à l'identique | Réglage fin, citation en français | 2026-10-31 |
 | FQuAD : **NON TÉLÉCHARGÉ, accès non obtenu** | huggingface.co `illuin/fquad` (HTTP 401) ; `fquad.illuin.tech` ne résout pas | **Non lue** : page inaccessible. Non commerciale d'après SPEC.md §12, à vérifier | Réglage fin, citation en français : en attente d'un accès | 2026-10-31 |
+
+## Poids fermés et usage commercial (Raphael, 2026-10-31)
+
+Synthèse de recherche, pas un avis juridique : à faire valider par un juriste avant toute vente. Détail dans `JOURNAL.md`.
+
+- **CC BY-SA (HotpotQA, SQuAD, PIAF, Wikipédia) :** à exclure du modèle commercial, sauf avis contraire d'un juriste. Une traduction reste soumise à la même licence.
+- **MIT (FinQA, TAB) :** compatible, avec l'avis de copyright.
+- **FQuAD :** à exclure (non commerciale d'après SPEC.md §12, non vérifié).
+- **Légifrance, Judilibre, non téléchargés :** Licence Ouverte 2.0 et conditions d'utilisation à accepter ; voir les réserves du journal pour Judilibre.

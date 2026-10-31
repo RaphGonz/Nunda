@@ -536,3 +536,24 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   2. CC BY-SA 4.0 et poids ouverts.
   3. §16 : pré-entraînement bilingue 70/30, ou français seul avec HotpotQA traduit.
 - **Suite prévue :** Raphael prévoit de télécharger le droit français (Légifrance, Judilibre, phases 4 et 5). Avant cela : lire les licences et le cadre de réutilisation des décisions de justice (vraies personnes). `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
+
+## 2026-10-31 — Phase 3 — Décisions de Raphael : noms, langue, poids ; recherche sur les licences
+
+- **Décisions de Raphael :**
+  - **Noms : on n'en veut pas, à réduire au maximum, quitte à décaler le plan.**
+  - **Langue : français.** §16 coché. La traduction de HotpotQA n'est pas décidée (voir ci-dessous).
+  - **Poids : préférence pour des poids fermés**, pour le levier commercial. Cela remplace « code fermé, poids ouverts » (2026-10-18, §3). §16 mis à jour, case laissée ouverte.
+  - Recherche sur les licences confiée à l'agent.
+- **Recherche (synthèse, pas un avis juridique) :**
+  - **Creative Commons** (page « Using CC-licensed works for AI training », lue) : la licence ne s'applique que si une permission est nécessaire ; une exception au droit d'auteur l'écarte. Le partage à l'identique ne joue que si le modèle ou ses sorties sont **partagés publiquement**, et CC conseille alors la même licence.
+  - **Exception de fouille de textes** (directive 2019/790 art. 4, art. L122-5-3 CPI ; extraits lus) : usage commercial possible, sauf opposition du titulaire. Son articulation avec le partage à l'identique reste débattue (Szkalej et Senftleben, JIPITEC, résumé lu seulement).
+  - **Conséquence :** des poids jamais distribués ne déclenchent pas le partage à l'identique selon CC. **Installer les poids chez un client est une distribution**, et le §3 vise un produit hors ligne : c'est là qu'est le risque. Une traduction est une adaptation : HotpotQA traduit reste CC BY-SA.
+  - **Légifrance :** Licence Ouverte 2.0, conditions de PISTE et de l'API (page Open data lue ; ces conditions non lues). Licence ouverte : réutilisation commerciale permise, avec mention de la source.
+  - **Judilibre :** Licence Ouverte 2.0 complétée par des CGU (V8, lues par extraits, pas en entier). **Trois réserves :** interdiction d'altérer les données ; juridiction, formation, siège et date à mentionner pour chaque décision, sans pouvoir les en détacher ; réutilisateur responsable de traitement, tenu de garder ses données à jour. Masquer et découper les décisions pour l'entraînement peut heurter les deux premières : **pas clair, à faire valider avant de s'en servir** (cas d'arrêt 3 si cela reste flou).
+  - **Art. L111-13 COJ (lu) :** interdiction, sous peine pénale, de réutiliser l'identité des magistrats et des greffiers pour évaluer, analyser, comparer ou prédire leurs pratiques. Noms des parties et des tiers occultés à la source, ce qui ne garantit pas qu'il n'en reste aucun.
+- **Recommandation de l'agent, non décidée :** poids fermés et français vont ensemble si le modèle commercial n'utilise aucune donnée CC BY-SA : retirer HotpotQA (traduit ou non), SQuAD, PIAF et Wikipédia. Le plus prudent ; un juriste peut assouplir. Sources restantes : corpus synthétique, Légifrance, Judilibre selon la validation, textes de l'Union européenne (licence à lire), livres du domaine public. Prix : plus de citation humaine annotée sur texte réel ; les chaînes et l'abstention reposeraient sur le synthétique et le modèle enseignant.
+- **Écarts avec SPEC.md :** le §12 (sources, poids) et le §1 C7 ne correspondent plus à la décision de langue ; non modifiés, en attente des arbitrages de Raphael. Les conversions anglaises de ce jour ne serviront sans doute pas à l'entraînement ; TAB reste utile pour la mesure.
+- **Plan pour les noms, à ne pas lancer sans demande :** mesurer `gliner_multi_pii-v1` et `camembert-ner` (entrée précédente) ; trouver une référence française réelle annotée, car 0,998 ne vaut que sur des noms synthétiques ; proposer la liste Wikidata des humains (déjà téléchargée, CC0) comme détecteur supplémentaire, ce qui change le §6 ; élargir le contrôle des exemples au-delà des titres de la question. JORF : nominations et décorations pleines de vrais noms, à surveiller.
+- **Tests :** `make test` non relancé : texte seul, aucun code touché.
+- **Questions pour Raphael :** 1. Retirer les données CC BY-SA du modèle commercial ? 2. Consulter un juriste pour Judilibre et les poids distribués ?
+- **Suite prévue :** selon les réponses. Avant tout téléchargement du droit français : lire en entier les CGU de Judilibre, de PISTE et de l'API Légifrance. `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
