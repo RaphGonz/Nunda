@@ -487,3 +487,52 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   3. FinQA en minuscules : garder le jeu (noms en clair, contraire au §15), ou chercher une autre détection ?
   4. CC BY-SA 4.0 (HotpotQA, SQuAD) : le partage à l'identique est-il compatible avec des poids ouverts sous une autre licence ?
 - **Suite prévue :** selon les réponses ; reprise avec `ccm convertir finqa`, puis `ccm convertir hotpot`, sous surveillance de la mémoire. `reports/phase-3.md` reste à écrire.
+
+## 2026-10-31 — Phase 3 — Jeux publics du §12 : conversion terminée (sauf FQuAD)
+
+- **Travail fait :** suite de l'entrée précédente, dont les questions sont tranchées. PIAF téléchargé et ajouté à `ccm/data/jeux.py`. Chaînes de détection par jeu, cache par chaîne. `ccm/eval/tab.py` (mesure sur TAB `dev`). `detecter_minuscules` pour FinQA. `convertir_partie` par paquets, pour la mémoire. SQuAD, HotpotQA, FinQA et PIAF reconvertis ; `squad` de la première passe remplacé. Sur `phase-3` (non close ; phase 4 non ouverte).
+- **Décisions de Raphael :**
+  - PIAF : CC BY-SA retenue (`DATA_LICENSES.md`).
+  - Anglais : GLiNER, règles, puis D4 ajouté après mesure ; pas de spaCy français.
+  - FinQA : chercher une autre détection, retirer le jeu si ce n'est pas satisfaisant. Résultat : gardé, voir mesures.
+  - CC BY-SA et poids ouverts : Raphael ne sait pas. **Question ouverte, à trancher avant toute publication de poids.**
+- **Mesures, conversion :**
+  - SQuAD : 46 428 gardés sur 49 443 (6,1 % de rejets, tous de titre ; 11 % sans D4).
+  - HotpotQA : 59 733 sur 97 852 (train 55 125, validation 4 608). **Rejets 39,0 %** : 38 096 titres restés en clair, 23 justificatives hors du contexte.
+  - FinQA : 6 086 sur 6 489 (train 4 606, validation 628, test 852, partie `test` jamais pour entraîner). Écartés par la règle du §12 avant conversion : 2 792.
+  - PIAF : 9 224 sur 9 224, 0 rejet.
+  - TAB : aucune conversion (§12). FQuAD : toujours sans accès, licence non lue, aucun miroir.
+  - Débit de la détection anglaise : environ 360 textes/s (1,9 M textes en 87 min, `lot_gliner` 128).
+- **Mesures, TAB `dev`, rappel PERSON / ORG / LOC et caractères masqués :**
+  - 4 détecteurs : 0,969 / 0,920 / 0,985 ; 44,6 %.
+  - GLiNER + règles : 0,919 / 0,826 / 0,940 ; 14,0 %.
+  - **+ D4 (retenu, anglais) : 0,934 / 0,857 / 0,972 ; 16,5 %.**
+  - Minuscules, seuil 0,6 : 0,907 / 0,792 / 0,925 ; 18,2 % (FinQA 8,7 %).
+  - **Minuscules, seuil 0,3 (retenu, FinQA) : 0,943 / 0,902 / 0,949 ; 23,7 % (FinQA 14,6 %).**
+  - Critères fixés avant mesure : PER ≥ 0,87 et masquage réduit (anglais) ; PER et ORG ≥ 0,87 sur TAB en minuscules et moins de 25 % masqués sur FinQA (FinQA gardé). TAB n'est pas financier : le rappel sur FinQA reste indirect.
+- **Contrôle du masquage** (échantillons de 3 000 questions pour la part masquée, 2 000 exemples convertis pour le reste ; script hors dépôt) :
+  - Caractères masqués, questions / phrases : SQuAD 14,3 / 15,6 % ; HotpotQA 25,5 / 24,7 % ; FinQA 11,3 / 14,6 % ; PIAF 13,5 / 15,2 %. **PIAF n'est pas sur-masqué** : son zéro rejet de titre ne vient pas de là.
+  - Mots à majuscule en milieu de phrase restés dans les exemples, pour 1 000 mots : SQuAD 21,0 ; HotpotQA 27,6 ; PIAF 0,5 ; FinQA 0,0 (en minuscules : ne prouve rien). Indice seulement : tous ne sont pas des noms.
+  - **HotpotQA : 10,3 % des exemples gardés contiennent un titre à plusieurs mots d'un autre article** (SQuAD 2,1 %), repéré parmi les titres de 3 000 questions seulement : c'est un minimum. Le rejet ne contrôle que les titres de la question elle-même.
+  - Rejets de titre HotpotQA, sur 3 000 questions : 1 199 rejets, 2 002 titres. 1 953 (97,5 %) ne contiennent que des mots courants (« Wildfire », « Hip hop », « Picture to Burn »), que D4 ne peut pas voir ; 34 ne sont trouvés qu'à l'intérieur d'un autre mot. Beaucoup ne sont pas des noms de personne ; proportion non mesurée.
+- **Décisions :**
+  - Rejet de titre gardé tel quel, malgré 39 % de rejets : l'assouplir laisserait passer plus de noms. Conséquence : perte de questions sur des titres de mots courants.
+  - Chaîne anglaise `[gliner, regle, majuscules]` et seuil FinQA 0,3 dans `configs/donnees.yaml`, propres aux jeux publics. Rien ne change dans la configuration d'ingestion.
+- **Écarts avec SPEC.md :**
+  - **§15 « aucune chaîne de nom dans un fichier d'entraînement » : non tenue strictement sur ces jeux réels.** Sur TAB, environ 6,6 % des personnes et 14 % des organisations restent en clair (anglais), 5,7 % et 10 % en minuscules. Le contrôle ci-dessus le confirme sur HotpotQA. **À trancher par Raphael avant tout entraînement sur ces jeux (phase 4).**
+  - §6 ne prévoit pas de chaîne anglaise distincte (D2 retiré pour `en`) ; `nombres_en` et colonne `valeurs` en plus.
+  - FQuAD absent : PIAF seul pour la citation en français (poids 15 %), 9 224 questions.
+  - HotpotQA ramené à 59 733 questions.
+- **Incidents :** Claude Code a arrêté la conversion de HotpotQA pour manque de mémoire vers 17 h 45, avec 3,4 Go libres. Le processus de conversion avait survécu à cet arrêt (15,4 Go) : tué à la main, cache intact. Relancée à la demande de Raphael, autres applications fermées, sans incident. Origine des 15 Go non cherchée.
+- **Tests :** `make test` : 325 passés, 1 ignoré, 1 désélectionné (T11). `ruff format --check` propre. `make test-complet` non lancé : aucun module de sa liste touché depuis la première passe.
+- **Pistes, à ne pas lancer sans demande (Raphael) :**
+  - Mesurer `urchade/gliner_multi_pii-v1` (Apache 2.0, licence vue sur sa page) sur TAB `dev`, en texte normal et en minuscules, à la place de GLiNER puis en plus.
+  - Mesurer `Jean-Baptiste/camembert-ner` (MIT, vue sur sa page). Français seul : TAB ne convient pas ; référence : corpus synthétique, partie validation, à regénérer (`ccm corpus`). Le rappel PER y est déjà de 0,998 : la mesure dira surtout s'il masque trop.
+  - Seuil proposé sur TAB, à confirmer avant la mesure : au moins la moitié des personnes et organisations restantes en moins, et 25 % de caractères masqués au plus. Aucun modèle n'entre dans la chaîne sans accord de Raphael (§6).
+  - LLM écarté par Raphael.
+  - FinQA : à comparer avec et sans en phase 4 (5 % du poids, le plus exposé aux noms).
+- **Questions pour Raphael :**
+  1. §15 : quel reste de noms accepter sur les jeux publics, avant la phase 4 ?
+  2. CC BY-SA 4.0 et poids ouverts.
+  3. §16 : pré-entraînement bilingue 70/30, ou français seul avec HotpotQA traduit.
+- **Suite prévue :** Raphael prévoit de télécharger le droit français (Légifrance, Judilibre, phases 4 et 5). Avant cela : lire les licences et le cadre de réutilisation des décisions de justice (vraies personnes). `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
