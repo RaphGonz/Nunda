@@ -6,5 +6,7 @@ graine: 0
 lot_parquet: 10000  # SPEC.md §3
 lot_detection: 20000  # textes par passage des détecteurs ; un passage écrit le cache
 lot_gliner: 128  # RTX 3090 ; la configuration d'ingestion garde 32
+detecteurs_en: [gliner, regle, majuscules]  # Raphael, 2026-10-31 ; mesuré sur TAB (ccm/eval/tab.py)
+seuil_minuscules: 0.3  # FinQA : mesuré sur TAB en minuscules (ORG 0,79 à 0,6 ; 0,90 à 0,3)
 distracteurs: 3  # FQuAD, PIAF : paragraphes du même article (SPEC.md §12)
-processus: 8  # valeur de départ
+processus: 6  # valeur de départ

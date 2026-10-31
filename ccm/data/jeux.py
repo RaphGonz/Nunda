@@ -1,8 +1,8 @@
 """Téléchargement des jeux publics de réglage fin (SPEC.md §12) dans `racine/brut/<jeu>/`.
 
 Versions figées, empreintes SHA-256 contrôlées ; licences dans `DATA_LICENSES.md`. Un jeu
-n'entre dans `FICHIERS` qu'une fois sa licence lue et claire. Absents : FQuAD (accès refusé,
-HTTP 401) et PIAF (licences contradictoires, voir `JOURNAL.md` du 2026-10-31).
+n'entre dans `FICHIERS` qu'une fois sa licence lue et claire. Absent : FQuAD (accès refusé,
+HTTP 401). PIAF : CC BY-SA retenue par Raphael (`JOURNAL.md`, 2026-10-31).
 
     uv run ccm jeux
 """
@@ -12,6 +12,7 @@ import urllib.request
 from pathlib import Path
 
 _HOTPOT = "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor"
+_PIAF = "https://static.data.gouv.fr/resources/piaf-le-dataset-francophone-de-questions-reponses/20210323-174441"
 _SQUAD = "https://rajpurkar.github.io/SQuAD-explorer/dataset"
 _FINQA = "https://raw.githubusercontent.com/czyssrs/FinQA/main"
 _TAB = "https://raw.githubusercontent.com/NorskRegnesentral/text-anonymization-benchmark/master"
@@ -24,6 +25,8 @@ FICHIERS = [
      "713661628434fbb19fff7392e2e321e4ed107e3c7c7784d0690946e5f722763f"),
     ("hotpot", "validation-00000-of-00001.parquet", f"{_HOTPOT}/validation-00000-of-00001.parquet",
      "c20b638ca82b21d04fe12e14ff417ad05153d4d215a65de54497fca4e972f7c6"),
+    ("piaf", "piaf-v1.2.json", f"{_PIAF}/piaf-v1.2.json",
+     "6f2734336d64e4a363bd6bbcc790a8ff993af51586f73a57f1d15a34d8440bf2"),
     ("squad", "train-v2.0.json", f"{_SQUAD}/train-v2.0.json",
      "68dcfbb971bd3e96d5b46c7177b16c1a4e7d4bdef19fb204502738552dede002"),
     ("squad", "dev-v2.0.json", f"{_SQUAD}/dev-v2.0.json",

@@ -17,6 +17,7 @@ from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
+from itertools import islice
 from pathlib import Path
 
 import pyarrow as pa
@@ -32,9 +33,9 @@ from ccm.graph.store import ajouter_nombres, ajouter_piece
 from ccm.ingest.conflicts import detecter_conflits
 from ccm.ingest.dedup import dedoublonner
 from ccm.ingest.numbers import NombreLu, nombres
-from ccm.ner.detectors import Zone
+from ccm.ner.detectors import Zone, d1_gliner, d3_regles
 from ccm.ner.propagate import detecter_message, ecrire_mentions, propager_stock
-from ccm.ner.union import detecter
+from ccm.ner.union import unir
 from ccm.schema import (
     Detecteur,
     Exemple,
@@ -143,8 +144,9 @@ def _ouvrir_cache(chemin: Path) -> sqlite3.Connection:
     return con
 
 
-def remplir_cache(textes: Iterable[str], chemin: Path, cfg: IngestConfig, lot: int) -> int:
-    """Détecte les textes absents du cache, par lots ; reprend là où il s'est arrêté."""
+def remplir_cache(textes: Iterable[str], chemin: Path, detection, lot: int) -> int:
+    """Détecte les textes absents du cache, par lots ; reprend là où il s'est arrêté.
+    `detection(textes)` → zones ; un cache par chaîne de détection."""
     con = _ouvrir_cache(chemin)
     vus = {k for (k,) in con.execute("SELECT cle FROM zones")}
     manquants = {}
@@ -155,7 +157,7 @@ def remplir_cache(textes: Iterable[str], chemin: Path, cfg: IngestConfig, lot: i
     ordre = sorted(manquants, key=lambda k: len(manquants[k]))  # lots GPU de longueur voisine
     for i in range(0, len(ordre), lot):
         cles = ordre[i : i + lot]
-        zones = detecter([manquants[k] for k in cles], cfg)
+        zones = detection([manquants[k] for k in cles])
         con.executemany(
             "INSERT OR REPLACE INTO zones VALUES (?, ?)",
             [(k, json.dumps([[z.debut, z.fin, str(z.type), sorted(map(str, z.detecteurs))]
@@ -165,6 +167,18 @@ def remplir_cache(textes: Iterable[str], chemin: Path, cfg: IngestConfig, lot: i
         print(f"détection : {min(i + lot, len(ordre))} / {len(ordre)}", flush=True)
     con.close()
     return len(ordre)
+
+
+def detecter_minuscules(textes: list[str], cfg: IngestConfig, seuil: float) -> list[list[Zone]]:
+    """Texte sans majuscules (FinQA) : GLiNER et règles, sans `limites`, qui ne garde que les
+    zones avec une majuscule. Mots sans lettre retirés : un nombre doit rester un nombre."""
+    gliner = cfg.detection.gliner.model_copy(update={"seuil": seuil})
+    sortie = []
+    for t, zs in zip(textes, d1_gliner(textes, gliner), strict=True):
+        regles = d3_regles(t, cfg.detection, cfg.nombres)
+        gardees = [z for z in zs if any(c.isalpha() for c in t[z.debut : z.fin])]
+        sortie.append(unir(gardees + regles))
+    return sortie
 
 
 def _zones(valeur: str) -> list[Zone]:
@@ -307,28 +321,30 @@ def _ecrire(lignes: list[tuple], dossier: Path, n: int) -> None:
 
 
 def convertir_partie(
-    bruts: list[Brut], sortie: Path, cache: Path, cfg: DonneesConfig, processus: int
+    bruts: Iterable[Brut], sortie: Path, cache: Path, cfg: DonneesConfig, processus: int
 ) -> dict:
     """Écrit `sortie/lot-*.parquet` ; rend le bilan (comptes, rejets par raison)."""
     rejets: Counter = Counter()
     lignes, lots, gardes = [], 0, 0
-    entrees = list(enumerate(bruts))
+    bruts = iter(bruts)
+    entrees = 0
     with multiprocessing.Pool(processus, _init, (str(cache), cfg.graine)) as pool:
-        for ligne, raison in pool.imap(_traiter, entrees, chunksize=64):
-            if ligne is None:
-                rejets[raison] += 1
-                continue
-            gardes += 1
-            lignes.append(ligne)
-            if len(lignes) == cfg.lot_parquet:
-                _ecrire(lignes, sortie, lots)
-                lots += 1
-                lignes = []
-            if gardes % 5000 == 0:
-                print(
-                    f"{sortie.name} : {gardes} gardés, {sum(rejets.values())} rejetés", flush=True
-                )
+        # Par paquets : `imap` lirait sinon toutes les questions en mémoire d'un coup.
+        while paquet := list(islice(bruts, cfg.lot_parquet)):
+            numerotes = [(entrees + k, b) for k, b in enumerate(paquet)]
+            entrees += len(paquet)
+            for ligne, raison in pool.imap(_traiter, numerotes, chunksize=64):
+                if ligne is None:
+                    rejets[raison] += 1
+                    continue
+                gardes += 1
+                lignes.append(ligne)
+                if len(lignes) == cfg.lot_parquet:
+                    _ecrire(lignes, sortie, lots)
+                    lots += 1
+                    lignes = []
+            print(f"{sortie.name} : {gardes} gardés, {sum(rejets.values())} rejetés", flush=True)
     if lignes:
         _ecrire(lignes, sortie, lots)
         lots += 1
-    return {"entrees": len(bruts), "gardes": gardes, "lots": lots, "rejets": dict(rejets)}
+    return {"entrees": entrees, "gardes": gardes, "lots": lots, "rejets": dict(rejets)}

@@ -8,7 +8,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from ccm.config import load_config
-from ccm.data import finqa, hotpot, squad_fr
+from ccm.data import finqa, hotpot, publics, squad_fr
 from ccm.data.publics import Brut, Rejet, convertir, convertir_partie, nombres_en, remplir_cache
 from ccm.ner.detectors import Zone
 from ccm.schema import Detecteur, TypeNom
@@ -128,6 +128,18 @@ def test_finqa_operande_absent_rejete(tmp_path):
         convertir(finqa.lire(f)[0][0], zones, CFG, GCFG, 0)
 
 
+def test_minuscules_garde_les_noms_et_rend_les_nombres(monkeypatch):
+    def gliner(textes, cfg):
+        assert cfg.seuil == 0.3
+        return [[Zone(0, 7, TypeNom.ORG, frozenset({Detecteur.GLINER})),
+                 Zone(11, 15, TypeNom.AUTRE, frozenset({Detecteur.GLINER}))]
+                for _ in textes]  # fmt: skip
+
+    monkeypatch.setattr(publics, "d1_gliner", gliner)
+    zs = publics.detecter_minuscules(["entergy in 2008"], CFG, 0.3)
+    assert [(z.debut, z.fin) for z in zs[0]] == [(0, 7)]
+
+
 def test_nombres_anglais():
     lus = nombres_en(
         "On March 5, 2010 sales of $ 5,829.50 rose 3.5 % in 2008 ; 12th.", [], 1900, 2100
@@ -141,9 +153,12 @@ def test_ecriture_deterministe_et_par_lots(tmp_path):
     bruts = [Brut(f"x{i}", "squad", "en", "Who?", [["Turing rose.", "Ada Lovelace fell."]],
                   abstention=True, temoins=["Absent"] if i else ["rose"])
              for i in range(5)]  # fmt: skip
-    icfg = CFG.model_copy(update={"detection": CFG.detection.model_copy(
-        update={"detecteurs": ("regle",)})})  # fmt: skip
-    remplir_cache((t for b in bruts for t in ("Who?", *b.paragraphes[0])), cache, icfg, 10)
+    remplir_cache(
+        (t for b in bruts for t in ("Who?", *b.paragraphes[0])),
+        cache,
+        lambda ts: [[] for _ in ts],
+        10,
+    )
     cfg = load_config("donnees").model_copy(update={"lot_parquet": 2})
     a = convertir_partie(bruts, tmp_path / "a", cache, cfg, 1)
     b = convertir_partie(bruts, tmp_path / "b", cache, cfg, 1)

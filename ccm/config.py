@@ -363,6 +363,8 @@ class DonneesConfig(ConfigBase):
     lot_parquet: int
     lot_detection: int
     lot_gliner: int
+    detecteurs_en: tuple[Literal["gliner", "spacy", "regle", "majuscules"], ...]
+    seuil_minuscules: float
     distracteurs: int
     processus: int
 

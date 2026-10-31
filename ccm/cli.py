@@ -279,43 +279,59 @@ def jeux() -> None:
 
 @app.command()
 def convertir(
-    jeu: Annotated[str, typer.Argument(help="hotpot, squad ou finqa")],
+    jeu: Annotated[str, typer.Argument(help="hotpot, squad, finqa ou piaf")],
     limite: Annotated[int, typer.Option(help="Questions par partie (0 : toutes).")] = 0,
 ) -> None:
     """Convertit un jeu public en exemples Parquet (§12), dans `racine/converti/<jeu>/`."""
     import json
-    from itertools import islice
+    from itertools import chain, islice
 
     from ccm.config import load_config
     from ccm.data import finqa, hotpot, squad_fr
-    from ccm.data.publics import convertir_partie, remplir_cache, textes_de
+    from ccm.data.publics import convertir_partie, detecter_minuscules, remplir_cache, textes_de
+    from ccm.ner.union import detecter
 
     cfg = load_config("donnees")
     brut = cfg.racine / "brut" / jeu
+    icfg = load_config("ingest")
+    gliner = icfg.detection.gliner.model_copy(update={"lot": cfg.lot_gliner})
+    det = icfg.detection.model_copy(update={"gliner": gliner})
+    icfg = icfg.model_copy(update={"detection": det})
+    en = icfg.model_copy(
+        update={"detection": det.model_copy(update={"detecteurs": cfg.detecteurs_en})}
+    )
     ecartes: dict[str, dict[str, int]] = {}
     if jeu == "hotpot":
-        parties = {p: hotpot.lire(brut, p) for p in ("train", "validation")}
+        chaine, detection = "en", lambda ts: detecter(ts, en)
+        lecteurs = {p: (lambda p=p: hotpot.lire(brut, p)) for p in ("train", "validation")}
     elif jeu == "squad":
-        parties = {"train": squad_fr.sans_reponse(brut / "train-v2.0.json"),
-                   "validation": squad_fr.sans_reponse(brut / "dev-v2.0.json")}  # fmt: skip
+        chaine, detection = "en", lambda ts: detecter(ts, en)
+        lecteurs = {"train": lambda: squad_fr.sans_reponse(brut / "train-v2.0.json"),
+                    "validation": lambda: squad_fr.sans_reponse(brut / "dev-v2.0.json"),
+                    }  # fmt: skip
     elif jeu == "finqa":
-        parties = {}
+        chaine = "minuscules"
+        detection = lambda ts: detecter_minuscules(ts, en, cfg.seuil_minuscules)  # noqa: E731
+        lecteurs = {}
         for p, f in (("train", "train"), ("validation", "dev"), ("test", "test")):
-            parties[p], ecartes[p] = finqa.lire(brut / f"{f}.json")
+            lus, ecartes[p] = finqa.lire(brut / f"{f}.json")
+            lecteurs[p] = lambda lus=lus: lus
+    elif jeu == "piaf":
+        chaine, detection = "fr", lambda ts: detecter(ts, icfg)
+        lecteurs = {"train": lambda: squad_fr.avec_reponse(
+            brut / "piaf-v1.2.json", "piaf", "fr", cfg.distracteurs, cfg.graine)}  # fmt: skip
     else:
         raise typer.BadParameter(f"jeu inconnu : {jeu}")
-    lus = {p: list(islice(b, limite or None)) for p, b in parties.items()}
-    cache = cfg.racine / "cache-zones.sqlite"
-    icfg = load_config("ingest")
-    det = icfg.detection.model_copy(
-        update={"gliner": icfg.detection.gliner.model_copy(update={"lot": cfg.lot_gliner})}
-    )
-    remplir_cache((t for b in lus.values() for x in b for t in textes_de(x)), cache,
-                  icfg.model_copy(update={"detection": det}), cfg.lot_detection)  # fmt: skip
+
+    def lire(p: str):
+        return islice(lecteurs[p](), limite or None)
+
+    cache = cfg.racine / f"cache-zones-{chaine}.sqlite"
+    remplir_cache((t for x in chain.from_iterable(map(lire, lecteurs)) for t in textes_de(x)),
+                  cache, detection, cfg.lot_detection)  # fmt: skip
     sortie = cfg.racine / "converti" / jeu
-    bilan = {p: convertir_partie(b, sortie / p, cache, cfg, cfg.processus)
-             | {"ecartes": ecartes.get(p, {})}
-             for p, b in lus.items()}  # fmt: skip
+    bilan = {p: convertir_partie(lire(p), sortie / p, cache, cfg, cfg.processus)
+             | {"ecartes": ecartes.get(p, {})} for p in lecteurs}  # fmt: skip
     (sortie / "bilan.json").write_text(
         json.dumps(bilan, indent=1, ensure_ascii=False), encoding="utf-8"
     )
