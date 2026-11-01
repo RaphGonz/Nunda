@@ -557,3 +557,24 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Tests :** `make test` non relancé : texte seul, aucun code touché.
 - **Questions pour Raphael :** 1. Retirer les données CC BY-SA du modèle commercial ? 2. Consulter un juriste pour Judilibre et les poids distribués ?
 - **Suite prévue :** selon les réponses. Avant tout téléchargement du droit français : lire en entier les CGU de Judilibre, de PISTE et de l'API Légifrance. `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
+
+## 2026-11-01 — Phase 3 — Droit français : Légifrance découpé, Judilibre en attente d'accès
+- **Travail fait :** demande de Raphael. `ccm jeux` connaît le stock LEGI (SHA-256 figé). `ccm legi` (`ccm/data/legi.py`) lit l'archive en flux (`tarfile` `r|gz`), sans rien écrire sur le disque. `ccm judilibre` (`ccm/data/judilibre.py`) : `/scan` par mois, jeton OAuth, reprise par fenêtre. `ccm/data/droit.py` écrit les textes dans le stock ; `segmenter_paragraphes`, extrait de `segmenter`, donne la même découpe que pour les PDF. `tests/unit/test_droit.py`.
+- **Taille sur le disque, Légifrance :**
+  - Archive `D:/Nunda-donnees/brut/legi/Freemium_legi_global_20250713-140000.tar.gz` : **1 171 027 316 octets** (égale au `Content-Length`). Aucun fichier décompressé : un seul fichier dans le dossier.
+  - Base `D:/Nunda-donnees/droit.sqlite` : **305 364 992 octets**.
+- **Mesures, Légifrance :** 5 253 903 membres lus ; sous `code_en_vigueur` : **161 302 articles gardés**, 327 600 écartés (autre état que VIGUEUR), 4 écartés (état VIGUEUR, date du dump hors de leur période). **926 515 propositions** : PHRASE 702 378, EN_TETE 161 338, LIGNE_TABLEAU 50 483, CHAMP 9 632, PARTIE 2 684. 78 codes. Aucune proposition vide. Contrôle : `Code civil, article 1240` donne son en-tête et une phrase, le texte attendu. Durée 12 à 21 min selon la charge de la machine, 6 processus.
+- **Judilibre : NON FAIT.** Aucune décision téléchargée. Identifiants OAuth de Raphael acceptés (jeton obtenu), mais **HTTP 403 sur tous les points de l'API**, `healthcheck` compris : accès de l'application à Judilibre (production) à ouvrir sur PISTE. Pause, reprise, plafond et refus 429 ne sont testés que contre une API simulée. Quotas réels non lus : un appel par seconde au plus, valeur prudente.
+- **Décisions :**
+  - **Une pièce par article ou décision**, avec une proposition EN_TETE d'identification (`Code civil, article 1240` ; juridiction, formation, siège et date pour une décision, art. V des CGU). Type LOI (rang 1) pour les articles, AUTRE pour les décisions.
+  - **Découpe seule** : ni noms, ni nombres, ni doublons, ni conflits, ni index BM25. Ils relèvent de la chaîne du §12. Conséquence : `droit.sqlite` contient le texte brut, dont des noms réels ; c'est une base de travail, pas un fichier d'entraînement.
+  - **Échantillon Judilibre :** Cour de cassation depuis 2016-01, cours d'appel depuis 2022-01, jusqu'à 2026-09 ; part égale par mois (50 000 ÷ 186 fenêtres = 268). Dans un mois : les premières décisions par date, donc un biais vers le début du mois. Un mois pauvre n'est pas compensé : le total peut rester sous 50 000.
+  - Identifiants dans `D:/Nunda-donnees/piste-identifiants.txt`, hors de git.
+- **Écarts avec SPEC.md :**
+  - **Le droit est figé au 2025-07-13**, date du dernier stock publié par la DILA : « en vigueur » veut dire en vigueur à cette date, soit 16 mois de retard. Les 484 mises à jour quotidiennes (environ 3,1 Go) ne sont pas appliquées.
+  - JORF non téléchargé à part (§12 le cite pour le pré-entraînement) ; pas demandé.
+  - CGU : lues en partie seulement, contrairement à la suite prévue plus haut. Cour de cassation V8 : articles V, VI, VII, IX, XI C à E, XII et XIII. PISTE : pages 3 à 6 sur 8. API Légifrance non lues : cette API n'est pas utilisée.
+- **À signaler seulement si l'échantillon sert à publier ou à vendre :** CGU art. V, obligation de tenir ses données à jour (72 h recommandées) ; un échantillon figé ne la remplit pas.
+- **Incident :** la clé d'API de Raphael s'est affichée dans la session de travail. Elle n'est pas utilisée, n'est pas dans le dépôt, et le fichier qui la portait est supprimé. À régénérer sur PISTE.
+- **Tests :** `make test` : 337 passés, 1 ignoré, 1 désélectionné (T11), avant le passage à OAuth. `test_droit.py` après OAuth : 14 passés. `make test-complet` (`ingest` touché) : T11 passé, avant ces mêmes changements.
+- **Suite prévue :** Raphael ouvre l'accès sur PISTE, puis `ccm judilibre`.
