@@ -28,4 +28,4 @@ Synthèse de recherche, pas un avis juridique : à faire valider par un juriste 
 - **CC BY-SA (HotpotQA, SQuAD, PIAF, Wikipédia) :** à exclure du modèle commercial, sauf avis contraire d'un juriste. Une traduction reste soumise à la même licence.
 - **MIT (FinQA, TAB) :** compatible, avec l'avis de copyright.
 - **FQuAD :** à exclure (non commerciale d'après SPEC.md §12, non vérifié).
-- **Légifrance, Judilibre, non téléchargés :** Licence Ouverte 2.0 et conditions d'utilisation à accepter ; voir les réserves du journal pour Judilibre.
+- **Légifrance, Judilibre, téléchargés :** Licence Ouverte 2.0 et conditions d'utilisation ; CGU lues en partie seulement, voir les réserves du journal.
