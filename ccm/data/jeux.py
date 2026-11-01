@@ -1,4 +1,4 @@
-"""Téléchargement des jeux publics de réglage fin (SPEC.md §12) dans `racine/brut/<jeu>/`.
+"""Téléchargement des jeux publics (SPEC.md §12) dans `racine/brut/<jeu>/`.
 
 Versions figées, empreintes SHA-256 contrôlées ; licences dans `DATA_LICENSES.md`. Un jeu
 n'entre dans `FICHIERS` qu'une fois sa licence lue et claire. Absent : FQuAD (accès refusé,
@@ -15,6 +15,7 @@ _HOTPOT = "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbb
 _PIAF = "https://static.data.gouv.fr/resources/piaf-le-dataset-francophone-de-questions-reponses/20210323-174441"
 _SQUAD = "https://rajpurkar.github.io/SQuAD-explorer/dataset"
 _FINQA = "https://raw.githubusercontent.com/czyssrs/FinQA/main"
+_LEGI = "https://echanges.dila.gouv.fr/OPENDATA/LEGI"
 _TAB = "https://raw.githubusercontent.com/NorskRegnesentral/text-anonymization-benchmark/master"
 
 # (jeu, fichier local, URL, SHA-256)
@@ -39,6 +40,9 @@ FICHIERS = [
      "831dbfb2e785dbc227f895ce3f24046433467aec67b09db2bd6ac7692a8a30dc"),
     ("finqa", "LICENSE", f"{_FINQA}/LICENSE",
      "92c0e67bd762c15c07ba60de09558338315a8ebf99aac4f51f487179809ac087"),
+    ("legi", "Freemium_legi_global_20250713-140000.tar.gz",
+     f"{_LEGI}/Freemium_legi_global_20250713-140000.tar.gz",
+     "f862b4a2238e11ec3c48ec70f3b1c68bac0bb1985907841666b98608653d4eca"),
     ("tab", "echr_train.json", f"{_TAB}/echr_train.json",
      "4aba41f8ac305ff9e93dd6f0bbc16756e57e9ace396c827931fab70e18d8c6a6"),
     ("tab", "echr_dev.json", f"{_TAB}/echr_dev.json",

@@ -338,5 +338,67 @@ def convertir(
     typer.echo(json.dumps(bilan))
 
 
+@app.command()
+def legi(
+    processus: Annotated[int | None, typer.Option(help="Processus de découpe.")] = None,
+) -> None:
+    """Découpe les articles en vigueur des codes (dump LEGI, lu en flux) en propositions (§12)."""
+    import json
+    from collections import Counter
+
+    from ccm.config import load_config
+    from ccm.data import legi as source
+    from ccm.data.droit import ecrire_textes, ouvrir_droit, taille_disque
+
+    cfg = load_config("donnees")
+    archive = cfg.racine / "brut" / "legi" / cfg.legi.archive
+    if not archive.exists():
+        raise typer.BadParameter(f"archive absente : {archive} (ccm jeux)")
+    stock = cfg.racine / cfg.stock_droit
+    lus: Counter = Counter()
+    con = ouvrir_droit(stock)
+    try:
+        bilan = ecrire_textes(
+            con, source.textes(archive, cfg.legi.date_dump, lus), processus or cfg.processus
+        )
+    finally:
+        con.close()
+    typer.echo(json.dumps(bilan | dict(lus) | {"octets_archive": taille_disque(archive),
+                                               "octets_stock": taille_disque(stock)}))  # fmt: skip
+
+
+@app.command()
+def judilibre(
+    processus: Annotated[int | None, typer.Option(help="Processus de découpe.")] = None,
+) -> None:
+    """Échantillon de Judilibre par l'API de PISTE, avec reprise, puis découpe (§12)."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data import judilibre as source
+    from ccm.data.droit import ecrire_textes, ouvrir_droit, taille_disque
+
+    cfg = load_config("donnees")
+    cle = source.lire_cle(cfg.racine)
+    if not cle:
+        raise typer.BadParameter(
+            f"clé absente : PISTE_KEY_ID, ou le fichier {cfg.racine / 'piste-cle.txt'}"
+        )
+    try:
+        recu = source.telecharger(cfg.racine, cfg, cle)
+    except source.ArretJudilibre as e:
+        typer.echo(f"arrêt : {e}. Relancer la commande reprend là où elle s'est arrêtée.", err=True)
+        raise typer.Exit(1) from None
+    stock = cfg.racine / cfg.stock_droit
+    con = ouvrir_droit(stock)
+    try:
+        bilan = ecrire_textes(con, source.textes(cfg.racine), processus or cfg.processus)
+    finally:
+        con.close()
+    dossier = cfg.racine / "brut" / "judilibre"
+    typer.echo(json.dumps(recu | bilan | {"octets_decisions": taille_disque(dossier),
+                                          "octets_stock": taille_disque(stock)}))  # fmt: skip
+
+
 if __name__ == "__main__":
     app()

@@ -23,7 +23,7 @@ from functools import cache
 import pysbd
 
 from ccm.config import IngestConfig, SegmentationConfig
-from ccm.ingest.extract import paragraphes
+from ccm.ingest.extract import Paragraphe, paragraphes
 from ccm.ingest.piece_type import PieceLue, motif_en_tete
 from ccm.schema import GenreProposition, TypeArete, TypePiece
 
@@ -100,13 +100,19 @@ def segmenter(
     piece: PieceLue, cfg: IngestConfig
 ) -> tuple[list[PropLue], list[tuple[int, int, TypeArete]]]:
     """Propositions de la pièce et arêtes (indices dans la liste des propositions)."""
+    return segmenter_paragraphes(paragraphes(piece.pages), piece.type, piece.pages[0].numero, cfg)
+
+
+def segmenter_paragraphes(
+    pars: list[Paragraphe], type_: TypePiece, premiere: int, cfg: IngestConfig
+) -> tuple[list[PropLue], list[tuple[int, int, TypeArete]]]:
+    """La même découpe, pour des paragraphes déjà lus (`premiere` : numéro de la première page)."""
     props: list[PropLue] = []
     aretes: list[tuple[int, int, TypeArete]] = []
-    audition = piece.type == TypePiece.PV_AUDITION
-    premiere = piece.pages[0].numero
+    audition = type_ == TypePiece.PV_AUDITION
     precedente = None
     tete = None  # ligne d'en-tête du tableau en cours
-    for par in paragraphes(piece.pages):
+    for par in pars:
         en_tete = (
             par.page == premiere
             and par.ligne < cfg.pieces.lignes_en_tete

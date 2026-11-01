@@ -10,3 +10,16 @@ detecteurs_en: [gliner, regle, majuscules]  # Raphael, 2026-10-31 ; mesuré sur 
 seuil_minuscules: 0.3  # FinQA : mesuré sur TAB en minuscules (ORG 0,79 à 0,6 ; 0,90 à 0,3)
 distracteurs: 3  # FQuAD, PIAF : paragraphes du même article (SPEC.md §12)
 processus: 6  # valeur de départ
+stock_droit: droit.sqlite  # sous racine : propositions de Légifrance et de Judilibre
+legi:
+  archive: Freemium_legi_global_20250713-140000.tar.gz  # dernier stock publié par la DILA
+  date_dump: "2025-07-13"
+judilibre:
+  url: https://api.piste.gouv.fr/cassation/judilibre/v1.0
+  total: 50000
+  lot: 500
+  juridictions: {cc: "2016-01", ca: "2022-01"}  # Cour de cassation, cours d'appel
+  fin: "2026-09"
+  pause_s: 1.0  # sans quota lu sur PISTE : un appel par seconde au plus
+  attente_s: 60.0
+  essais: 5

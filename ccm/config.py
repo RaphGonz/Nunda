@@ -355,6 +355,26 @@ class WorldgenConfig(ConfigBase):
     questions: QuestionsConfig
 
 
+class LegiConfig(_Bloc):
+    """Dump LEGI de la DILA (SPEC.md §12) : archive dans `racine/brut/legi/`."""
+
+    archive: str
+    date_dump: str  # AAAA-MM-JJ : les articles en vigueur à cette date
+
+
+class JudilibreConfig(_Bloc):
+    """Échantillon de décisions par l'API de PISTE (SPEC.md §12)."""
+
+    url: str
+    total: int  # décisions au plus
+    lot: int  # décisions par appel, 1 000 au plus (API)
+    juridictions: dict[str, str]  # juridiction → premier mois AAAA-MM
+    fin: str  # dernier mois AAAA-MM
+    pause_s: float  # entre deux appels : valeur prudente, à comparer aux quotas de PISTE
+    attente_s: float  # après un refus sans `Retry-After`, doublée à chaque essai
+    essais: int
+
+
 class DonneesConfig(ConfigBase):
     """Jeux publics de réglage fin (SPEC.md §12)."""
 
@@ -367,6 +387,9 @@ class DonneesConfig(ConfigBase):
     seuil_minuscules: float
     distracteurs: int
     processus: int
+    stock_droit: str  # base des propositions du droit, sous `racine`
+    legi: LegiConfig
+    judilibre: JudilibreConfig
 
 
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
