@@ -1,7 +1,7 @@
 """Échantillon de décisions de Judilibre, par l'API de PISTE (SPEC.md §12).
 
-Pas de dump : `/scan` par mois et par juridiction, avec une part égale par mois (échantillon
-réparti dans le temps ; dans un mois, les premières décisions par date). Chaque fenêtre donne
+Pas de dump : `/scan` jour par jour et par juridiction, avec une part égale par mois (échantillon
+réparti dans le temps ; dans un jour, les premières décisions rendues par l'API). Chaque mois donne
 un fichier `racine/brut/judilibre/<juridiction>/<AAAA-MM>.jsonl.gz`, écrit d'un coup : un
 fichier présent n'est pas redemandé, relancer reprend après un arrêt. Les quotas (CGU PISTE :
 à ne pas contourner) sont respectés par une pause entre deux appels ; un refus 429 ou une
@@ -21,7 +21,9 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from calendar import monthrange
 from collections.abc import Callable, Iterator
+from math import ceil
 from pathlib import Path
 
 from ccm.config import DonneesConfig, JudilibreConfig
@@ -120,31 +122,26 @@ def _appeler(url: str, cle, cfg: JudilibreConfig, lire, dormir) -> dict:
     raise ArretJudilibre(f"{raison} après {cfg.essais} essais")
 
 
-def _fenetre(jur: str, mois: str, part: int, cle, cfg: JudilibreConfig, lire, dormir
-             ) -> list[dict]:  # fmt: skip
+def _fenetre(jur: str, mois: str, part: int, cle, cfg: JudilibreConfig, lire, dormir) -> list[dict]:
+    """Un appel par jour : l'API trie par date, un appel par mois ne verrait que ses premiers
+    jours. Chaque jour demande sa part de ce qui reste : un jour vide reporte sur les suivants."""
     a, m = map(int, mois.split("-"))
-    suivant = f"{a + 1:04d}-01-01" if m == 12 else f"{a:04d}-{m + 1:02d}-01"
+    jours = monthrange(a, m)[1]
     decisions: list[dict] = []
-    apres = None
-    while len(decisions) < part:
+    for j in range(1, jours + 1):
+        besoin = min(cfg.lot, ceil((part - len(decisions)) / (jours - j + 1)))
+        if besoin <= 0:
+            break
+        date = f"{mois}-{j:02d}"
         p = {
             "jurisdiction": jur,
             "date_type": "creation",  # sinon la date de mise à jour
-            "date_start": f"{mois}-01",
-            "date_end": suivant,
-            "order": "asc",
-            "batch_size": min(cfg.lot, part - len(decisions)),
+            "date_start": date,
+            "date_end": date,
+            "batch_size": besoin,
         }
-        if apres:
-            p["search_after"] = apres
         rep = _appeler(f"{cfg.url}/scan?{urllib.parse.urlencode(p)}", cle, cfg, lire, dormir)
-        # Si `date_end` est inclus par l'API, le premier du mois suivant reste à sa fenêtre.
-        lus = [d for d in rep.get("results") or [] if d.get("decision_date", "")[:7] == mois]
-        decisions += lus[: part - len(decisions)]
-        suite = urllib.parse.parse_qs(urllib.parse.urlsplit(rep.get("next_batch") or "").query)
-        apres = suite.get("search_after", [None])[0]
-        if not apres or not rep.get("results"):
-            break
+        decisions += (rep.get("results") or [])[:besoin]
     return decisions
 
 
@@ -175,8 +172,12 @@ def telecharger(
     return {"fenetres": len(fs), "decisions": decisions, "part_par_fenetre": part}
 
 
+_JURIDICTIONS = {"cc": "Cour de cassation", "ca": "Cour d'appel"}
+
+
 def _tete(d: dict) -> str:
-    champs = (d.get("jurisdiction"), d.get("chamber"), d.get("formation"), d.get("location"),
+    jur = d.get("jurisdiction")
+    champs = (_JURIDICTIONS.get(jur, jur), d.get("chamber"), d.get("formation"), d.get("location"),
               d.get("number"), d.get("decision_date"))  # fmt: skip
     return "Décision : " + ", ".join(str(c) for c in champs if c)
 

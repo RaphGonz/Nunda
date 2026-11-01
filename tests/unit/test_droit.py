@@ -13,7 +13,8 @@ import pytest
 
 from ccm.config import load_config
 from ccm.data import judilibre, legi
-from ccm.data.droit import ecrire_textes, ouvrir_droit
+from ccm.data.droit import ecrire_textes, net, ouvrir_droit
+from ccm.ingest.segment import phrases
 from ccm.schema import GenreProposition
 
 DUMP = "2025-07-13"
@@ -115,7 +116,7 @@ TEXTE = "Attendu que la cour statue.\r\n\r\nPar ces motifs rejette le pourvoi."
 
 
 class Api:
-    """`/scan` simulée : 10 décisions par mois, pages avec `search_after`."""
+    """`/scan` simulée : pour un jour, les décisions demandées, 10 au plus."""
 
     def __init__(self):
         self.appels = []
@@ -127,13 +128,12 @@ class Api:
         if self.pannes:
             raise self.pannes.pop(0)
         q = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
-        assert q["date_type"] == ["creation"]
-        mois, debut = q["date_start"][0][:7], int(q.get("search_after", ["0"])[0])
-        fin = debut + int(q["batch_size"][0])
-        res = [{"id": f"{q['jurisdiction'][0]}{mois}-{i}", "decision_date": f"{mois}-02",
+        assert q["date_type"] == ["creation"] and q["date_start"] == q["date_end"]
+        jour = q["date_start"][0]
+        res = [{"id": f"{q['jurisdiction'][0]}{jour}-{i}", "decision_date": jour,
                 "jurisdiction": "cc", "chamber": "civ1", "text": TEXTE}
-               for i in range(debut, min(fin, 10))]  # fmt: skip
-        return {"results": res, "next_batch": f"/scan?search_after={fin}" if fin < 10 else None}
+               for i in range(min(int(q["batch_size"][0]), 10))]  # fmt: skip
+        return {"results": res, "next_batch": None}
 
 
 def _erreur(code, retry=None):
@@ -144,18 +144,35 @@ def test_judilibre_plafond_et_pause_entre_les_appels(tmp_path):
     api, attentes = Api(), []
     bilan = judilibre.telecharger(tmp_path, _cfg(total=8), "cle", api, attentes.append)
     assert bilan == {"fenetres": 2, "decisions": 8, "part_par_fenetre": 4}
-    assert len(api.appels) == 4 and attentes == [0.5] * 4  # lots de 3, puis de 1
+    assert len(api.appels) == 8 and attentes == [0.5] * 8  # un par décision, puis plus rien
     with gzip.open(tmp_path / "brut/judilibre/cc/2024-01.jsonl.gz", "rt", encoding="utf-8") as f:
         assert len(f.readlines()) == 4
 
 
+def test_judilibre_reparti_sur_le_mois_et_jour_vide_reporte(tmp_path):
+    def api(url, cle):
+        q = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
+        vides = {"2024-02-01", "2024-02-02"}
+        jour = q["date_start"][0]
+        return {"results": [] if jour in vides else
+                [{"id": f"{jour}-{i}", "decision_date": jour, "text": "x"}
+                 for i in range(int(q["batch_size"][0]))]}  # fmt: skip
+
+    cfg = _cfg(total=29, juridictions={"cc": "2024-02"}, fin="2024-02")
+    bilan = judilibre.telecharger(tmp_path, cfg, "cle", api, lambda s: None)
+    assert bilan["decisions"] == 29  # les deux jours vides sont reportés
+    with gzip.open(tmp_path / "brut/judilibre/cc/2024-02.jsonl.gz", "rt", encoding="utf-8") as f:
+        jours = {json.loads(x)["decision_date"] for x in f}
+    assert len(jours) == 27  # tous les jours non vides de février 2024
+
+
 def test_judilibre_reprise_apres_arret_sans_redemander(tmp_path):
-    api, cfg = Api(), _cfg(total=4)  # 2 par mois : un appel par mois
+    api, cfg = Api(), _cfg(total=4)  # 2 par mois : deux appels par mois
     judilibre.telecharger(tmp_path, cfg, "cle", api, lambda s: None)
     n = len(api.appels)
     (tmp_path / "brut/judilibre/cc/2024-02.jsonl.gz").unlink()
     bilan = judilibre.telecharger(tmp_path, cfg, "cle", api, lambda s: None)
-    assert len(api.appels) == n + 1 and "2024-02" in api.appels[-1]
+    assert len(api.appels) == n + 2 and "2024-02" in api.appels[-1]
     assert bilan["decisions"] == 4
 
 
@@ -194,22 +211,10 @@ def test_judilibre_propositions_dans_la_base_avec_metadonnees(tmp_path):
     p = con.execute("SELECT piece_id FROM piece ORDER BY piece_id").fetchone()[0]
     lignes = [t for (t,) in con.execute(
         "SELECT texte FROM proposition WHERE piece_id = ? ORDER BY ordre", (p,))]  # fmt: skip
-    assert lignes[0] == "Décision : cc, civ1, 2024-01-02"
+    assert lignes[0] == "Décision : Cour de cassation, civ1, 2024-01-01"
     assert lignes[1:] == ["Attendu que la cour statue.", "Par ces motifs rejette le pourvoi."]
     assert ecrire_textes(con, judilibre.textes(tmp_path))["ajoutes"] == 0
     con.close()
-
-
-def test_judilibre_decision_du_mois_suivant_ecartee(tmp_path):
-    def api(url, cle):
-        return {"results": [
-            {"id": "a", "decision_date": "2024-01-31", "text": "x"},
-            {"id": "b", "decision_date": "2024-02-01", "text": "x"},
-        ], "next_batch": None}  # fmt: skip
-
-    judilibre.telecharger(tmp_path, _cfg(total=5, fin="2024-01"), "cle", api, lambda s: None)
-    with gzip.open(tmp_path / "brut/judilibre/cc/2024-01.jsonl.gz", "rt", encoding="utf-8") as f:
-        assert [json.loads(x)["id"] for x in f] == ["a"]
 
 
 def test_identifiants_lus_dans_l_environnement_ou_le_fichier(tmp_path, monkeypatch):
@@ -250,3 +255,16 @@ def test_jeton_refuse_sans_citer_le_secret():
     with pytest.raises(judilibre.ArretJudilibre) as e:
         judilibre.Jetons("https://j.test", "i", "secret", ouvrir)()
     assert "secret" not in str(e.value)
+
+
+def test_nom_pseudonymise_ne_coupe_pas_la_phrase():
+    cfg = load_config("ingest").segmentation
+    texte = "M. X... a formé un pourvoi. La cour de J.P. Durand a statué."
+    assert [texte[a:b] for a, b in phrases(texte, cfg)] == [
+        "M. X... a formé un pourvoi.",
+        "La cour de J.P. Durand a statué.",
+    ]
+
+
+def test_net_decode_les_entites():
+    assert net("l&apos;article  1240\n&quot;x&quot;") == 'l\'article 1240 "x"'

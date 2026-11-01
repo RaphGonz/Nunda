@@ -6,6 +6,7 @@ nombres relèvent de la chaîne du §12, à appliquer plus tard. Un texte déjà
 SHA-256) est ignoré : relancer reprend après un arrêt.
 """
 
+import html
 import multiprocessing
 import re
 import sqlite3
@@ -24,8 +25,9 @@ _BLANCS = re.compile(r"\s+")
 
 
 def net(texte: str) -> str:
-    """Blancs réduits à une espace : le seul changement apporté au texte."""
-    return _BLANCS.sub(" ", texte).strip()
+    """Entités décodées (`&apos;` dans 1 758 décisions) et blancs réduits à une espace : les
+    seuls changements apportés au texte."""
+    return _BLANCS.sub(" ", html.unescape(texte)).strip()
 
 
 @dataclass(frozen=True)

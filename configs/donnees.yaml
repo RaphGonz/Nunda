@@ -18,9 +18,9 @@ judilibre:
   url: https://api.piste.gouv.fr/cassation/judilibre/v1.0
   oauth: https://oauth.piste.gouv.fr/api/oauth/token
   total: 50000
-  lot: 500
+  lot: 500  # décisions par jour au plus
   juridictions: {cc: "2016-01", ca: "2022-01"}  # Cour de cassation, cours d'appel
   fin: "2026-09"
-  pause_s: 1.0  # sans quota lu sur PISTE : un appel par seconde au plus
+  pause_s: 0.2  # en-tête x-rate-limit lu le 2026-11-01 : 20 appels sur la fenêtre courte
   attente_s: 60.0
   essais: 5

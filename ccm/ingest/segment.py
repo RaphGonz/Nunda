@@ -46,7 +46,9 @@ def _segmenteur() -> pysbd.Segmenter:
 @cache
 def _abreviations(abreviations: tuple[str, ...]) -> re.Pattern:
     mots = "|".join(re.escape(a) for a in sorted(abreviations, key=len, reverse=True))
-    return re.compile(rf"(?<!\w)(?:(?:{mots})\.|(?:[A-ZÀ-Ý]\.)+)(?!\w)")
+    # (?!\.) : « X... » (nom pseudonymisé) n'est pas une initiale ; masquer son premier point
+    # en laissait deux, et la phrase se coupait en « M. X.. », « . », « a formé un pourvoi. »
+    return re.compile(rf"(?<!\w)(?:(?:{mots})\.|(?:[A-ZÀ-Ý]\.)+)(?![\w.])")
 
 
 def _sans_blancs(texte: str, debut: int, fin: int) -> tuple[int, int]:
