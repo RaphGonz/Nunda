@@ -379,13 +379,13 @@ def judilibre(
     from ccm.data.droit import ecrire_textes, ouvrir_droit, taille_disque
 
     cfg = load_config("donnees")
-    cle = source.lire_cle(cfg.racine)
-    if not cle:
+    ids = source.lire_identifiants(cfg.racine)
+    if not ids:
         raise typer.BadParameter(
-            f"clé absente : PISTE_KEY_ID, ou le fichier {cfg.racine / 'piste-cle.txt'}"
+            f"identifiants absents : {cfg.racine / source.FICHIER_IDENTIFIANTS} ou l'environnement"
         )
     try:
-        recu = source.telecharger(cfg.racine, cfg, cle)
+        recu = source.telecharger(cfg.racine, cfg, source.Jetons(cfg.judilibre.oauth, *ids))
     except source.ArretJudilibre as e:
         typer.echo(f"arrêt : {e}. Relancer la commande reprend là où elle s'est arrêtée.", err=True)
         raise typer.Exit(1) from None

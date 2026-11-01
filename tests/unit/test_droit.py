@@ -212,13 +212,41 @@ def test_judilibre_decision_du_mois_suivant_ecartee(tmp_path):
         assert [json.loads(x)["id"] for x in f] == ["a"]
 
 
-def test_cle_lue_dans_l_environnement_ou_le_fichier(tmp_path, monkeypatch):
-    monkeypatch.delenv("PISTE_KEY_ID", raising=False)
-    assert judilibre.lire_cle(tmp_path) is None
-    fichier = tmp_path / "piste-cle.txt"
-    fichier.write_text("# mode d'emploi\n\n", encoding="utf-8")
-    assert judilibre.lire_cle(tmp_path) is None
-    fichier.write_text("# mode d'emploi\n k\n", encoding="utf-8")
-    assert judilibre.lire_cle(tmp_path) == "k"
-    monkeypatch.setenv("PISTE_KEY_ID", "e")
-    assert judilibre.lire_cle(tmp_path) == "e"
+def test_identifiants_lus_dans_l_environnement_ou_le_fichier(tmp_path, monkeypatch):
+    monkeypatch.delenv("PISTE_CLIENT_ID", raising=False)
+    monkeypatch.delenv("PISTE_CLIENT_SECRET", raising=False)
+    assert judilibre.lire_identifiants(tmp_path) is None
+    fichier = tmp_path / judilibre.FICHIER_IDENTIFIANTS
+    fichier.write_text("# mode d'emploi\nclient_id =\nclient_secret =\n", encoding="utf-8")
+    assert judilibre.lire_identifiants(tmp_path) is None
+    fichier.write_text("# client_id = non\nclient_id = i\nclient_secret = s=1\n", encoding="utf-8")
+    assert judilibre.lire_identifiants(tmp_path) == ("i", "s=1")
+    monkeypatch.setenv("PISTE_CLIENT_ID", "e")
+    assert judilibre.lire_identifiants(tmp_path) == ("e", "s=1")
+
+
+class _Reponse(io.BytesIO):
+    pass
+
+
+def test_jeton_garde_jusqu_a_sa_fin_puis_redemande():
+    corps = []
+
+    def ouvrir(req, timeout):
+        corps.append(urllib.parse.parse_qs(req.data.decode()))
+        return _Reponse(json.dumps({"access_token": f"j{len(corps)}", "expires_in": 3600}).encode())
+
+    jetons = judilibre.Jetons("https://j.test", "i", "s", ouvrir)
+    assert jetons() == "j1" and jetons() == "j1" and len(corps) == 1
+    assert corps[0]["grant_type"] == ["client_credentials"] and corps[0]["client_secret"] == ["s"]
+    jetons.fin = 0.0
+    assert jetons() == "j2"
+
+
+def test_jeton_refuse_sans_citer_le_secret():
+    def ouvrir(req, timeout):
+        raise _erreur(401)
+
+    with pytest.raises(judilibre.ArretJudilibre) as e:
+        judilibre.Jetons("https://j.test", "i", "secret", ouvrir)()
+    assert "secret" not in str(e.value)

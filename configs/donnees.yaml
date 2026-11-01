@@ -16,6 +16,7 @@ legi:
   date_dump: "2025-07-13"
 judilibre:
   url: https://api.piste.gouv.fr/cassation/judilibre/v1.0
+  oauth: https://oauth.piste.gouv.fr/api/oauth/token
   total: 50000
   lot: 500
   juridictions: {cc: "2016-01", ca: "2022-01"}  # Cour de cassation, cours d'appel

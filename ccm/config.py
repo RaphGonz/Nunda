@@ -366,6 +366,7 @@ class JudilibreConfig(_Bloc):
     """Échantillon de décisions par l'API de PISTE (SPEC.md §12)."""
 
     url: str
+    oauth: str  # adresse des jetons OAuth 2.0 de PISTE
     total: int  # décisions au plus
     lot: int  # décisions par appel, 1 000 au plus (API)
     juridictions: dict[str, str]  # juridiction → premier mois AAAA-MM

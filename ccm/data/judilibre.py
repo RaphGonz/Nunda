@@ -9,8 +9,8 @@ panne fait attendre puis, s'il persiste, arrête proprement. CGU de Judilibre, a
 juridiction, la formation, le siège et la date restent attachés à chaque décision (en-tête) ;
 art. VI : aucune indexation des magistrats ni des greffiers.
 
-La clé (`KeyId`) vient de l'environnement `PISTE_KEY_ID`, ou du fichier `racine/piste-cle.txt` :
-jamais dans le dépôt.
+Les identifiants OAuth viennent de l'environnement (`PISTE_CLIENT_ID`, `PISTE_CLIENT_SECRET`) ou
+du fichier `racine/piste-identifiants.txt` : jamais dans le dépôt.
 """
 
 import gzip
@@ -28,18 +28,51 @@ from ccm.config import DonneesConfig, JudilibreConfig
 from ccm.data.droit import Texte, net
 from ccm.schema import TypePiece
 
+FICHIER_IDENTIFIANTS = "piste-identifiants.txt"
+
 
 class ArretJudilibre(Exception):
     """L'API refuse ou ne répond plus : à relancer plus tard, ce qui est écrit reste."""
 
 
-def lire_cle(racine: Path) -> str | None:
-    cle = os.environ.get("PISTE_KEY_ID")
-    fichier = racine / "piste-cle.txt"
-    if not cle and fichier.exists():  # les lignes en « # » sont le mode d'emploi du fichier
-        lignes = fichier.read_text(encoding="utf-8-sig").splitlines()
-        cle = next((x for x in lignes if x.strip() and not x.lstrip().startswith("#")), None)
-    return cle.strip() if cle and cle.strip() else None
+def lire_identifiants(racine: Path) -> tuple[str, str] | None:
+    """(client_id, client_secret) : environnement, sinon fichier « nom = valeur » ; None si
+    l'un manque. Les lignes en « # » sont le mode d'emploi du fichier."""
+    vus = {
+        "client_id": os.environ.get("PISTE_CLIENT_ID"),
+        "client_secret": os.environ.get("PISTE_CLIENT_SECRET"),
+    }
+    fichier = racine / FICHIER_IDENTIFIANTS
+    if fichier.exists():
+        for ligne in fichier.read_text(encoding="utf-8-sig").splitlines():
+            nom, _, valeur = ligne.partition("=")
+            if not ligne.lstrip().startswith("#") and nom.strip() in vus:
+                vus[nom.strip()] = vus[nom.strip()] or valeur.strip().strip("\"'<>")
+    return (vus["client_id"], vus["client_secret"]) if all(vus.values()) else None
+
+
+class Jetons:
+    """Jeton OAuth 2.0 de PISTE (CGU de Judilibre, art. XI C), redemandé avant sa fin. Une
+    erreur ne cite jamais les identifiants."""
+
+    def __init__(self, url: str, client_id: str, secret: str, ouvrir=urllib.request.urlopen):
+        self.url, self.id, self.secret, self.ouvrir = url, client_id, secret, ouvrir
+        self.jeton, self.fin = "", 0.0
+
+    def __call__(self) -> str:
+        if time.monotonic() >= self.fin:
+            corps = urllib.parse.urlencode({
+                "grant_type": "client_credentials", "client_id": self.id,
+                "client_secret": self.secret, "scope": "openid",
+            }).encode()  # fmt: skip
+            try:
+                with self.ouvrir(urllib.request.Request(self.url, corps), timeout=60) as r:
+                    d = json.load(r)
+            except urllib.error.HTTPError as e:
+                raise ArretJudilibre(f"HTTP {e.code} sur le jeton : identifiants ?") from None
+            self.jeton = d["access_token"]
+            self.fin = time.monotonic() + float(d.get("expires_in", 3600)) - 60
+        return self.jeton
 
 
 def _mois(debut: str, fin: str) -> Iterator[str]:
@@ -53,15 +86,15 @@ def fenetres(cfg: JudilibreConfig) -> list[tuple[str, str]]:
     return [(jur, m) for jur, d in cfg.juridictions.items() for m in _mois(d, cfg.fin)]
 
 
-def _lire(url: str, cle: str) -> dict:
-    req = urllib.request.Request(url, headers={"KeyId": cle, "accept": "application/json"})
+def _lire(url: str, cle: Callable[[], str]) -> dict:
+    entetes = {"Authorization": f"Bearer {cle()}", "accept": "application/json"}
+    req = urllib.request.Request(url, headers=entetes)
     with urllib.request.urlopen(req, timeout=120) as r:
         return json.load(r)
 
 
-def _appeler(url: str, cle: str, cfg: JudilibreConfig, lire, dormir) -> dict:
-    """Une réponse ; attend entre les essais (`Retry-After` s'il est donné). Le message
-    d'erreur ne contient jamais la clé."""
+def _appeler(url: str, cle, cfg: JudilibreConfig, lire, dormir) -> dict:
+    """Une réponse ; attend entre les essais (`Retry-After` s'il est donné)."""
     raison = ""
     for essai in range(cfg.essais):
         dormir(cfg.pause_s)
@@ -69,7 +102,9 @@ def _appeler(url: str, cle: str, cfg: JudilibreConfig, lire, dormir) -> dict:
             return lire(url, cle)
         except urllib.error.HTTPError as e:
             if e.code in (401, 403):
-                raise ArretJudilibre(f"HTTP {e.code} : clé ou CGU de Judilibre à valider") from None
+                raise ArretJudilibre(
+                    f"HTTP {e.code} : API ou CGU de Judilibre à valider sur PISTE"
+                ) from None
             if e.code != 429 and e.code < 500:
                 raise ArretJudilibre(f"HTTP {e.code} sur {url}") from None
             attente = e.headers.get("Retry-After") if e.headers else None
@@ -85,7 +120,7 @@ def _appeler(url: str, cle: str, cfg: JudilibreConfig, lire, dormir) -> dict:
     raise ArretJudilibre(f"{raison} après {cfg.essais} essais")
 
 
-def _fenetre(jur: str, mois: str, part: int, cle: str, cfg: JudilibreConfig, lire, dormir
+def _fenetre(jur: str, mois: str, part: int, cle, cfg: JudilibreConfig, lire, dormir
              ) -> list[dict]:  # fmt: skip
     a, m = map(int, mois.split("-"))
     suivant = f"{a + 1:04d}-01-01" if m == 12 else f"{a:04d}-{m + 1:02d}-01"
@@ -116,8 +151,8 @@ def _fenetre(jur: str, mois: str, part: int, cle: str, cfg: JudilibreConfig, lir
 def telecharger(
     racine: Path,
     cfg: DonneesConfig,
-    cle: str,
-    lire: Callable[[str, str], dict] = _lire,
+    cle,
+    lire: Callable[..., dict] = _lire,
     dormir: Callable[[float], None] = time.sleep,
 ) -> dict:
     """Télécharge les fenêtres manquantes ; rend le bilan des fenêtres et des décisions."""
