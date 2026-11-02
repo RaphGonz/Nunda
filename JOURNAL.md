@@ -609,6 +609,7 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   Deuxième exécution : sorties identiques pour les deux modèles. La VRAM est le pic relevé après chaque article, pas un suivi continu.
 - **Décisions :**
   - **Enseignant retenu : Qwen2.5-7B-Instruct, Q4_K_M, servi par llama.cpp.** Il garde plus d'exemples, et ceux qu'il garde sont meilleurs. Les réponses des deux modèles et la mémoire ne départagent pas : les deux tiennent largement dans 24 Go.
+  - **Confirmé par Raphael le 2026-11-02 : on garde Qwen.**
   - **Ce choix renverse celui du 2026-10-18** (« Mistral, meilleur en français », et un modèle de 12B ou 24B envisagé). Sur ces 10 articles, Mistral 7B ne fait pas mieux en français. Nemo 12B et Small 24B n'ont pas été testés.
   - **llama.cpp plutôt que vLLM :** vLLM n'est pas pris en charge sous Windows natif, il aurait fallu WSL ou Docker. Q4_K_M donne bien 4 bits, sans étape de plus.
   - **Mistral 7B :** pas de GGUF officiel trouvé, quantification communautaire de `bartowski`. Qwen vient du dépôt officiel.
