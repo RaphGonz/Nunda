@@ -587,3 +587,39 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Incident :** la clé d'API de Raphael s'est affichée dans la session de travail. Elle n'est pas utilisée, n'est pas dans le dépôt, et le fichier qui la portait est supprimé. À régénérer sur PISTE.
 - **Tests :** `make test-complet` sur le code final : 341 passés, 1 ignoré, 1 désélectionné ; T11 passé.
 - **Suite prévue :** la dernière « Suite prévue » de phase 3 reste ouverte : `reports/phase-3.md`, et les arbitrages de langue et de licence demandés à Raphael. La chaîne du §12 (noms, nombres, doublons, conflits, BM25) n'est pas lancée sur `droit.sqlite`.
+
+## 2026-11-02 — Phase 3 (§16, préparation de la phase 4) — Enseignant 7B local : Qwen retenu
+- **Travail fait :** llama.cpp b12048 (CUDA 12.4) installé dans `D:/Nunda-donnees/llama.cpp/b12048/`, empreintes GitHub contrôlées. Qwen2.5-7B-Instruct et Mistral-7B-Instruct-v0.3 téléchargés en Q4_K_M dans `D:/Nunda-donnees/modeles/enseignant/`, SHA-256 identiques à ceux de Hugging Face. `uv run ccm enseignant` (`ccm/data/enseignant.py`) lance les deux modèles sur 10 articles de Légifrance : même prompt, température 0, JSON imposé par schéma, puis second passage du §12. Résultats : `D:/Nunda-donnees/enseignant/comparaison.json`, avec les sorties complètes.
+- **Mesures, 10 articles** (tirés avec la graine 20261102 parmi les 54 012 articles de 3 à 8 phrases et de 400 à 1 800 caractères) :
+
+  | | Qwen2.5-7B Q4_K_M | Mistral-7B v0.3 Q4_K_M |
+  | --- | --- | --- |
+  | Le modèle répond, JSON valide | 10/10 | 10/10 |
+  | Couches sur le GPU | 29/29 | 33/33 |
+  | VRAM au pic, sur 24 576 Mio (contexte 8 192) | 5 050 Mio | 5 530 Mio |
+  | Débit | 103 jetons/s | 109 jetons/s |
+  | Gardées par les règles du §12 | 6/10 | 4/10 |
+  | Rejets : plus de 4 justificatives | 1 | 0 |
+  | Rejets : « réponse possible » sans les justificatives | 2 | 6 |
+  | Rejets : « pas de réponse » avec les justificatives | 1 | 0 |
+  | Lecture de l'agent : question bonne (voir ci-dessous) | 6/10 (n° 1, 2, 3, 8, 9, 10) | 2/10 (n° 4, 5) |
+  | Parmi les gardées : bonnes selon cette lecture | 5/6 | 0/4 |
+  | Fautes de français | 0 | 2 (n° 9 « Quels sont les règles », n° 10 « peut dispensé ») |
+
+  Deuxième exécution : sorties identiques pour les deux modèles. La VRAM est le pic relevé après chaque article, pas un suivi continu.
+- **Décisions :**
+  - **Enseignant retenu : Qwen2.5-7B-Instruct, Q4_K_M, servi par llama.cpp.** Il garde plus d'exemples, et ceux qu'il garde sont meilleurs. Les réponses des deux modèles et la mémoire ne départagent pas : les deux tiennent largement dans 24 Go.
+  - **Ce choix renverse celui du 2026-10-18** (« Mistral, meilleur en français », et un modèle de 12B ou 24B envisagé). Sur ces 10 articles, Mistral 7B ne fait pas mieux en français. Nemo 12B et Small 24B n'ont pas été testés.
+  - **llama.cpp plutôt que vLLM :** vLLM n'est pas pris en charge sous Windows natif, il aurait fallu WSL ou Docker. Q4_K_M donne bien 4 bits, sans étape de plus.
+  - **Mistral 7B :** pas de GGUF officiel trouvé, quantification communautaire de `bartowski`. Qwen vient du dépôt officiel.
+- **Limites de la comparaison :**
+  - **Échantillon de 10 articles : indice, pas preuve.** Un seul prompt, non réglé. L'écart de 6 contre 4 aux règles du §12 tient à deux articles.
+  - **La « lecture de l'agent » est un jugement d'une seule personne, sans aveugle** : l'agent savait quel modèle avait écrit quoi. Critère : réponse présente dans les justificatives, jeu de justificatives juste, rien d'inventé, français correct. Cas limites comptés bons ou mauvais par ce critère : n° 8 de Mistral compté non bon (justificative 6 superflue, contenu juste), n° 6 de Qwen non bon (3 et 5 superflues, 6 manquante). Le français pèse lourd : sans ce critère, les n° 9 et 10 de Mistral comptent, soit 4/10 pour Mistral contre 6/10.
+  - **Chaque modèle confirme ses propres questions** au second passage : les taux de 6/10 et 4/10 ne mesurent pas seulement la qualité des questions.
+- **Risques pour la phase 4, non corrigés :**
+  - **Le second passage laisse passer des erreurs et rejette de bonnes questions.** Mistral n° 6 demande « Qui sont les deux hôteliers » : le texte ne les nomme pas, et l'exemple passe. Mistral rejette ainsi ses bonnes questions n° 4 et 5.
+  - **Les connecteurs ne sont pas fiables chez les deux modèles :** un connecteur rendu pour une seule justificative, MAIS ou EN_REVANCHE sans opposition dans le texte. À ne pas utiliser tels quels.
+  - Qwen dépasse la limite de 4 justificatives et en donne parfois trop : le code rejette le premier cas, pas le second.
+- **Écarts avec SPEC.md :** aucun. Le travail relève de §16 et prépare la phase 4, mais reste sur `phase-3` : la phase 3 n'est pas close et aucun exemple d'entraînement n'est produit. La décision de §16 est écrite ici, `SPEC.md` n'est pas modifié.
+- **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis (ni `grammar`, ni `verify`, ni `anonymize`, ni `ingest`, ni `worldgen`).
+- **Suite prévue :** inchangée pour la phase 3 : `reports/phase-3.md` et les arbitrages de langue et de licence. En phase 4 : mesurer le second passage sur plus d'articles avant de lancer les 20 000 exemples.
