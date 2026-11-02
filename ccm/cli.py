@@ -268,6 +268,15 @@ def modeles() -> None:
 
 
 @app.command()
+def enseignant() -> None:
+    """Compare les modèles enseignants sur 10 articles de Légifrance (§12, §16)."""
+    from ccm.config import load_config
+    from ccm.data.enseignant import comparer
+
+    typer.echo(comparer(load_config("donnees").racine))
+
+
+@app.command()
 def jeux() -> None:
     """Télécharge les jeux publics de réglage fin (§12) ; affiche tailles et empreintes."""
     from ccm.config import load_config
