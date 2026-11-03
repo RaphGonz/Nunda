@@ -268,6 +268,19 @@ def modeles() -> None:
 
 
 @app.command()
+def questions(
+    cible: Annotated[int, typer.Option(help="Exemples gardés visés, moitié par source.")] = 20_000,
+    paralleles: Annotated[int, typer.Option(help="Requêtes simultanées au serveur.")] = 4,
+    nom: Annotated[str, typer.Option(help="Nom du fichier JSONL.")] = "questions",
+) -> None:
+    """Questions de l'enseignant sur Légifrance et Judilibre, second passage compris (§12)."""
+    from ccm.config import load_config
+    from ccm.data.questions import generer
+
+    typer.echo(generer(load_config("donnees").racine, cible, paralleles, nom))
+
+
+@app.command()
 def enseignant(
     modeles: Annotated[list[str] | None, typer.Argument(help="Modèles (tous par défaut).")] = None,
     n: Annotated[int, typer.Option(help="Nombre d'articles de Légifrance.")] = 10,

@@ -68,9 +68,9 @@ def _numerotees(props: list[tuple[int, str]]) -> str:
     return "\n".join(f"[{i}] {t}" for i, t in props)
 
 
-def prompt_question(props: list[str]) -> str:
+def prompt_question(props: list[str], nature: str = "d'un texte de loi français") -> str:
     return (
-        "Voici les propositions numérotées d'un texte de loi français.\n\n"
+        f"Voici les propositions numérotées {nature}.\n\n"
         f"{_numerotees(list(enumerate(props, 1)))}\n\n"
         "Écris en français une question précise dont la réponse se trouve dans ces propositions. "
         "Rends un JSON : `question` ; `justificatives`, les numéros des propositions nécessaires "
