@@ -268,12 +268,16 @@ def modeles() -> None:
 
 
 @app.command()
-def enseignant() -> None:
-    """Compare les modèles enseignants sur 10 articles de Légifrance (§12, §16)."""
+def enseignant(
+    modeles: Annotated[list[str] | None, typer.Argument(help="Modèles (tous par défaut).")] = None,
+    n: Annotated[int, typer.Option(help="Nombre d'articles de Légifrance.")] = 10,
+    nom: Annotated[str, typer.Option(help="Nom du fichier de résultats.")] = "comparaison",
+) -> None:
+    """Compare les modèles enseignants sur des articles de Légifrance (§12, §16)."""
     from ccm.config import load_config
-    from ccm.data.enseignant import comparer
+    from ccm.data.enseignant import MODELES, comparer
 
-    typer.echo(comparer(load_config("donnees").racine))
+    typer.echo(comparer(load_config("donnees").racine, modeles or list(MODELES), n, nom))
 
 
 @app.command()

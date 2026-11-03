@@ -20,6 +20,11 @@ SERVEUR = "llama.cpp/b12048/llama-server.exe"
 MODELES = {
     "qwen2.5-7b": "modeles/enseignant/qwen2.5-7b/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf",
     "mistral-7b-v0.3": "modeles/enseignant/mistral-7b-v0.3/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
+    "qwen2.5-14b": "modeles/enseignant/qwen2.5-14b/qwen2.5-14b-instruct-q4_k_m-00001-of-00003.gguf",
+    "qwen2.5-32b": "modeles/enseignant/qwen2.5-32b/qwen2.5-32b-instruct-q4_k_m-00001-of-00005.gguf",
+    "qwen3-32b": "modeles/enseignant/qwen3-32b/Qwen3-32B-Q4_K_M.gguf",
+    "qwen3.5-27b": "modeles/enseignant/qwen3.5-27b/Qwen_Qwen3.5-27B-Q4_K_M.gguf",
+    "qwen3.5-35b-a3b": "modeles/enseignant/qwen3.5-35b-a3b/Qwen_Qwen3.5-35B-A3B-Q4_K_M.gguf",
 }
 CONNECTEURS = ["ET", "MAIS", "EN_REVANCHE", "PAR_AILLEURS"]
 _SCHEMA = {
@@ -146,7 +151,7 @@ def evaluer(racine: Path, nom: str, textes: list[dict]) -> dict:
     with (racine / "enseignant" / f"{nom}.log").open("w", encoding="utf-8") as journal:
         p = subprocess.Popen(
             [racine / SERVEUR, "-m", racine / MODELES[nom], "--port", str(PORT), "-ngl", "99"]
-            + ["-c", "8192", "--parallel", "1"],
+            + ["-c", "8192", "--parallel", "1", "--reasoning", "off"],
             stdout=journal,
             stderr=subprocess.STDOUT,
         )
@@ -192,11 +197,11 @@ def evaluer(racine: Path, nom: str, textes: list[dict]) -> dict:
     }
 
 
-def comparer(racine: Path) -> Path:
-    """Écrit `racine/enseignant/comparaison.json`."""
+def comparer(racine: Path, modeles: list[str], n: int = 10, nom: str = "comparaison") -> Path:
+    """Écrit `racine/enseignant/<nom>.json`. Les `n` premiers extraits ne dépendent pas de `n`."""
     (racine / "enseignant").mkdir(exist_ok=True)
-    textes = extraits(racine / "droit.sqlite")
-    res = {"extraits": textes, "modeles": [evaluer(racine, n, textes) for n in MODELES]}
-    cible = racine / "enseignant" / "comparaison.json"
+    textes = extraits(racine / "droit.sqlite", n)
+    res = {"extraits": textes, "modeles": [evaluer(racine, m, textes) for m in modeles]}
+    cible = racine / "enseignant" / f"{nom}.json"
     cible.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
     return cible
