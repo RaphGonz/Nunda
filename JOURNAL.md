@@ -624,3 +624,26 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** aucun. Le travail relève de §16 et prépare la phase 4, mais reste sur `phase-3` : la phase 3 n'est pas close et aucun exemple d'entraînement n'est produit. La décision de §16 est écrite ici, `SPEC.md` n'est pas modifié.
 - **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis (ni `grammar`, ni `verify`, ni `anonymize`, ni `ingest`, ni `worldgen`).
 - **Suite prévue :** inchangée pour la phase 3 : `reports/phase-3.md` et les arbitrages de langue et de licence. En phase 4 : mesurer le second passage sur plus d'articles avant de lancer les 20 000 exemples.
+
+## 2026-11-03 — Phase 3 (§16, préparation de la phase 4) — Enseignant : Qwen plus gros
+- **Travail fait :** demande de Raphael : tester des Qwen plus gros que le 7B avant la génération de la phase 4. Téléchargés en Q4_K_M dans `D:/Nunda-donnees/modeles/enseignant/` : Qwen2.5-14B, Qwen2.5-32B, Qwen3-32B (dépôts officiels), Qwen3.5-27B et Qwen3.5-35B-A3B (`bartowski` : pas de GGUF officiel). SHA-256 contrôlés pour 14B, 3.5-27B et 3-32B. `ccm enseignant` prend maintenant la liste des modèles, `--n` et `--nom` ; le serveur démarre avec `--reasoning off` (Qwen3 et 3.5 réfléchissent sinon). 20 articles (graine 20261102 ; les 10 premiers sont ceux du 2026-11-02). Résultats : `D:/Nunda-donnees/enseignant/q-<modèle>.json`.
+- **Mesures, 20 articles :**
+
+  |  | Qwen2.5-7B | Qwen2.5-14B | Qwen3.5-27B |
+  | --- | --- | --- | --- |
+  | VRAM au pic, sur 24 576 Mio | 5 050 Mio | 10 104 Mio | 17 142 Mio |
+  | Débit | 99 jetons/s | 58 jetons/s | 23 jetons/s |
+  | Durée des 20 articles (3 appels chacun) | 20 s | 36 s | 78 s |
+  | Gardées par les règles du §12 | 16/20 | 18/20 | 18/20 |
+  | Lecture de l'agent : question bonne | 9/20 | 7/20 | 17/20 |
+  | Parmi les gardées : bonnes | 8/16 | 6/18 | 15/18 |
+
+  Qwen2.5-7B : sorties des 10 premiers articles identiques à celles du 2026-11-02 (`--reasoning off` sans effet sur lui). Même critère de lecture que le 2026-11-02 : réponse dans les justificatives, jeu juste (ni manquante ni superflue, titre de l'article ou intertitre « III. » compris), rien d'inventé, français correct.
+  - **Qwen3.5-27B :** non bons n° 4 (4 missions sur 4 citées, la 4e manque : limite de 4 justificatives), 18 (titre superflu ; « est mise fin »), 20 (intertitre « III. » superflu). Rejetées à tort : n° 6 et 19, bonnes questions.
+  - **Qwen2.5-14B :** pire que le 7B à la lecture. Il met souvent le titre de l'article [1] ou des propositions superflues, et fait des fautes d'accord (« Quels sont les étapes », « Quels sont les deux entités »).
+- **Incident :** la première série (5 modèles en arrière-plan) a été arrêtée par Claude Code, mémoire du système basse, au chargement du 27B. Relancé seul au premier plan : la mémoire physique libre (hors cache) est descendue à 152 Mio. À suivre pour les modèles de plus de 18 Go.
+- **Décisions :** aucune. **Recommandation de l'agent, non décidée :** Qwen3.5-27B comme enseignant. Prix : environ 4 fois plus lent que le 7B ; 20 000 exemples gardés à 90 % demandent environ 24 h de calcul contre environ 6 h, sans parallélisme. Le choix reste Qwen2.5-7B tant que Raphael n'a pas tranché.
+- **Limites :** 20 articles ; lecture d'une seule personne, sans aveugle. Chaque modèle confirme ses propres questions au second passage. Qwen3-32B, Qwen2.5-32B et Qwen3.5-35B-A3B non testés (Raphael : « essaye seulement le 3.5 27B »). Le 27B vient d'une quantification communautaire.
+- **Écarts avec SPEC.md :** aucun ; travail de §16, sur `phase-3`, aucun exemple d'entraînement produit.
+- **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** choix de l'enseignant par Raphael (7B ou 3.5-27B), puis phase 4 comme prévu.
