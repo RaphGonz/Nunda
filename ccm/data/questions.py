@@ -60,8 +60,11 @@ def fenetre_decision(props: list[tuple[int, str, str]], rng: random.Random) -> l
     return rng.choice(candidates) if candidates else []
 
 
-def passages(base: Path, graine: int = GRAINE):
-    """Un générateur de passages (source, piece, [prop_id], [texte]) par source."""
+def passages(base: Path, graine: int = GRAINE, sauter: frozenset[str] = frozenset()):
+    """Un générateur de passages (source, piece, [prop_id], [texte]) par source.
+
+    Les pièces de `sauter` sont omises sans être lues : la reprise reste rapide.
+    """
     c = sqlite3.connect(f"file:{base.as_posix()}?mode=ro", uri=True, check_same_thread=False)
     legi = sorted(
         r[0]
@@ -86,11 +89,15 @@ def passages(base: Path, graine: int = GRAINE):
 
     def de_legi():
         for piece in legi:
+            if piece in sauter:
+                continue
             p = lire(piece)
             yield "legi", piece, [x[0] for x in p], [x[2] for x in p]
 
     def de_jud():
         for piece in jud:
+            if piece in sauter:
+                continue
             p = lire(piece)
             idx = fenetre_decision(p, random.Random(f"{graine}-{piece}"))
             if idx:
@@ -154,7 +161,7 @@ def generer(racine: Path, cible: int = 20_000, paralleles: int = 4, nom: str = "
                     f.flush()
 
             en_cours = []
-            sources = passages(racine / "droit.sqlite")
+            sources = passages(racine / "droit.sqlite", sauter=frozenset(faits))
             while sources:
                 for nom_source, gen in list(sources.items()):
                     p = next(gen, None)
