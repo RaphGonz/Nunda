@@ -6,11 +6,13 @@ un ordre tiré pour l'époque, puis les places sont mélangées. Chaque exemple 
 neuf, dans cet ordre :
 
 1. Genre, tiré une fois par exemple : abstention (justificatives et doublons retirés du
-   stock), conflit injecté, contrefactuel (`data/negatives.py`), ou normal.
+   stock ; pour le corpus synthétique, aussi toutes les lignes de leurs événements, d'après
+   la vérité terrain), conflit injecté, contrefactuel (`data/negatives.py`), ou normal.
 2. Contexte réel : la recherche de la section 7 sur le stock (index BM25 en mémoire).
    Avec la probabilité `contexte_complet`, les propositions que la cible cite et que la
    recherche n'a pas rendues sont ajoutées, dans leur pièce ; sinon, s'il en manque une,
-   la cible devient ABSTENTION.
+   la cible devient ABSTENTION, sauf si une ligne qui dit le même fait (témoin de la
+   vérité terrain) est dans le contexte : les manquantes sont alors ajoutées aussi.
 3. Anonymiseur avec une table tirée de nouveau : indices de noms et de valeurs propres à
    l'époque et à la place.
 4. Cible de la source, puis règle 4 de l'ordre des suites (§10) : un CITE d'une proposition
@@ -81,6 +83,10 @@ class Cas:
     historique: list[Message] = field(default_factory=list)  # pour l'anonymiseur
     precedentes: list[Message] = field(default_factory=list)  # pour la recherche
     citees: frozenset[int] = frozenset()
+    # Vérité terrain : toutes les propositions qui disent les faits des justificatives, sous
+    # une autre forme aussi. Retirées avec elles pour l'abstention ; une seule dans le
+    # contexte suffit pour qu'un contexte incomplet ne devienne pas ABSTENTION.
+    temoins: list[int] = field(default_factory=list)
 
 
 class Source(Protocol):
@@ -136,6 +142,13 @@ class SourceSynthetique:
         lignes = _lignes(base, d)
         utiles = list(dict.fromkeys(lignes[r] for r in _lignes_utiles(q)))
         citees = frozenset(lignes[x] for t in q.historique for x in t.lignes)
+        justifs = [p for p in utiles if p not in citees]
+        # Toutes les lignes des événements des justificatives : la même chose dite par un
+        # autre témoin, sous une autre forme de nom ou dans une autre version.
+        evenement = {lignes[f"{pc.id}:{k}"]: li.evenement for pc in d.pieces
+                     for k, li in enumerate(pc.lignes)}  # fmt: skip
+        evs = {evenement[p] for p in justifs} - {None}
+        temoins = [p for p, ev in evenement.items() if ev in evs and p not in justifs]
 
         def cible(ex: Exemple, valeurs: dict[int, str], con: sqlite3.Connection) -> list[str]:
             g = negatives.gardes(con)
@@ -149,7 +162,7 @@ class SourceSynthetique:
             negatives.copier_stock(base),
             message_de_reference(q.message, cfg),
             utiles,
-            [p for p in utiles if p not in citees],
+            justifs,
             cible,
             sans_reponse=q.abstention,
             historique=[message_de_reference(t, cfg) for t in q.historique if t.texte],
@@ -159,6 +172,7 @@ class SourceSynthetique:
                 if t.role == "UTILISATEUR" and t.texte
             ],  # fmt: skip
             citees=citees,
+            temoins=temoins,
         )
 
 
@@ -324,7 +338,9 @@ class Chargeur:
         """Transforme le stock ; rend la copie en conflit pour un conflit injecté."""
         cfg, con = self.cfg, cas.con
         if genre == "abstention":
-            negatives.retirer(con, cas.justificatives)
+            if set(cas.temoins) & cas.citees:
+                raise Rejet("fait déjà cité au tour précédent")
+            negatives.retirer(con, [*cas.justificatives, *cas.temoins])
             return None
         candidates = list(cas.justificatives)
         rng.shuffle(candidates)
@@ -352,8 +368,9 @@ class Chargeur:
         ids = list(res.prop_ids)
         manquantes = [p for p in necessaires if p not in ids]
         fixe = ABSTENTION if genre == "abstention" else None
+        temoin = any(g.get(p) in ids for p in cas.temoins)
         if fixe is None and manquantes:
-            if complet:
+            if complet or temoin:  # un témoin dans le contexte : la réponse y est
                 ids = completer(con, ids, manquantes, self.scfg.budget.propositions)
             else:
                 fixe, genre = ABSTENTION, "abstention_contexte"

@@ -705,3 +705,18 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - L'abstention retire les justificatives et leurs doublons, comme le §12. Une autre ligne qui dit le même fait autrement peut rester, et la cible ABSTENTION serait alors fausse. C'est un risque.
 - **Tests :** `make test` : 355 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis : `search`, `data` et `train` seulement ; ni `grammar`, ni `anonymize`, ni `ingest`, ni `worldgen` modifiés.
 - **Suite prévue :** source Légifrance et Judilibre (chaîne du §12 sur `questions.jsonl`) ; parallélisme du chargeur ; `reports/phase-3.md` toujours à écrire.
+
+## 2026-11-04 — Phase 4 — Chargeur : conflit injecté et abstention, choix de Raphael
+- **Décisions de Raphael :**
+  - **Conflit injecté :** la règle du §5 est gardée. L'arête CONFLIT vient toujours de l'ingestion, donc les conflits injectés viennent du corpus synthétique seulement.
+  - **Abstention, option B :** pour le corpus synthétique, l'abstention se fonde sur la vérité terrain (« si ça aide l'entraînement à s'abstenir, c'est bien »).
+- **Travail fait :** `Cas.temoins` (`ccm/train/chargeur.py`) = toutes les lignes des événements des justificatives (`Ligne.evenement` de `verite.json`). Cela couvre un autre témoin, une autre forme du nom et l'autre version d'un conflit.
+  - **Abstention :** les justificatives, leurs témoins et leurs doublons sortent du stock. Si un témoin a été cité au tour précédent, le fait reste dans le contexte : l'exemple redevient normal (repli).
+  - **Contexte incomplet (20 %) :** si une justificative manque mais qu'un témoin est dans le contexte, la réponse y est. Les manquantes sont alors ajoutées, au lieu de mettre ABSTENTION.
+  - Jeux publics inchangés : ils n'ont pas de vérité terrain, et les justificatives et leurs doublons sont retirés comme avant.
+  - Test ajouté : `test_abstention_synthetique_retire_tout_l_evenement`. Sur 10 questions, aucune justificative ni aucun témoin ne reste dans le contexte, et chaque pas est dans son masque.
+- **Mesures :** sur 20 dossiers synthétiques, 418 des 713 questions avec réponse (59 %) ont au moins une autre ligne du même événement hors des lignes équivalentes de la question. Avec l'ancienne règle, leur ABSTENTION pouvait être fausse. 5 questions ont un témoin déjà cité.
+- **Limite :** retirer tout l'événement retire aussi des lignes qui ne portent pas l'attribut demandé. Les abstentions sont donc un peu plus faciles, mais leur cible est sûre. 5 lignes d'étape sur 1 437 n'ont pas d'événement : pour elles, seules les lignes équivalentes sortent.
+- **Écarts avec SPEC.md :** le §12 dit « retire les justificatives et leurs doublons ». Pour le synthétique, le code retire plus, sur décision de Raphael. `SPEC.md` n'est pas modifié.
+- **Tests :** `make test` : 356 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** inchangée (source Légifrance et Judilibre, parallélisme du chargeur, `reports/phase-3.md`).

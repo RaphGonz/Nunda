@@ -243,3 +243,24 @@ def test_blocs_conflit_seulement_en_debut_de_segment(publiques):
     assert blocs_conflit(ex, [f"P:{a}", "FIN"]) == ["CONFLIT", f"P:{a}", f"P:{b}", "FIN_CONFLIT",
                                                      "FIN"]  # fmt: skip
     assert blocs_conflit(ex, [f"P:{a}", "ET", f"P:{b}", "FIN"]) == [f"P:{a}", "ET", f"P:{b}", "FIN"]
+
+
+def test_abstention_synthetique_retire_tout_l_evenement(synthetique):
+    """Option B (Raphael, 2026-11-04) : la même chose dite ailleurs, sous une autre forme,
+    sort aussi du stock ; la cible ABSTENTION est donc vraie."""
+    ch = _chargeur({"synthetique": synthetique}, abstention=1.0)
+    vus = 0
+    for j in range(len(synthetique)):
+        cas = synthetique.cas(j)
+        cas.con.close()
+        if cas.sans_reponse or not cas.temoins or set(cas.temoins) & cas.citees:
+            continue
+        t = ch.exemple("synthetique", j, 0, j)
+        assert t.genre == "abstention" and t.exemple.cible == ["ABSTENTION", "FIN"], t.repli
+        rendues = {p.prop_id for p in t.exemple.propositions}
+        assert not rendues & {*cas.justificatives, *cas.temoins}
+        _dans_son_masque(t)
+        vus += 1
+        if vus == 10:
+            break
+    assert vus == 10
