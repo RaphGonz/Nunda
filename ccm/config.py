@@ -251,8 +251,22 @@ class PretrainConfig(ConfigBase):
     pass
 
 
+class ChargeurConfig(_Bloc):
+    """Chargeur de données du réglage fin (SPEC.md §12, « Exemples négatifs et difficiles » ;
+    §13). Parts : valeurs de départ."""
+
+    graine: int
+    exemples_par_epoque: int
+    poids: dict[str, float]  # part de chaque source dans une époque (§12)
+    contexte_complet: float  # part des exemples où le code ajoute les justificatives manquantes
+    abstention: float  # 10 à 15 % : justificatives et doublons retirés du stock
+    conflit_injecte: float
+    contrefactuel: float  # 5 %
+    essais_valeur: int  # tirages d'une valeur nouvelle avant d'abandonner la transformation
+
+
 class FinetuneConfig(ConfigBase):
-    pass
+    chargeur: ChargeurConfig
 
 
 Intervalle = tuple[int, int]
