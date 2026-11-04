@@ -720,3 +720,21 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** le §12 dit « retire les justificatives et leurs doublons ». Pour le synthétique, le code retire plus, sur décision de Raphael. `SPEC.md` n'est pas modifié.
 - **Tests :** `make test` : 356 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** inchangée (source Légifrance et Judilibre, parallélisme du chargeur, `reports/phase-3.md`).
+
+## 2026-11-04 — Phase 4 — Choix du modèle de base et du GPU ; durée estimée de A0 et A1
+- **Décisions de Raphael (§16) :** modèle de base de A : **SmolLM**. GPU : **une RTX 3090 (24 Go)**, rien d'autre. L'entraînement se fait par nuits de 8 h.
+- **Mesure :** longueur des séquences A0 avec le tokenizer de SmolLM2-360M (`HuggingFaceTB/SmolLM2-360M`, tokenizer seul) sur 597 exemples du chargeur, toutes sources présentes (sans Légifrance ni Judilibre). T moyen 1 499, médiane 1 466, q90 2 503, max 3 546. Par source : synthétique 2 159, HotpotQA 1 314, FinQA 892, PIAF 601, SQuAD 175.
+- **Estimation, à remplacer par la mesure de 20 minutes du §13 :**
+  - SmolLM2-360M : 32 couches, dimension 960.
+  - Environ 2,2 GFLOP par jeton à l'entraînement avec LoRA : environ 0,72 GFLOP en avant, multiplié par 3.
+  - RTX 3090 : 71 TFLOPS en bf16 ; 15 à 35 % d'utilisation, soit environ 5 000 à 11 000 jetons/s.
+  - Une époque = 200 000 × 1 500 = 3·10⁸ jetons, soit **7,5 à 17 h, environ 9 h**.
+  - A0, 3 époques : 23 à 50 h, environ 28 h, soit **4 nuits (3 à 7)**.
+  - A1, 2 époques depuis A0 : biais dense sans attention rapide, contexte de 2 500 jetons ; environ 1,5 fois plus lent. Environ 28 h, soit **4 nuits (3 à 6)**.
+  - Chargeur : 0,3 s par exemple, soit 17 h de CPU par époque. Il faut 3 ou 4 processus de chargement pendant l'entraînement pour suivre le GPU.
+- **Points ouverts :**
+  - SmolLM2 n'a pas de taille entre 0,4 et 0,6 milliard (§9). Les tailles voisines sont 360 M, puis 1,7 milliard à la place de 1,5.
+  - SmolLM2 est entraîné surtout sur de l'anglais, et nos données sont surtout en français.
+  - SmolLM2-1.7B coûterait environ 5 fois plus : environ 140 h pour 3 époques. C'est au-delà des 5 jours du §15, cas 4.
+  - Les résultats finaux demandent 3 graines (§13), ce qui triple les nuits des entraînements finaux.
+- **Suite prévue :** inchangée ; mesure du débit réel au premier essai à blanc.
