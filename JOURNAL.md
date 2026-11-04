@@ -647,3 +647,22 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** aucun ; travail de §16, sur `phase-3`, aucun exemple d'entraînement produit.
 - **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** choix de l'enseignant par Raphael (7B ou 3.5-27B), puis phase 4 comme prévu.
+
+## 2026-11-03 — Phase 4 — Questions de l'enseignant sur Légifrance et Judilibre (en cours)
+- **Travail fait :** Raphael retient **Qwen3.5-27B** (Q4_K_M, `bartowski`) comme enseignant et demande la génération du §12 « Modèle enseignant ». Branche `phase-4` créée depuis `phase-3`. `uv run ccm questions` (`ccm/data/questions.py`) : un passage par article ou décision, Légifrance et Judilibre en alternance, même prompt et même second passage que la comparaison (« d'une décision de justice française » pour Judilibre). Sortie `D:/Nunda-donnees/enseignant/questions.jsonl`, une ligne par passage (source, pièce, `prop_id` de `droit.sqlite`, sortie de l'enseignant, réponses du second passage, motif de rejet) ; une relance reprend après la dernière ligne. Lancée à 22 h 50 dans un processus détaché (`Start-Process`), hors des commandes de Claude Code.
+- **Passages :** Légifrance : articles de 3 à 8 phrases et de 400 à 1 800 caractères (54 012), comme la comparaison. Judilibre : dans chaque décision, une suite tirée au hasard de 3 à 8 PHRASE consécutives, 400 à 1 800 caractères, sans proposition qui contient maître, « Me », avocat, greffier, président, conseiller, magistrat, rapporteur ou procureur. Décisions sans telle suite : écartées. Ordre tiré avec la graine 20261103.
+- **Réglage du serveur :** `--parallel 4`, contexte 4 096 par requête. Mesuré : 4,2 s par passage à 1 requête, 2,45 s à 4, 2,6 s à 8. Chargement sans mmap (`--load-mode none`) : 2 min 30 et 9,7 Go de RAM gardés ; mmap gardé.
+- **Mesures provisoires, 2026-11-04 à 1 h 06** (3 823 passages) :
+
+  |  | Passages | Gardés | Rejet total | « Réponse possible » sans les justificatives | « Pas de réponse » avec | Numéros invalides |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | Légifrance | 1 912 | 1 703 | 10,9 % | 7,1 % | 3,6 % | 0,3 % |
+  | Judilibre | 1 911 | 1 694 | 11,4 % | 4,6 % | 6,8 % | 0,1 % |
+  | Total | 3 823 | 3 397 | 11,1 % | 5,8 % | 5,2 % | 0,2 % |
+
+  Rythme : environ 1 600 exemples gardés par heure ; fin prévue vers 15 h le 2026-11-04.
+- **Décisions :** moitié Légifrance, moitié Judilibre (10 000 chacun) : le §12 ne fixe pas la part. Exclusion des passages qui citent une personne : le moins de noms possible dans les questions (L111-13 COJ pour les magistrats ; noms d'avocats non occultés dans les décisions).
+- **Écarts avec SPEC.md :** la phase 3 n'est pas close (`reports/phase-3.md` non écrit) : cette génération de phase 4 se fait sur demande de Raphael. `questions.jsonl` contient du texte de décisions et peut contenir des noms : fichier de travail, pas fichier d'entraînement ; la chaîne du §12 (noms, nombres, pointeurs) passera dessus.
+- **Incident :** `tests/unit/test_questions.py` (questions du monde synthétique) écrasé par erreur au premier commit, restauré au suivant ; tests du générateur dans `tests/unit/test_questions_enseignant.py`.
+- **Tests :** `make test` à relancer en fin de génération (GPU et RAM occupés).
+- **Suite prévue :** bilan final au journal quand la cible est atteinte.
