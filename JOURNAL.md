@@ -676,3 +676,32 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
  Les 4 exemples au-delà de 20 000 viennent des requêtes déjà parties quand le quota est atteint. Rythme après la relance : environ 1 475 gardés par heure.
 - **Tests :** `make test` : 345 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** chaîne du §12 (noms, nombres, pointeurs) sur `questions.jsonl` ; `reports/phase-3.md` toujours à écrire.
+
+## 2026-11-04 — Phase 4 — Chargeur de données du réglage fin (§12, §13)
+- **Travail fait :** demande de Raphael. `ccm/train/chargeur.py` et `ccm/data/negatives.py` (nom de l'arborescence du §3). Chaque exemple est construit à neuf à partir du stock de sa question, avec les fonctions de l'inférence :
+  1. **Mélange pondéré :** `chargeur.poids` de `configs/finetune.yaml` (les parts du §12), renormalisés sur les sources présentes. Une époque est un plan fixé par la graine : parts par plus forts restes, questions de chaque source dans un ordre tiré pour l'époque, places mélangées.
+  2. **Genre tiré :** abstention 12,5 % (justificatives et toutes leurs copies retirées du stock), conflit injecté 10 %, contrefactuel 5 %, sinon normal. Aucun genre pour une question sans réponse.
+  3. **Contexte réel :** `chercher` (§7) sur le stock, avec un index BM25 en mémoire (`Index.en_memoire`). 80 % des exemples : les propositions manquantes que la cible cite sont ajoutées dans leur pièce, à leur place. 20 % : s'il en manque une, la cible devient ABSTENTION (genre `abstention_contexte`).
+  4. **Indices tirés à chaque époque :** nouvelle `TableConversation`, avec une graine tirée de (graine, époque, place).
+  5. **Masques :** `encode` avec le `Contexte` de l'automate. Un pas de référence hors de son masque est une erreur.
+  - Sources : `SourceSynthetique` (stock de référence + `cible_de_reference`, lignes prises dans la copie gardée de leur groupe de doublons) et `SourcePublique` (`publics.stock_de`, factorisé hors de `convertir`, sans changement de comportement). `sources_disponibles` lit les parties d'entraînement avec les lecteurs de `ccm convertir` et les caches de zones.
+  - Test du §13 : `tests/unit/test_chargeur.py`, 10 tests. Chaque pas de référence est dans son masque pour chaque genre et chaque source (synthétique, HotpotQA, PIAF, FinQA, SQuAD). Les tests couvrent aussi le mélange, les indices retirés et la structure gardée, l'abstention avec doublons, le conflit d'un autre rang trouvé par l'ingestion, le contrefactuel, le contexte incomplet et la règle 4.
+- **Mesures :**
+  - 3 dossiers synthétiques, parts relevées : 150 exemples en environ 7 s, aucun sauté.
+  - Vraies sources publiques : 2 000 places, 1 985 exemples gardés, tous les pas dans leur masque. Durée 600 s, en un processus : environ 0,3 s par exemple. Une époque de 200 000 demande donc environ 17 h en un processus, ou environ 3 h sur 6 processus.
+  - Replis : conflit 187 sur 187 ; contrefactuel 50 sur 93 ; 15 exemples sautés (Rejet).
+  - Chargement des sources : 39 s.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - **Les transformations se font sur le stock, pas sur l'exemple JSON.** Après chaque ajout, `dedoublonner` et `detecter_conflits` repassent sur le stock : l'arête CONFLIT d'un conflit injecté vient de l'ingestion. Si le conflit n'est pas trouvé (§5 : il faut une date au jour près, un nom commun et une heure ou des montants qui se recouvrent), l'exemple redevient normal et il est compté comme repli.
+  - **Valeur changée :** seulement un nombre NUM. Mêmes positions et même nombre de chiffres ; le nombre doit être relu par l'extraction comme le même genre, à la même unité. Aucune date n'est changée : une date différente veut dire un autre fait (§5). « Inverser une règle » n'est pas fait.
+  - **Contrefactuel :** la forme d'origine va dans une pièce `AUTRE`, de rang 0. Elle est retirée si l'ingestion la trouve en conflit avec la justificative, sinon la règle 4 imposerait un bloc CONFLIT.
+  - **Règle 4 du §10 :** elle s'applique à toutes les sources. Un CITE en début de segment, dont la proposition a un conflit établi dans le contexte, devient un bloc CONFLIT avec ses partenaires non cités ailleurs.
+  - **Parts et réglages :** conflit injecté 10 % (le §12 ne fixe pas la part ; c'est celle des conflits du corpus synthétique). 200 000 exemples par époque. Le stock synthétique passe aussi par `dedoublonner`.
+  - **Mode citation seulement :** `encode` calcule les masques sans synthèse.
+- **Écarts avec SPEC.md :** aucun sur les règles.
+  - **Le conflit injecté ne prend pas sur les jeux publics** (0 sur 187). Il ne vient que du corpus synthétique, environ 1 sur 3 des essais sur 3 dossiers. À revoir avec Raphael : garder la règle du §5, ou viser d'autres phrases.
+  - Le conflit supposé et le faux conflit (§12) ne sont pas faits : ils ne font pas partie de la tâche.
+  - Il n'y a pas encore de source Légifrance et Judilibre : `questions.jsonl` n'est pas converti, et les 15 % sont répartis sur les autres sources.
+  - L'abstention retire les justificatives et leurs doublons, comme le §12. Une autre ligne qui dit le même fait autrement peut rester, et la cible ABSTENTION serait alors fausse. C'est un risque.
+- **Tests :** `make test` : 355 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis : `search`, `data` et `train` seulement ; ni `grammar`, ni `anonymize`, ni `ingest`, ni `worldgen` modifiés.
+- **Suite prévue :** source Légifrance et Judilibre (chaîne du §12 sur `questions.jsonl`) ; parallélisme du chargeur ; `reports/phase-3.md` toujours à écrire.
