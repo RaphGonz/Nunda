@@ -738,3 +738,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - SmolLM2-1.7B coûterait environ 5 fois plus : environ 140 h pour 3 époques. C'est au-delà des 5 jours du §15, cas 4.
   - Les résultats finaux demandent 3 graines (§13), ce qui triple les nuits des entraînements finaux.
 - **Suite prévue :** inchangée ; mesure du débit réel au premier essai à blanc.
+
+## 2026-11-04 — Phase 4 — Taille du modèle de base
+- **Décision de Raphael :** A0 et A1 utilisent **SmolLM2-360M** seulement. Pas d'étape à 1,5 ou 1,7 milliard (« je n'ai pas 18 jours pour un réglage fin »).
+- **Durée estimée :** environ 4 nuits de 8 h pour A0 et environ 4 nuits pour A1, à remplacer par la mesure du §13.
+- **Écart avec SPEC.md :**
+  - Le §9 prévoit 0,4 à 0,6 milliard, puis 1,5 milliard. 360 M est la taille de SmolLM2 la plus proche, et l'étape à 1,5 milliard est abandonnée.
+  - Pour réduire la durée sans changer de modèle : baisser `exemples_par_epoque` (200 000 aujourd'hui), ou ne pas faire A1. Raphael n'a choisi ni l'un ni l'autre.
