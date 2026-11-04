@@ -192,9 +192,10 @@ def textes_de(b: Brut) -> Iterator[str]:
         yield from par
 
 
-def convertir(b: Brut, zones_de, cfg: IngestConfig, gcfg: GrammarConfig, graine: int
-              ) -> tuple[Exemple, dict[int, str]]:  # fmt: skip
-    """Exemple et valeurs (valeur_id → valeur) de la question. Rejet si elle ne convient pas."""
+def stock_de(b: Brut, zones_de, cfg: IngestConfig
+             ) -> tuple[sqlite3.Connection, list[list[int]], Message]:  # fmt: skip
+    """Stock en mémoire de la question (étapes de l'ingestion), prop_ids par paragraphe et
+    message lu par les détecteurs."""
     con = ouvrir_stock(":memory:")
     ids = []
     for i, par in enumerate(b.paragraphes):
@@ -218,6 +219,39 @@ def convertir(b: Brut, zones_de, cfg: IngestConfig, gcfg: GrammarConfig, graine:
         tuple((z.debut, z.fin, z.type) for z in zq),
         tuple(_nombres(b.question, [(z.debut, z.fin) for z in zq], b.langue, cfg)),
     )
+    return con, ids, msg
+
+
+def justificatives_de(b: Brut, ids: list[list[int]]) -> list[int]:
+    """prop_ids des justificatives, dans l'ordre du jeu, sans répétition."""
+    out = []
+    for i, j in b.justificatives:
+        if i >= len(ids) or j >= len(ids[i]):
+            raise Rejet("justificative hors du contexte")
+        if ids[i][j] not in out:
+            out.append(ids[i][j])
+    return out
+
+
+def cible_publique(b: Brut, ex: Exemple, justifs: list[int], valeurs: dict[int, str]
+                   ) -> list[str]:  # fmt: skip
+    """Cible d'une question publique ; `justifs` : numéros locaux, dans l'ordre."""
+    if b.abstention:
+        return ["ABSTENTION", "FIN"]
+    if not justifs:
+        raise Rejet("aucune justificative")
+    cible = []
+    for k in justifs:
+        cible += (["ET"] if cible else []) + [f"P:{k}"]
+    if b.postfixe:
+        cible += ["DONC", "CALCUL", *_operandes(b.postfixe, ex, justifs, valeurs), "FIN_CALCUL"]
+    return [*cible, "FIN"]
+
+
+def convertir(b: Brut, zones_de, cfg: IngestConfig, gcfg: GrammarConfig, graine: int
+              ) -> tuple[Exemple, dict[int, str]]:  # fmt: skip
+    """Exemple et valeurs (valeur_id → valeur) de la question. Rejet si elle ne convient pas."""
+    con, ids, msg = stock_de(b, zones_de, cfg)
     tous = [p for pids in ids for p in pids]
     if len(tous) > 150:
         raise Rejet("plus de 150 propositions")
@@ -227,23 +261,8 @@ def convertir(b: Brut, zones_de, cfg: IngestConfig, gcfg: GrammarConfig, graine:
     # L'anonymiseur a écrit chaque nombre ; ses valeurs servent aux opérandes.
     valeurs = table.valeurs()
     local = {p.prop_id: p.local for p in ex.propositions}
-    justifs = []
-    for i, j in b.justificatives:
-        if i >= len(ids) or j >= len(ids[i]):
-            raise Rejet("justificative hors du contexte")
-        if local[ids[i][j]] not in justifs:
-            justifs.append(local[ids[i][j]])
-    if b.abstention:
-        cible = ["ABSTENTION", "FIN"]
-    else:
-        if not justifs:
-            raise Rejet("aucune justificative")
-        cible = []
-        for k in justifs:
-            cible += (["ET"] if cible else []) + [f"P:{k}"]
-        if b.postfixe:
-            cible += ["DONC", "CALCUL", *_operandes(b.postfixe, ex, justifs, valeurs), "FIN_CALCUL"]
-        cible.append("FIN")
+    justifs = [local[p] for p in justificatives_de(b, ids)]
+    cible = cible_publique(b, ex, justifs, valeurs)
     ex = Exemple.model_validate(
         {
             **ex.model_dump(mode="json"),
