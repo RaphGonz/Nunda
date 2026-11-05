@@ -745,3 +745,17 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écart avec SPEC.md :**
   - Le §9 prévoit 0,4 à 0,6 milliard, puis 1,5 milliard. 360 M est la taille de SmolLM2 la plus proche, et l'étape à 1,5 milliard est abandonnée.
   - Pour réduire la durée sans changer de modèle : baisser `exemples_par_epoque` (200 000 aujourd'hui), ou ne pas faire A1. Raphael n'a choisi ni l'un ni l'autre.
+
+## 2026-11-05 — Phase 4 — Code de A0 (§9) et perte du §13
+- **Travail fait :** demande de Raphael. `ccm/model/a0.py`, `ccm/train/a0.py`, `tests/unit/test_a0.py` ; dépendance `peft` ajoutée (§3).
+  - **Tronc :** SmolLM2-360M (`AutoModel`, sans tête), LoRA rang 16, alpha 32, abandon 0,05 sur `q/k/v/o_proj` et `gate/up/down_proj` ; poids de base gelés.
+  - **Jetons nouveaux :** table propre (`Vocabulaire` de A0, avec l'en-tête [REL] déjà écrit par `encode`) ; l'entrée passe par `inputs_embeds`. `num_attr` : 4 tables ajoutées au vecteur du slot.
+  - **Deux passes :** l'entrée jusqu'avant [SORTIE] (cache gardé), puis la sortie. Vecteurs pointés : [/P] → linéaire → RMSNorm ; nombre et mention : état du slot. Après un pointeur : ⟨PT:X⟩ + `W_in` × vecteur pointé de la référence, gradient passant.
+  - **Têtes :** `W_lex` sur les 25 + synthèse de `LEXIQUE_COMPLET` ; pointeurs P, N, M à 256 dimensions avec τ et b par famille ; sélection sigmoïde sur `r_p`. Masque de l'automate appliqué aux logits.
+  - **Perte (§13) :** L_actions (pas de mention : −log de la somme des mentions autorisées du nom) + 0,5 · BCE de sélection, poids des positives = négatives / positives borné à 10.
+  - Optimiseur : AdamW (0,9 ; 0,999), 2e-4 LoRA, 1e-3 modules nouveaux, décroissance 0,01, norme bornée à 1,0, bf16 (autocast) sur GPU.
+- **Mesures :** surapprentissage voulu, 8 exemples synthétiques (dossier 0, chargeur, T 2 160 à 2 530), 200 pas d'un lot de 8 : perte 3,59 au pas 0, 1,20 au pas 10, 0,068 au pas 50, 1e-5 au pas 199. RTX 3090 : 705 s, environ 3,5 s par pas de 8 exemples, soit environ 5 400 jetons/s (bas de l'estimation du 2026-11-04 ; à remplacer par la mesure de 20 minutes).
+- **Décisions (SPEC.md muet, option la plus simple) :** un contexte par passe avant (accumulation pour le lot) ; tronc en float32 avec autocast bf16 ; pas d'échauffement dans l'essai de surapprentissage ; ni décodage glouton ni sauvegarde de point de contrôle (pas dans la tâche).
+- **Écarts avec SPEC.md :** aucun.
+- **Tests :** `make test` : 359 passés, 1 ignoré, 1 désélectionné. 3 tests nouveaux sur un petit LLaMA tiré au hasard (CPU) : formes et gradients, pointeur de nom, surapprentissage.
+- **Suite prévue :** décodage glouton sous masque, points de contrôle, essai à blanc du §13 (200 pas sur 1 000 exemples) et mesure du débit de 20 minutes.
