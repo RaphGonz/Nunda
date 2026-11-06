@@ -819,3 +819,21 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Il n'y a pas de jeu de validation pour choisir le meilleur point de contrôle.
 - **Tests :** `make test` : 363 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** nuit 1 de A0 (`make nuit`), puis lecture du tableau (vitesse réelle, perte par source) ; nuits 2 et 3.
+
+## 2026-11-06 — Phase 4 — A0 : nuit 1 lancée, mesures de validation (§2, §14)
+- **Demande de Raphael :** lancer la première époque, puis les mesures ; il filme demain.
+- **Nuit 1 :** `make nuit` lancé à 20 h 14 (`runs/2026-11-06-a0/`). Un `ccm ingest` lancé en parallèle a pris le GPU (24,2 Go) et ralenti l'entraînement de 0,27 à 0,11 pas/s ; arrêté au bout de 10 min. Même chose avec `make test` (un processus de test sur le GPU malgré `CUDA_VISIBLE_DEVICES` vide), arrêté aussi. **Rien d'autre ne doit tourner sur le GPU pendant une nuit.**
+- **Travail fait :**
+  - `ccm/model/decodeur.py` : `DecodeurA0`, décodage glouton sous le masque de l'automate, par lots groupés par longueur. Chaque pas réencode l'exemple avec le préfixe décodé (pas de cache : même calcul que l'entraînement). Même interface que `Oracle.decoder`.
+  - `ccm answer --modele POINT.pt` : A0 à la place de l'oracle, de bout en bout (recherche, anonymiseur, vérificateur). `--oracle DOSSIER` reste requis pour les questions et la vérité terrain.
+  - `ccm/eval/a0.py`, `make eval` : mesures sur 1 000 exemples synthétiques de validation (niveau 0) et 1 000 HotpotQA validation (distracteurs), tirés par le chargeur de l'entraînement (mêmes parts d'abstention, de conflit, de contrefactuel). Écrit `eval-<point>/rapport.md`, `resultats.json`, `suites.jsonl` à côté du point de contrôle.
+  - Partie de validation du corpus niveau 0 écrite dans `runs/corpus/niveau0-val/` (200 dossiers, 8 000 questions), pour ne pas écraser `controle.json` de `niveau0`.
+  - `runs/apres-nuit.ps1` (hors git) : attend la ligne « arret » de la nuit, lance `make eval`, puis ingère `syn-1000000` dans `runs/demo/` pour la démonstration, puis `make test` (`runs/test-apres-nuit.log`).
+  - Test `test_decodeur_glouton` : suites acceptées par l'automate, identiques à chaque appel, premier pas = argmax permis de la passe d'entraînement.
+- **Essai de la chaîne :** sur `runs/2026-11-06-a0-essai/pas-200.pt`, en CPU, 4 + 4 exemples : 14 s, rapport écrit. Le modèle de 200 pas s'abstient sur le synthétique et cite P:0 sur HotpotQA : attendu à ce stade.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - F1 de citation : moyenne par question sur les questions qui ont une réponse (convention de HotpotQA). Abstention : part des ABSTENTION sur les questions sans réponse de référence.
+  - Mesures sur la validation, jamais sur le test. La mesure finale de la phase se fera une seule fois sur le test.
+- **Écarts avec SPEC.md :** pas de `eval/report.py` commun ; le rapport de A0 est écrit par `ccm/eval/a0.py`.
+- **Tests :** `ruff` propre ; `tests/unit/test_a0.py` : 7 passés. **`make test` complet pas encore passé** : lancé automatiquement après la nuit, pour ne pas toucher au GPU.
+- **Suite prévue :** vérifier `runs/test-apres-nuit.log` ; lire `runs/2026-11-06-a0/eval-pas-*/rapport.md` et `tableau.md` après la nuit 1 ; nuits 2 et 3.
