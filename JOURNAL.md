@@ -778,3 +778,44 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** aucun.
 - **Tests :** `make test` : 361 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** chargeur en processus parallèles, rotation des points de contrôle tous les 2 000 pas (garder les 3 derniers et le meilleur), puis lancement de A0.
+
+## 2026-11-06 — Phase 4 — A0 : débit doublé, préchargement des 3 époques, source de droit, lancement par nuits
+- **Demande de Raphael :** les 65 h prévues sont trop longues. Il veut tout charger aujourd'hui, puis entraîner la nuit, **en 3 nuits**, avec du droit et des tableaux de suivi. Une époque de 9 h au lieu de 8 lui convient.
+- **Débit du GPU :**
+  - **Diagnostic :** à un contexte par passe, le GPU attendait 45 % du temps, à cause des lancements de noyaux (0,23 s de calcul pour 0,41 s par contexte). Mettre le tronc en bf16 seul ne change rien : 2,56 contre 2,52 contextes/s.
+  - **Correctif :** `ModeleA0.lot` passe plusieurs contextes à la fois, complétés à droite, avec un masque d'attention et les positions propres à chacun. Un test vérifie que le lot donne les mêmes logits que les contextes un par un. Les contextes de chaque pas sont groupés par longueur, en paquets de 8 000 jetons au plus (`JETONS_LOT`). Les poids gelés du tronc sont en bf16 ; LoRA et les modules nouveaux restent en float32.
+  - **Mesures (RTX 3090) :** 6 000 jetons par paquet : 4,74 ctx/s ; **8 000 : 5,09 ctx/s, 17 Go** ; 10 000 : 0,82 ctx/s, car la mémoire déborde dans la RAM partagée de Windows.
+- **Durée :** décision de Raphael, **145 000 exemples par époque** au lieu de 200 000 (`configs/finetune.yaml`, valeur de départ). Une époque fait 9 062 pas de 16 contextes, soit **environ 8 h à 5,1 ctx/s**. 3 époques font **3 nuits, environ 24 h**. `lancer` fait une époque entière par nuit, sans limite d'heure.
+- **Préchargement (`ccm/train/precharger.py`) :**
+  - Les 3 époques du chargeur sont écrites d'avance dans `D:/Nunda-donnees/tirages/a0/epoque-E/<source>-NNNN.pkl`, par paquets de 1 000 places : **441 paquets, 67 Go**, fini à 12 h 51.
+  - Il y a un groupe de processus par source, qui ne charge que sa source : avec toutes les sources dans chaque processus, 8 processus épuisaient les 32 Go de RAM.
+  - La place et le tirage d'un exemple ne dépendent que de la graine et de la taille de sa source. Le plan est donc le même qu'avec le chargeur en ligne : les places de chaque époque sont tirées de nouveau (§12). `lire(e)` fusionne les sources dans l'ordre des places, et refuse une époque incomplète.
+  - **Exemples gardés / places :** synthétique 174 000 / 174 000 ; hotpot 86 983 / 87 000 ; PIAF 65 250 / 65 250 ; droit 65 250 / 65 250 ; SQuAD 21 750 / 21 750 ; FinQA, environ 5 % sautés (703 sur les 13 000 places relevées).
+  - **Deux pannes corrigées :**
+    - Un `Rejet` levé dans `Source.cas` faisait tomber le chargeur ; la question est maintenant sautée.
+    - D: est un **disque dur** : les lectures au hasard du cache de détection, depuis plusieurs processus, bloquaient hotpot (11 % de CPU, aucun paquet en 45 min). `ZonesCache` copie maintenant le cache en mémoire.
+- **Source Légifrance et Judilibre (`ccm/data/droit_questions.py`) :**
+  - 20 004 questions gardées par l'enseignant : Légifrance 10 003, Judilibre 10 001. Les passages sont lus dans `droit.sqlite`.
+  - Chaque question a son passage, plus 3 passages d'autres questions de la même source, tirés par la graine, comme distracteurs.
+  - Les justificatives sont dans l'ordre de l'enseignant.
+  - Ses connecteurs (ET 17 888, MAIS 1 528, PAR_AILLEURS 460, EN_REVANCHE 79) sont gardés s'il y en a un de moins que de justificatives, sinon ET partout. 4 110 questions sont dans ce second cas. Champ `Brut.connecteurs`, test `test_connecteurs_de_l_enseignant`.
+  - Détection des noms : chaîne française, 108 849 textes, cache `cache-zones-droit.sqlite`.
+- **Lancement (`make nuit`) :**
+  - `python -m ccm.train.a0 lancer` lit les exemples préchargés, fait une époque entière, puis s'arrête.
+  - Point de contrôle tous les 2 000 pas et à la fin. Il garde les 3 derniers et `meilleur.pt`, choisi sur la perte d'entraînement moyenne des 2 000 derniers pas (il n'y a pas encore de jeu de validation).
+  - Après une panne, `make nuit` reprend au dernier point de contrôle, au même exemple. Pas de mise en veille pendant l'entraînement.
+  - La perte de chaque contexte est écrite par source et par genre.
+  - Raphael lance lui-même chaque soir : pas de tâche programmée.
+- **Tableaux (`make tableau`, `ccm/train/tableau.py`) :** `runs/<date>-a0/tableau.md`, refait à la fin de chaque nuit. Il donne :
+  - les nuits : horaires, pas, contextes/s, jetons/s, perte ;
+  - l'avancement, avec une prévision ;
+  - la perte par tranche de 1 000 pas, au total et pour chacune des 6 sources ;
+  - les points de contrôle.
+- **Essai de 3 minutes sur les vraies données :** les 6 sources sont présentes. Perte de la fenêtre : 3,17 au pas 20, puis 2,48 au pas 40. Reprise après panne vérifiée (pas 44 → 51). Vitesse 4,37 ctx/s, mais pendant le préchargement, qui occupait le CPU. Le GPU dépend du CPU pour lancer ses noyaux. La vraie vitesse sera lue dans le tableau de la nuit 1.
+- **Décisions (SPEC.md muet, option la plus simple) :** distracteurs du droit tirés dans la même source ; toutes les questions du droit vont à l'entraînement (pas de validation de droit) ; meilleur point de contrôle choisi sur la perte d'entraînement.
+- **Écarts avec SPEC.md :**
+  - 145 000 exemples par époque au lieu de 200 000, sur décision de Raphael.
+  - Le conflit supposé et le faux conflit du droit (§12) ne sont pas faits.
+  - Il n'y a pas de jeu de validation pour choisir le meilleur point de contrôle.
+- **Tests :** `make test` : 363 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** nuit 1 de A0 (`make nuit`), puis lecture du tableau (vitesse réelle, perte par source) ; nuits 2 et 3.
