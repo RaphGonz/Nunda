@@ -92,3 +92,29 @@ def test_surapprentissage(tirages):
     m = _modele()
     pertes = entrainer(m, tirages, 60, accumulation=len(tirages), lr_lora=2e-3, lr_nouveaux=1e-2)
     assert pertes[-1] < 0.3 * pertes[0], pertes[::10]
+
+
+def test_point_de_controle(tirages, tmp_path):
+    """§13 : un point de contrôle se recharge (mêmes pertes) et la reprise suit le même
+    chemin que l'entraînement sans arrêt."""
+    from ccm.model.a0 import optimiseur
+    from ccm.train.a0 import ordonnanceur, pertes_eval, recharger, sauver
+
+    def neuf(graine):
+        m = _modele(graine)
+        o = optimiseur(m)
+        return m, o, ordonnanceur(o, 4)
+
+    m, o, s = neuf(0)
+    entrainer(m, tirages, 3, 2, opt=o, sched=s)
+    sauver(tmp_path / "pc.pt", m, o, s, 3)
+    torch.manual_seed(5)
+    suite = entrainer(m, tirages, 2, 2, opt=o, sched=s, debut=3)
+
+    m2, o2, s2 = neuf(1)
+    m2.load_state_dict({k: v for k, v in _modele(0).state_dict().items()
+                        if "lora" not in k and "tronc" in k}, strict=False)  # fmt: skip
+    assert recharger(tmp_path / "pc.pt", m2, o2, s2) == 3
+    torch.manual_seed(5)
+    assert entrainer(m2, tirages, 2, 2, opt=o2, sched=s2, debut=3) == pytest.approx(suite, abs=1e-5)
+    assert pertes_eval(m2, tirages) == pytest.approx(pertes_eval(m, tirages), abs=1e-6)
