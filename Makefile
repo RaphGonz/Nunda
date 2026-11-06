@@ -20,9 +20,9 @@ test-complet:
 	$(MAKE) test
 	$(MAKE) test-t11
 
-# Une nuit d'entraînement de A0 (8 h au plus, une époque), puis les tableaux (§13).
+# Une nuit d'entraînement de A0 (une époque, environ 8 à 9 h), puis les tableaux (§13).
 nuit:
-	uv run --locked python -m ccm.train.a0 lancer 8 >> runs/nuit.log 2>&1
+	uv run --locked python -m ccm.train.a0 lancer >> runs/nuit.log 2>&1
 	uv run --locked python -m ccm.train.tableau
 
 tableau:

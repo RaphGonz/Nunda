@@ -44,14 +44,14 @@ def tableau(run: Path, total: int, par_nuit: int) -> str:
         n = len(ps)
         debut = sum(p["perte"] for p in ps[:100]) / min(100, n)
         fin = sum(p["perte"] for p in ps[-100:]) / min(100, n)
-        arret = ("fin d'époque" if a["fin_epoque"] else "heure") if a else "en cours ou panne"
+        arret = "fin d'époque" if a else "en cours ou panne"
         rangs.append([rp["nuit"], rp.get("heure", "–"), a["heure"] if a else "–",
                       f"{ps[0]['pas']}–{ps[-1]['pas']}", n, f"{16 * n / sec:.2f}",
                       f"{sum(p['jetons'] for p in ps) / sec:.0f}", f"{debut:.3f} → {fin:.3f}",
-                      rp["pas_sautes"], arret])  # fmt: skip
+                      arret])  # fmt: skip
     out += ["## Nuits", ""]
     out += _table(["nuit", "début", "fin", "pas", "nb pas", "contextes/s", "jetons/s",
-                   "perte (100 premiers → derniers)", "pas sautés", "arrêt"], rangs)  # fmt: skip
+                   "perte (100 premiers → derniers)", "arrêt"], rangs)  # fmt: skip
 
     # Avancement.
     fait = pas[-1]["pas"] + 1 if pas else 0
@@ -59,12 +59,11 @@ def tableau(run: Path, total: int, par_nuit: int) -> str:
     if rangs:
         ps = seances[-1]["pas"] or pas
         vitesse = len(ps) / max(1, ps[-1]["secondes"] - ps[0]["secondes"])
-    sautes = sum(s["reprise"]["pas_sautes"] for s in seances)
     reste = total - fait
     out += ["", "## Avancement", ""]
-    out += _table(["pas faits", "pas sautés", "total", "fait", "nuits faites", "nuits prévues",
+    out += _table(["pas faits", "total", "fait", "nuits faites", "nuits prévues",
                    "durée d'une époque à la vitesse actuelle"], [[
-        fait, sautes, total, f"{100 * fait / total:.1f} %", len(rangs), total // par_nuit,
+        fait, total, f"{100 * fait / total:.1f} %", len(rangs), total // par_nuit,
         f"{par_nuit / vitesse / 3600:.1f} h" if vitesse else "–"]])  # fmt: skip
     if vitesse:
         out += ["", f"Reste {reste} pas, soit {reste / vitesse / 3600:.1f} h à cette vitesse."]

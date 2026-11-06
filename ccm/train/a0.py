@@ -278,15 +278,13 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
     return bilan
 
 
-def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
-           echauffement: int = 500, tous_les: int = 2000, nom: str = "a0") -> None:  # fmt: skip
+def lancer(epoques: int = 3, accumulation: int = 16, echauffement: int = 500,
+           tous_les: int = 2000, nom: str = "a0") -> None:  # fmt: skip
     """Une nuit d'entraînement de A0 sur les exemples préchargés (`precharger`) : une époque
-    par nuit, jusqu'à sa fin ou jusqu'à `heures` (15 min gardées pour finir). Si l'heure
-    arrive avant la fin de l'époque, le reste est sauté : la nuit suivante commence l'époque
-    suivante, et `epoques` époques font `epoques` nuits. Point de contrôle tous les
-    `tous_les` pas et à l'arrêt ; les 3 derniers et le meilleur (perte moyenne la plus basse
-    sur les `tous_les` derniers pas) sont gardés. Après une panne (pas d'arrêt écrit), la
-    relance reprend au dernier point de contrôle, au même exemple."""
+    entière, puis arrêt. Point de contrôle tous les `tous_les` pas et à la fin ; les 3
+    derniers et le meilleur (perte moyenne la plus basse sur les `tous_les` derniers pas)
+    sont gardés. Après une panne, la relance reprend au dernier point de contrôle, au même
+    exemple, et finit l'époque en cours."""
     from ccm.config import load_config
     from ccm.model.a0 import charger_smollm
     from ccm.train.precharger import lire
@@ -300,8 +298,7 @@ def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
     total = epoques * par_epoque
 
     etat_f = run / "etat.json"
-    etat = json.loads(etat_f.read_text()) if etat_f.exists() else {}
-    meilleure = etat.get("meilleure", float("inf"))
+    meilleure = json.loads(etat_f.read_text())["meilleure"] if etat_f.exists() else float("inf")
     voc, _ = _tokenizer()
     torch.manual_seed(0)
     modele = charger_smollm(voc, SMOLLM).to("cuda")
@@ -309,36 +306,31 @@ def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
     sched = ordonnanceur(opt, echauffement)
     pcs = sorted(run.glob("pas-*.pt"))
     i = recharger(pcs[-1], modele, opt, sched) if pcs else 0
-    sautes = 0
-    if etat.get("nuit_finie") and i % par_epoque:  # l'heure est arrivée avant la fin
-        sautes = par_epoque - i % par_epoque
-        i += sautes
     if i >= total:
         print(f"{run.name} : entraînement fini ({i} pas)", flush=True)
         return
     e = i // par_epoque
     nuit = e + 1
-    ecrire(etape="reprise", pas=i, epoque=e, nuit=nuit, pas_sautes=sautes,
+    ecrire(etape="reprise", pas=i, epoque=e, nuit=nuit,
            point_de_controle=pcs[-1].name if pcs else None,
            heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
-    print(f"{run.name} : nuit {nuit}, époque {e}, reprise au pas {i} ({sautes} pas sautés)",
-          flush=True)  # fmt: skip
+    print(f"{run.name} : nuit {nuit}, époque {e}, reprise au pas {i}", flush=True)
 
-    def garder(nom_pc: str | None = None, nuit_finie: bool = False) -> None:
+    def garder(nom_pc: str | None = None) -> None:
         sauver(run / f"pas-{i:06d}.pt", modele, opt, sched, i)
         for vieux in sorted(run.glob("pas-*.pt"))[:-3]:
             vieux.unlink()
         if nom_pc:
             shutil.copy(run / f"pas-{i:06d}.pt", run / nom_pc)
-        etat_f.write_text(json.dumps({"pas": i, "meilleure": meilleure, "nuit_finie": nuit_finie}))
+        etat_f.write_text(json.dumps({"pas": i, "meilleure": meilleure}))
 
     if sys.platform == "win32":  # pas de mise en veille pendant la nuit
         import ctypes
 
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)
-    t0, fenetre, fin = time.time(), [], 3600 * heures - 900
+    t0, fenetre = time.time(), []
     flux = itertools.islice(lire(e), (i % par_epoque) * accumulation, None)
-    while i < (e + 1) * par_epoque and time.time() - t0 < fin:
+    while i < (e + 1) * par_epoque:
         lus = list(itertools.islice(flux, accumulation))
         if len(lus) < accumulation:  # époque plus courte (exemples sautés au préchargement)
             i = (e + 1) * par_epoque
@@ -364,9 +356,9 @@ def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
             garder(nom_pc)
             ecrire(etape="point_de_controle", pas=i, perte_fenetre=m, meilleur=nom_pc is not None)
             fenetre = []
-    garder(nuit_finie=True)
+    garder()
     ecrire(etape="arret", pas=i, epoque=e, nuit=nuit, secondes=time.time() - t0,
-           fin_epoque=i >= (e + 1) * par_epoque, fini=i >= total,
+           fini=i >= total,
            heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
     print(f"nuit {nuit} finie au pas {i} sur {total}", flush=True)
 
