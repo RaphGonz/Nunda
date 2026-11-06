@@ -308,7 +308,11 @@ class Chargeur:
         rng = random.Random(f"{self.cfg.graine}:{epoque}:{place}")
         u, complet = rng.random(), rng.random() < self.cfg.contexte_complet
         graine = rng.getrandbits(32)
-        cas = self.sources[source].cas(j)
+        try:
+            cas = self.sources[source].cas(j)
+        except (Rejet, KeyError, ValueError) as e:  # question qui ne se convertit pas
+            self.bilan[f"sauté : {type(e).__name__}"] += 1
+            return None
         genre, seuil = "normal", 0.0
         for nom, part in zip(GENRES, (self.cfg.abstention, self.cfg.conflit_injecte,
                                       self.cfg.contrefactuel), strict=True):  # fmt: skip
