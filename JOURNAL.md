@@ -759,3 +759,22 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** aucun.
 - **Tests :** `make test` : 359 passés, 1 ignoré, 1 désélectionné. 3 tests nouveaux sur un petit LLaMA tiré au hasard (CPU) : formes et gradients, pointeur de nom, surapprentissage.
 - **Suite prévue :** décodage glouton sous masque, points de contrôle, essai à blanc du §13 (200 pas sur 1 000 exemples) et mesure du débit de 20 minutes.
+
+## 2026-11-06 — Phase 4 — A0 : essai à blanc et mesure du débit (§13)
+- **Travail fait :** `ccm/train/a0.py` : échauffement linéaire (500 pas), lot de 16 contextes par accumulation, points de contrôle (`sauver`, `recharger` : poids entraînés seulement, optimiseur, ordonnanceur, pas ; reprise au même exemple). `python -m ccm.train.a0 essai` : essai à blanc, rechargement dans un modèle neuf, puis 20 minutes de débit. Dossier `runs/2026-11-06-a0-essai/` : configs, commit, paquets, `metrics.jsonl`, `bilan.json`, `pas-200.pt`. Tests ajoutés : `test_point_de_controle` (reprise = même chemin, mêmes pertes), `test_perte_sans_proposition`.
+- **Correction :** au premier essai, 9 pas sur 200 avaient une perte NaN. Ils contenaient un exemple d'abstention à contexte vide (P = 0), où la BCE de sélection est la moyenne d'un tenseur vide. Sans proposition, la perte de sélection vaut maintenant 0. Les poids n'étaient pas touchés, car aucun gradient n'était NaN. Ce premier essai est gardé dans `metrics-essai1-nan.jsonl`.
+- **Mesures (RTX 3090, SmolLM2-360M + LoRA, bf16) :**
+  - **Données :** 1 000 exemples réels de l'époque 0 (synthétique sur 20 dossiers rédigés en mémoire, HotpotQA, PIAF, FinQA, SQuAD). T moyen 1 504 jetons. Chargement 283 s, soit 0,28 s par exemple en un processus.
+  - **Essai à blanc :** 200 pas × 16 contextes, 1 244 s. Perte moyenne 3,19 sur les 20 premiers pas, 1,67 sur les 20 derniers, aucun NaN. **La perte baisse.**
+  - **Point de contrôle :** rechargé dans un modèle neuf. Écart des pertes sur 8 exemples : 0,0. Pas relu : 200.
+  - **Débit (20 min, 193 pas) :** 2,57 contextes/s, 3 858 jetons/s, mémoire max 9,2 Go.
+  - T1 : en A, l'écart est une mesure et non un test (§14). Il n'est pas mesuré ce soir.
+- **Durée prévue de A0 :** 3 époques × 200 000 contextes ÷ 2,57/s = **65 h, soit 2,7 jours**. C'est sous les 3 jours visés et sous les 5 jours du §15. Cela fait environ 8 nuits de 8 h.
+  - La mesure est plus lente que l'estimation du 2026-11-04 (28 h) : 3 858 jetons/s au lieu de 5 000 à 11 000.
+  - Le chargeur demande 0,28 s de CPU par exemple, et le GPU en consomme un toutes les 0,39 s. Il faut au moins 1 processus de chargement en parallèle de l'entraînement, 2 pour avoir de la marge.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - Après l'échauffement, le pas d'apprentissage reste constant : le §13 ne fixe pas de décroissance pour la phase 4.
+  - La mesure du débit réutilise les 1 000 exemples de l'essai, pris en boucle, avec la même répartition des longueurs.
+- **Écarts avec SPEC.md :** aucun.
+- **Tests :** `make test` : 361 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** chargeur en processus parallèles, rotation des points de contrôle tous les 2 000 pas (garder les 3 derniers et le meilleur), puis lancement de A0.
