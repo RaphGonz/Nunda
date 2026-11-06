@@ -35,9 +35,11 @@ class Resultat:
 def repondre(
     con: sqlite3.Connection, index: Index, oracle: Oracle, q: Question, cfg: IngestConfig,
     cfg_s: SearchConfig, gcfg: GrammarConfig, vcfg: VerifyConfig, *, conv_id: str,
-    synthese: bool = False, graine: int = 0,
+    synthese: bool = False, graine: int = 0, modele=None,
 ) -> Resultat:  # fmt: skip
-    """Réponse vérifiée à la question `q` (message et historique du dossier de l'oracle)."""
+    """Réponse vérifiée à la question `q` (message et historique du dossier de l'oracle).
+    `modele` : décodeur à la place de l'oracle (`DecodeurA0`), même interface."""
+    dec_ = modele or oracle
     msg = lire_message(q.message.texte, con, cfg)
     precedentes = [lire_message(t.texte, con, cfg) for t in q.historique
                    if t.role == "UTILISATEUR" and t.texte]  # fmt: skip
@@ -56,11 +58,11 @@ def repondre(
                         conv_id=conv_id, citees=citees, id=q.id)  # fmt: skip
         valeurs = table.valeurs()
         ctx = Contexte.depuis_exemple(ex, valeurs, cfg.conflits.negation, oracle.vocabulaire)
-        dec = oracle.decoder(con, q, ex, msg, ctx, cfg, gcfg, synthese=synthese, relance=relance)
+        dec = dec_.decoder(con, q, ex, msg, ctx, cfg, gcfg, synthese=synthese, relance=relance)
         e = Entree(ex, valeurs, msg, historique, conv_id=conv_id, reponse_id=rid)
         out.tours.append(Tour(e, dec.suite, dec.raison))
         return verifier(con, e, dec.suite, cfg, gcfg, vcfg, synthese=synthese,
-                        vocabulaire=oracle.vocabulaire, modele=oracle.nom,
+                        vocabulaire=oracle.vocabulaire, modele=dec_.nom,
                         relancer=None if relance else lambda: tour(True))  # fmt: skip
 
     out.reponse = tour(False)

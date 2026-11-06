@@ -216,6 +216,9 @@ def answer(
     conv: Annotated[str | None, typer.Option(help="Conversation (contraintes).")] = None,
     graine: Annotated[int, typer.Option(help="Graine de la table de la conversation.")] = 0,
     suite: Annotated[bool, typer.Option(help="Affiche aussi les pas du modèle.")] = False,
+    modele: Annotated[
+        Path | None, typer.Option(help="Point de contrôle de A0 à la place de l'oracle.")
+    ] = None,
 ) -> None:
     """Répond de bout en bout : recherche, anonymiseur, modèle, vérificateur (§2, §11)."""
     import sys
@@ -228,7 +231,7 @@ def answer(
     from ccm.search.bm25 import charger_index, dossier_index
 
     if oracle is None:
-        raise typer.BadParameter("seul le modèle oracle existe (phase 3) : --oracle DOSSIER")
+        raise typer.BadParameter("--oracle DOSSIER requis : questions et vérité terrain du dossier")
     if not stock.exists():
         raise typer.BadParameter(f"base absente : {stock}")
     if question is None and id is None:
@@ -243,7 +246,13 @@ def answer(
     try:
         index = charger_index(dossier_index(stock))
         conv = conv or uuid.uuid4().hex
-        r = repondre(con, index, o, q, *cfgs, conv_id=conv, synthese=synthese, graine=graine)
+        dec = None
+        if modele is not None:
+            from ccm.model.decodeur import charger_decodeur
+
+            dec = charger_decodeur(modele)
+        r = repondre(con, index, o, q, *cfgs, conv_id=conv, synthese=synthese, graine=graine,
+                     modele=dec)  # fmt: skip
     finally:
         con.close()
     if hasattr(sys.stdout, "reconfigure"):
