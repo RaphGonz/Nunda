@@ -147,7 +147,9 @@ def perte(sortie: Sortie, enc: Encodage, justificatives: list[int]) -> dict[str,
     y[torch.as_tensor(justificatives, dtype=torch.long, device=dev)] = 1
     pos = y.sum()
     poids = ((len(y) - pos) / pos).clamp(max=10) if pos else torch.ones((), device=dev)
-    selection = F.binary_cross_entropy_with_logits(sel, y, pos_weight=poids)
+    selection = (
+        F.binary_cross_entropy_with_logits(sel, y, pos_weight=poids) if len(y) else sel.sum()
+    )  # aucune proposition (contexte vide) : pas de perte
     return {"total": actions + 0.5 * selection, "actions": actions, "selection": selection}
 
 

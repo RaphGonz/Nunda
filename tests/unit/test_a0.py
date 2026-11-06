@@ -118,3 +118,11 @@ def test_point_de_controle(tirages, tmp_path):
     torch.manual_seed(5)
     assert entrainer(m2, tirages, 2, 2, opt=o2, sched=s2, debut=3) == pytest.approx(suite, abs=1e-5)
     assert pertes_eval(m2, tirages) == pytest.approx(pertes_eval(m, tirages), abs=1e-6)
+
+
+def test_perte_sans_proposition(tirages):
+    """Contexte vide (abstention, P = 0) : la perte de sélection vaut 0, pas NaN."""
+    t = tirages[0]
+    s = _modele()(t.encodage)
+    p = perte(Sortie(s.logits, s.selection[:0]), t.encodage, [])
+    assert p["selection"].item() == 0 and torch.isfinite(p["total"])

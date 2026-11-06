@@ -10,6 +10,7 @@ les paquets, `metrics.jsonl` et le point de contrôle.
 import datetime
 import itertools
 import json
+import pickle
 import shutil
 import subprocess
 import sys
@@ -157,12 +158,25 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
     voc, decouper = _tokenizer()
 
     t0 = time.time()
-    ch = chargeur_reel(voc, decouper)
-    tirages = list(itertools.islice(ch.epoque(0, int(exemples * 1.1)), exemples))
+    cache = run / "tirages.pkl"  # mêmes exemples d'un essai à l'autre (époque 0, graine fixée)
+    ch = None if cache.exists() else chargeur_reel(voc, decouper)
+    tirages = (
+        pickle.loads(cache.read_bytes())
+        if ch is None
+        else list(itertools.islice(ch.epoque(0, int(exemples * 1.1)), exemples))
+    )
+    if ch is not None:
+        cache.write_bytes(pickle.dumps(tirages))
     t_donnees = time.time() - t0
     longueurs = sorted(len(t.encodage.input_ids) for t in tirages)
-    ecrire(etape="donnees", exemples=len(tirages), secondes=t_donnees, bilan=dict(ch.bilan),
-           jetons_moyen=sum(longueurs) / len(longueurs), jetons_max=longueurs[-1])  # fmt: skip
+    ecrire(
+        etape="donnees",
+        exemples=len(tirages),
+        secondes=t_donnees,
+        bilan=dict(ch.bilan) if ch else None,
+        jetons_moyen=sum(longueurs) / len(longueurs),
+        jetons_max=longueurs[-1],
+    )
     moyen = sum(longueurs) / len(longueurs)
     print(f"{len(tirages)} exemples en {t_donnees:.0f} s ; T moyen {moyen:.0f}", flush=True)
 
@@ -199,7 +213,8 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
     torch.cuda.empty_cache()
     ecrire(etape="point_de_controle", pas=pas_relu, ecart_max=ecart, avant=avant, apres=apres)
     print(
-        f"perte {debut:.3f} → {fin:.3f} ; point de contrôle rechargé, écart {ecart:.2e}", flush=True
+        f"perte {debut:.3f} -> {fin:.3f} ; point de contrôle rechargé, écart {ecart:.2e}",
+        flush=True,
     )
 
     # 3. Débit : `minutes` d'entraînement à pleine taille (lot de 16 contextes).
@@ -229,7 +244,7 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
         "jetons_par_s": jetons / duree, "memoire_max_go": torch.cuda.max_memory_allocated() / 2**30
         if dev == "cuda" else 0.0,
         "exemples_par_epoque": par_epoque, "epoques": epoques, "duree_totale_h": total_h,
-        "secondes_chargeur_par_exemple": t_donnees / len(tirages),
+        "secondes_chargeur_par_exemple": t_donnees / len(tirages) if ch else None,
     }  # fmt: skip
     ecrire(etape="bilan", **bilan)
     (run / "bilan.json").write_text(json.dumps(bilan, indent=2))
