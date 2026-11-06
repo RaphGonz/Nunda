@@ -411,14 +411,14 @@ class ZonesCache:
         return _zones(r[0])
 
 
-def sources_disponibles(dcfg: DonneesConfig, icfg: IngestConfig, corpus: Path | None = None
-                        ) -> dict[str, Source]:  # fmt: skip
+def sources_disponibles(dcfg: DonneesConfig, icfg: IngestConfig, corpus: Path | None = None,
+                        seules: set[str] | None = None) -> dict[str, Source]:  # fmt: skip
     """Parties d'entraînement présentes sur le disque, mêmes lecteurs que `ccm convertir`.
     `corpus` : la partie d'entraînement du corpus synthétique (`worldgen.corpus`)."""
-    from ccm.data import finqa, hotpot, squad_fr
+    from ccm.data import droit_questions, finqa, hotpot, squad_fr
 
     brut, out = dcfg.racine / "brut", {}
-    if corpus is not None and corpus.exists():
+    if corpus is not None and corpus.exists() and (seules is None or "synthetique" in seules):
         out["synthetique"] = SourceSynthetique.depuis_corpus(corpus, icfg)
     lecteurs = {
         "hotpot": ("en", brut / "hotpot", lambda: hotpot.lire(brut / "hotpot", "train")),
@@ -430,7 +430,16 @@ def sources_disponibles(dcfg: DonneesConfig, icfg: IngestConfig, corpus: Path | 
             brut / "piaf" / "piaf-v1.2.json", "piaf", "fr", dcfg.distracteurs, dcfg.graine)),
     }  # fmt: skip
     for nom, (chaine, dossier, lire) in lecteurs.items():
+        if seules is not None and nom not in seules:
+            continue
         cache = dcfg.racine / f"cache-zones-{chaine}.sqlite"
         if dossier.exists() and cache.exists():
             out[nom] = SourcePublique(list(lire()), ZonesCache(cache), icfg)
+    cache = dcfg.racine / droit_questions.CACHE
+    if (
+        (dcfg.racine / droit_questions.QUESTIONS).exists()
+        and cache.exists()
+        and (seules is None or "droit" in seules)
+    ):
+        out["droit"] = SourcePublique(droit_questions.bruts(dcfg), ZonesCache(cache), icfg)
     return out

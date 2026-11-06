@@ -264,3 +264,16 @@ def test_abstention_synthetique_retire_tout_l_evenement(synthetique):
         if vus == 10:
             break
     assert vus == 10
+
+
+def test_connecteurs_de_l_enseignant():
+    """Droit (§12) : les connecteurs de l'enseignant relient les justificatives de la cible."""
+    b = Brut("droit-q", "legi", "fr", "Quel délai et quelle exception ?",
+             [["Le délai est de deux mois.", "Le texte s'applique partout.",
+               "Il ne s'applique pas aux mineurs."], ["Ada Lovelace a lu le texte."]],
+             [(0, 0), (0, 2)], connecteurs=["MAIS"])  # fmt: skip
+    ch = _chargeur({"droit": SourcePublique([b], zones, CFG)}, abstention=0.0,
+                   conflit_injecte=0.0, contrefactuel=0.0, contexte_complet=1.0)  # fmt: skip
+    t = ch.exemple("droit", 0, 0, 0)
+    _dans_son_masque(t)
+    assert t.exemple.cible[:3] == ["P:0", "MAIS", "P:2"], t.exemple.cible

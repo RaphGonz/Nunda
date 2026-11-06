@@ -69,6 +69,7 @@ class Brut:
     postfixe: list[str] | None = None
     genres: list[GenreProposition] | None = None  # genre de chaque paragraphe
     temoins: list[str] = field(default_factory=list)
+    connecteurs: list[str] | None = None  # entre justificatives ; ET partout si None
 
 
 # Nombres et dates de l'anglais (les formats de `ingest.numbers` sont français : « 5,829 »
@@ -241,8 +242,9 @@ def cible_publique(b: Brut, ex: Exemple, justifs: list[int], valeurs: dict[int, 
     if not justifs:
         raise Rejet("aucune justificative")
     cible = []
-    for k in justifs:
-        cible += (["ET"] if cible else []) + [f"P:{k}"]
+    for i, k in enumerate(justifs):
+        lien = b.connecteurs[i - 1] if b.connecteurs else "ET"
+        cible += ([lien] if cible else []) + [f"P:{k}"]
     if b.postfixe:
         cible += ["DONC", "CALCUL", *_operandes(b.postfixe, ex, justifs, valeurs), "FIN_CALCUL"]
     return [*cible, "FIN"]

@@ -6,7 +6,7 @@ description: "Réglage fin (SPEC.md §13)."
 # 80 000 exemples synthétiques (§12) pour une part de 40 %.
 chargeur:
   graine: 0
-  exemples_par_epoque: 200000
+  exemples_par_epoque: 145000  # 3 nuits de 8 h à 5,1 contextes/s (Raphael, 2026-11-06)
   poids:  # SPEC.md §12, « Données de réglage fin » ; TAB : évaluation seulement
     synthetique: 0.40
     hotpot: 0.20
