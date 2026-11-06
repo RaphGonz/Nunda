@@ -24,6 +24,7 @@ from ccm.model.a0 import ModeleA0, optimiseur, perte
 from ccm.train.chargeur import Tirage
 
 SMOLLM = "HuggingFaceTB/SmolLM2-360M"
+JETONS_LOT = 8000  # RTX 3090 : 5,1 contextes/s ; 10 000 déborde de la mémoire
 
 
 def ordonnanceur(
@@ -34,9 +35,24 @@ def ordonnanceur(
     return torch.optim.lr_scheduler.LambdaLR(opt, lambda i: min(1.0, (i + 1) / echauffement))
 
 
+def paquets(tirages: Sequence[Tirage], jetons: int | None) -> list[list[Tirage]]:
+    """Contextes d'un pas groupés par longueur ; un paquet complété à droite tient dans
+    `jetons` (None : un contexte par passe)."""
+    if jetons is None:
+        return [[t] for t in tirages]
+    out: list[list[Tirage]] = []
+    for t in sorted(tirages, key=lambda t: len(t.encodage.input_ids)):
+        n = len(t.encodage.input_ids)
+        if out and (len(out[-1]) + 1) * n <= jetons:
+            out[-1].append(t)
+        else:
+            out.append([t])
+    return out
+
+
 def entrainer(modele: ModeleA0, tirages: Sequence[Tirage], pas: int, accumulation: int = 1,
               journal: Callable[[int, float], None] | None = None, opt=None, sched=None,
-              debut: int = 0, **lr) -> list[float]:  # fmt: skip
+              debut: int = 0, jetons_lot: int | None = None, **lr) -> list[float]:  # fmt: skip
     """`pas` mises à jour à partir du pas `debut`, exemples pris en boucle (le pas i lit les
     exemples i·accumulation et suivants) ; rend la perte moyenne de chaque pas."""
     opt = opt or optimiseur(modele, **lr)
@@ -46,12 +62,14 @@ def entrainer(modele: ModeleA0, tirages: Sequence[Tirage], pas: int, accumulatio
     pertes = []
     for i in range(debut, debut + pas):
         total = 0.0
-        for k in range(i * accumulation, (i + 1) * accumulation):
-            t = tirages[k % len(tirages)]
+        lus = [tirages[k % len(tirages)] for k in range(i * accumulation, (i + 1) * accumulation)]
+        for paquet in paquets(lus, jetons_lot):
             with torch.autocast(dev.type, dtype=torch.bfloat16, enabled=bf16):
-                p = perte(modele(t.encodage), t.encodage, t.exemple.justificatives)
-            (p["total"] / accumulation).backward()
-            total += p["total"].item() / accumulation
+                sorties = modele.lot([t.encodage for t in paquet])
+                p = sum(perte(s, t.encodage, t.exemple.justificatives)["total"]
+                        for s, t in zip(sorties, paquet, strict=True))  # fmt: skip
+            (p / accumulation).backward()
+            total += p.item() / accumulation
         torch.nn.utils.clip_grad_norm_(modele.parameters(), 1.0)
         opt.step()
         opt.zero_grad(set_to_none=True)
@@ -194,7 +212,9 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
         if i % 10 == 0 or i == pas - 1:
             print(f"pas {i} perte {x:.4f}", flush=True)
 
-    pertes = entrainer(modele, tirages, pas, accumulation, journal, opt, sched)
+    pertes = entrainer(
+        modele, tirages, pas, accumulation, journal, opt, sched, jetons_lot=JETONS_LOT
+    )
     t_essai = time.time() - t0
     debut, fin = sum(pertes[:20]) / 20, sum(pertes[-20:]) / 20
 
@@ -223,7 +243,7 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
         torch.cuda.reset_peak_memory_stats()
     t0, i, contextes, jetons = time.time(), pas, 0, 0
     while time.time() - t0 < 60 * minutes:
-        p = entrainer(modele, tirages, 1, accumulation, None, opt, sched, debut=i)[0]
+        p = entrainer(modele, tirages, 1, accumulation, None, opt, sched, i, JETONS_LOT)[0]
         lus = [tirages[k % len(tirages)] for k in range(i * accumulation, (i + 1) * accumulation)]
         contextes += len(lus)
         jetons += sum(len(t.encodage.input_ids) for t in lus)

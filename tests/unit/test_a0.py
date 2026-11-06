@@ -126,3 +126,16 @@ def test_perte_sans_proposition(tirages):
     s = _modele()(t.encodage)
     p = perte(Sortie(s.logits, s.selection[:0]), t.encodage, [])
     assert p["selection"].item() == 0 and torch.isfinite(p["total"])
+
+
+def test_lot_egal_un_par_un(tirages):
+    """Plusieurs contextes complétés à droite en une passe : mêmes logits qu'un par un."""
+    m = _modele().eval()
+    with torch.no_grad():
+        seuls = [m(t.encodage) for t in tirages]
+        lot = m.lot([t.encodage for t in tirages])
+    for a, b in zip(seuls, lot, strict=True):
+        fini = torch.isfinite(a.logits)
+        assert torch.equal(fini, torch.isfinite(b.logits))
+        assert torch.allclose(a.logits[fini], b.logits[fini], atol=1e-4)
+        assert torch.allclose(a.selection, b.selection, atol=1e-4)

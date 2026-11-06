@@ -87,38 +87,64 @@ class ModeleA0(nn.Module):
         return x + sum(e(attr[:, i]) for i, e in enumerate(self.attributs))
 
     def forward(self, enc: Encodage) -> Sortie:
+        return self.lot([enc])[0]
+
+    def lot(self, encs: list[Encodage]) -> list[Sortie]:
+        """Plusieurs contextes en une passe : entrées complétées à droite, masque d'attention
+        sur les cases vides ; chaque contexte garde ses positions. Même résultat que un par un
+        (aux arrondis près) : un jeton réel ne voit jamais une case vide."""
         dev = self.lex.weight.device
         t = lambda a: torch.as_tensor(a, device=dev)  # noqa: E731
-        ids, attr = t(enc.input_ids), t(enc.num_attr).reshape(-1, 4)
-        if attr.max() >= ATTR_MAX:
-            raise ValueError(f"attribut {attr.max().item()} ≥ {ATTR_MAX}")
-        s0 = int((t(enc.segment) == 2).nonzero()[0])  # position de [SORTIE]
-        x = self.plonger(ids, attr)
+        L = len(LEXIQUE_COMPLET)
+        xs, s0s, cibles = [], [], []
+        for enc in encs:
+            ids, attr = t(enc.input_ids), t(enc.num_attr).reshape(-1, 4)
+            if attr.max() >= ATTR_MAX:
+                raise ValueError(f"attribut {attr.max().item()} ≥ {ATTR_MAX}")
+            xs.append(self.plonger(ids, attr))
+            s0s.append(int((t(enc.segment) == 2).nonzero()[0]))  # position de [SORTIE]
+            cibles.append(t(enc.cible))
+        B, l1 = len(encs), max(s0s)
+        l2 = max(len(x) - s0 for x, s0 in zip(xs, s0s, strict=True))
+        d, dt = xs[0].shape[1], xs[0].dtype
 
-        # Passe 1 : l'entrée.
-        o1 = self.tronc(inputs_embeds=x[None, :s0], use_cache=True)
-        h = o1.last_hidden_state[0]
-        r_p = self.prop(h[t(enc.fin_prop)])
-        h_n, h_m = h[t(enc.pos_nombre)], h[t(enc.pos_mention)]
-        pointes = torch.cat([r_p, h_n, h_m]).to(x.dtype)
+        # Passe 1 : les entrées.
+        x1 = xs[0].new_zeros(B, l1, d)
+        m1 = torch.zeros(B, l1, dtype=torch.long, device=dev)
+        for b, (x, s0) in enumerate(zip(xs, s0s, strict=True)):
+            x1[b, :s0], m1[b, :s0] = x[:s0], 1
+        o1 = self.tronc(inputs_embeds=x1, attention_mask=m1, use_cache=True)
+        hs = o1.last_hidden_state
 
-        # Passe 2 : la sortie ; un pointeur reçoit son genre + W_in × vecteur pointé.
-        L, S = len(LEXIQUE_COMPLET), len(enc.cible)
-        x2 = x[s0:]  # [SORTIE], puis les S pas de référence
-        cible = t(enc.cible)
-        pt = cible >= L
-        ajout = torch.zeros_like(x2[1:])
-        ajout[pt] = self.w_in(pointes[cible[pt] - L]).to(x2.dtype)
-        x2 = torch.cat([x2[:1], x2[1:] + ajout])
-        pos = torch.arange(s0, len(ids), device=dev)[None]
-        o2 = self.tronc(inputs_embeds=x2[None], past_key_values=o1.past_key_values,
-                        position_ids=pos, use_cache=False)  # fmt: skip
-        ht = o2.last_hidden_state[0, :S]
+        # Passe 2 : les sorties ; un pointeur reçoit son genre + W_in × vecteur pointé.
+        x2 = xs[0].new_zeros(B, l2, d)
+        m2 = torch.zeros(B, l2, dtype=torch.long, device=dev)
+        pos = torch.zeros(B, l2, dtype=torch.long, device=dev)
+        pointes = []
+        for b, (enc, x, s0, cible) in enumerate(zip(encs, xs, s0s, cibles, strict=True)):
+            h = hs[b, :s0]
+            r_p = self.prop(h[t(enc.fin_prop)])
+            h_n, h_m = h[t(enc.pos_nombre)], h[t(enc.pos_mention)]
+            pointes.append((r_p, h_n, h_m))
+            v = torch.cat([r_p, h_n, h_m]).to(dt)
+            pt = cible >= L
+            ajout = torch.zeros_like(x[s0 + 1 :])
+            ajout[pt] = self.w_in(v[cible[pt] - L]).to(dt)
+            n = len(x) - s0
+            x2[b, :n] = torch.cat([x[s0 : s0 + 1], x[s0 + 1 :] + ajout])
+            m2[b, :n] = 1
+            pos[b] = s0 + torch.arange(l2, device=dev)
+        o2 = self.tronc(inputs_embeds=x2, past_key_values=o1.past_key_values, position_ids=pos,
+                        attention_mask=torch.cat([m1, m2], 1), use_cache=False)  # fmt: skip
 
-        logits = torch.cat([self.lex(ht), self.p(ht, r_p), self.n(ht, h_n), self.m(ht, h_m)], 1)
-        if enc.masque is not None:
-            logits = logits.float().masked_fill(~t(enc.masque), float("-inf"))
-        return Sortie(logits, self.select(r_p).squeeze(-1))
+        out = []
+        for b, (enc, (r_p, h_n, h_m)) in enumerate(zip(encs, pointes, strict=True)):
+            ht = o2.last_hidden_state[b, : len(enc.cible)]
+            logits = torch.cat([self.lex(ht), self.p(ht, r_p), self.n(ht, h_n), self.m(ht, h_m)], 1)
+            if enc.masque is not None:
+                logits = logits.float().masked_fill(~t(enc.masque), float("-inf"))
+            out.append(Sortie(logits, self.select(r_p).squeeze(-1)))
+        return out
 
 
 def groupes(enc: Encodage) -> torch.Tensor:
@@ -166,7 +192,11 @@ def optimiseur(modele: ModeleA0, lr_lora=2e-4, lr_nouveaux=1e-3, decroissance=0.
 def charger_smollm(voc: Vocabulaire, nom: str = "HuggingFaceTB/SmolLM2-360M") -> ModeleA0:
     from transformers import AutoModel
 
-    tronc = AutoModel.from_pretrained(nom, dtype=torch.float32)
+    tronc = AutoModel.from_pretrained(nom, dtype=torch.bfloat16)  # poids de base gelés
     if tronc.get_input_embeddings().num_embeddings != voc.taille:
         raise ValueError("taille du tokenizer différente de celle du vocabulaire")
-    return ModeleA0(avec_lora(tronc), voc)
+    m = ModeleA0(avec_lora(tronc), voc)
+    for p in m.parameters():  # LoRA et modules nouveaux en float32 (AdamW)
+        if p.requires_grad:
+            p.data = p.data.float()
+    return m
