@@ -139,3 +139,23 @@ def test_lot_egal_un_par_un(tirages):
         assert torch.equal(fini, torch.isfinite(b.logits))
         assert torch.allclose(a.logits[fini], b.logits[fini], atol=1e-4)
         assert torch.allclose(a.selection, b.selection, atol=1e-4)
+
+
+def test_decodeur_glouton(tirages):
+    """Suites gloutonnes sous masque : acceptées par l'automate, mêmes à chaque appel (T9),
+    et le premier pas est l'argmax permis de la passe de l'entraînement."""
+    from ccm.grammar.automaton import Contexte, accepter
+    from ccm.model.decodeur import DecodeurA0
+
+    gcfg = load_config("grammar")
+    m = _modele()
+    items = [(t.exemple, Contexte.depuis_exemple(t.exemple, t.valeurs, CFG.conflits.negation))
+             for t in tirages]  # fmt: skip
+    dec = DecodeurA0(m, VOC, decouper, gcfg, jetons_lot=3000)
+    s1, s2 = dec.suites(items), dec.suites(items)
+    assert s1 == s2
+    for (_, ctx), s, t in zip(items, s1, tirages, strict=True):
+        assert accepter(ctx, s, gcfg)
+        with torch.no_grad():
+            lg = m(t.encodage).logits[0]
+        assert t.encodage.espace[int(lg.argmax())] == s[0]
