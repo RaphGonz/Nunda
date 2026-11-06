@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-t11 test-complet nuit tableau
+.PHONY: setup lint test test-t11 test-complet nuit tableau eval
 
 setup:
 	uv sync --locked
@@ -27,3 +27,6 @@ nuit:
 
 tableau:
 	uv run --locked python -m ccm.train.tableau
+
+eval:
+	uv run --locked python -m ccm.eval.a0 >> runs/eval.log 2>&1
