@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-t11 test-complet
+.PHONY: setup lint test test-t11 test-complet nuit tableau
 
 setup:
 	uv sync --locked
@@ -19,3 +19,11 @@ test-t11:
 test-complet:
 	$(MAKE) test
 	$(MAKE) test-t11
+
+# Une nuit d'entraînement de A0 (8 h au plus, une époque), puis les tableaux (§13).
+nuit:
+	uv run --locked python -m ccm.train.a0 lancer 8 >> runs/nuit.log 2>&1
+	uv run --locked python -m ccm.train.tableau
+
+tableau:
+	uv run --locked python -m ccm.train.tableau

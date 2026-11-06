@@ -401,14 +401,18 @@ class Chargeur:
 
 class ZonesCache:
     """Zones de noms lues dans un cache de la conversion (`publics.remplir_cache`) ;
-    connexion ouverte au premier appel (une par processus)."""
+    copié en mémoire au premier appel (une copie par processus) : sur un disque dur, des
+    lectures au hasard de plusieurs processus font attendre chacun."""
 
     def __init__(self, chemin: Path):
         self.chemin, self._con = chemin, None
 
     def __call__(self, texte: str):
         if self._con is None:
-            self._con = sqlite3.connect(f"file:{self.chemin.as_posix()}?mode=ro", uri=True)
+            disque = sqlite3.connect(f"file:{self.chemin.as_posix()}?mode=ro", uri=True)
+            self._con = sqlite3.connect(":memory:")
+            disque.backup(self._con)
+            disque.close()
         r = self._con.execute("SELECT valeur FROM zones WHERE cle = ?", (_cle(texte),)).fetchone()
         if r is None:
             raise Rejet("texte absent du cache de détection")

@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import time
+from collections import Counter
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
@@ -52,9 +53,11 @@ def paquets(tirages: Sequence[Tirage], jetons: int | None) -> list[list[Tirage]]
 
 def entrainer(modele: ModeleA0, tirages: Sequence[Tirage], pas: int, accumulation: int = 1,
               journal: Callable[[int, float], None] | None = None, opt=None, sched=None,
-              debut: int = 0, jetons_lot: int | None = None, **lr) -> list[float]:  # fmt: skip
+              debut: int = 0, jetons_lot: int | None = None, details: list | None = None,
+              **lr) -> list[float]:  # fmt: skip
     """`pas` mises à jour à partir du pas `debut`, exemples pris en boucle (le pas i lit les
-    exemples i·accumulation et suivants) ; rend la perte moyenne de chaque pas."""
+    exemples i·accumulation et suivants) ; rend la perte moyenne de chaque pas. `details`
+    reçoit (source, genre, perte) de chaque contexte."""
     opt = opt or optimiseur(modele, **lr)
     dev = modele.lex.weight.device
     bf16 = dev.type == "cuda"
@@ -66,8 +69,11 @@ def entrainer(modele: ModeleA0, tirages: Sequence[Tirage], pas: int, accumulatio
         for paquet in paquets(lus, jetons_lot):
             with torch.autocast(dev.type, dtype=torch.bfloat16, enabled=bf16):
                 sorties = modele.lot([t.encodage for t in paquet])
-                p = sum(perte(s, t.encodage, t.exemple.justificatives)["total"]
-                        for s, t in zip(sorties, paquet, strict=True))  # fmt: skip
+                ps = [perte(s, t.encodage, t.exemple.justificatives)["total"]
+                      for s, t in zip(sorties, paquet, strict=True)]  # fmt: skip
+                p = sum(ps)
+            if details is not None:
+                details += [(t.source, t.genre, x.item()) for t, x in zip(paquet, ps, strict=True)]
             (p / accumulation).backward()
             total += p.item() / accumulation
         torch.nn.utils.clip_grad_norm_(modele.parameters(), 1.0)
@@ -273,22 +279,29 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
 
 
 def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
-           echauffement: int = 500, tous_les: int = 2000) -> None:  # fmt: skip
-    """Entraînement de A0 sur les exemples préchargés (`precharger`), pour `heures` au plus :
-    point de contrôle tous les `tous_les` pas et à l'arrêt ; les 3 derniers et le meilleur
-    (perte moyenne d'entraînement la plus basse sur les `tous_les` derniers pas) sont gardés.
-    Une relance reprend au dernier point de contrôle, au même exemple."""
+           echauffement: int = 500, tous_les: int = 2000, nom: str = "a0") -> None:  # fmt: skip
+    """Une nuit d'entraînement de A0 sur les exemples préchargés (`precharger`) : une époque
+    par nuit, jusqu'à sa fin ou jusqu'à `heures` (15 min gardées pour finir). Si l'heure
+    arrive avant la fin de l'époque, le reste est sauté : la nuit suivante commence l'époque
+    suivante, et `epoques` époques font `epoques` nuits. Point de contrôle tous les
+    `tous_les` pas et à l'arrêt ; les 3 derniers et le meilleur (perte moyenne la plus basse
+    sur les `tous_les` derniers pas) sont gardés. Après une panne (pas d'arrêt écrit), la
+    relance reprend au dernier point de contrôle, au même exemple."""
     from ccm.config import load_config
     from ccm.model.a0 import charger_smollm
     from ccm.train.precharger import lire
 
     racine = Path(__file__).resolve().parents[2] / "runs"
-    anciens = sorted(racine.glob("*-a0"))
-    run = anciens[-1] if anciens else _dossier_run("a0")
+    anciens = sorted(racine.glob(f"*-{nom}"))
+    run = anciens[-1] if anciens else _dossier_run(nom)
     metrics = (run / "metrics.jsonl").open("a", encoding="utf-8")
     ecrire = lambda **k: (metrics.write(json.dumps(k) + "\n"), metrics.flush())  # noqa: E731
     par_epoque = load_config("finetune").chargeur.exemples_par_epoque // accumulation
+    total = epoques * par_epoque
 
+    etat_f = run / "etat.json"
+    etat = json.loads(etat_f.read_text()) if etat_f.exists() else {}
+    meilleure = etat.get("meilleure", float("inf"))
     voc, _ = _tokenizer()
     torch.manual_seed(0)
     modele = charger_smollm(voc, SMOLLM).to("cuda")
@@ -296,46 +309,66 @@ def lancer(heures: float = 8.0, epoques: int = 3, accumulation: int = 16,
     sched = ordonnanceur(opt, echauffement)
     pcs = sorted(run.glob("pas-*.pt"))
     i = recharger(pcs[-1], modele, opt, sched) if pcs else 0
-    etat = run / "etat.json"
-    meilleure = json.loads(etat.read_text())["meilleure"] if etat.exists() else float("inf")
-    ecrire(etape="reprise", pas=i, point_de_controle=pcs[-1].name if pcs else None)
-    print(f"{run.name} : reprise au pas {i}", flush=True)
+    sautes = 0
+    if etat.get("nuit_finie") and i % par_epoque:  # l'heure est arrivée avant la fin
+        sautes = par_epoque - i % par_epoque
+        i += sautes
+    if i >= total:
+        print(f"{run.name} : entraînement fini ({i} pas)", flush=True)
+        return
+    e = i // par_epoque
+    nuit = e + 1
+    ecrire(etape="reprise", pas=i, epoque=e, nuit=nuit, pas_sautes=sautes,
+           point_de_controle=pcs[-1].name if pcs else None,
+           heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
+    print(f"{run.name} : nuit {nuit}, époque {e}, reprise au pas {i} ({sautes} pas sautés)",
+          flush=True)  # fmt: skip
 
-    def garder(nom: str | None = None) -> None:
+    def garder(nom_pc: str | None = None, nuit_finie: bool = False) -> None:
         sauver(run / f"pas-{i:06d}.pt", modele, opt, sched, i)
         for vieux in sorted(run.glob("pas-*.pt"))[:-3]:
             vieux.unlink()
-        if nom:
-            shutil.copy(run / f"pas-{i:06d}.pt", run / nom)
-        etat.write_text(json.dumps({"pas": i, "meilleure": meilleure}))
+        if nom_pc:
+            shutil.copy(run / f"pas-{i:06d}.pt", run / nom_pc)
+        etat_f.write_text(json.dumps({"pas": i, "meilleure": meilleure, "nuit_finie": nuit_finie}))
 
-    t0, fenetre, fin = time.time(), [], 3600 * heures - 900  # 15 min pour finir
-    while i < epoques * par_epoque and time.time() - t0 < fin:
-        e = i // par_epoque
-        flux = itertools.islice(lire(e), (i % par_epoque) * accumulation, None)
-        while i < (e + 1) * par_epoque and time.time() - t0 < fin:
-            lus = list(itertools.islice(flux, accumulation))
-            if len(lus) < accumulation:  # époque plus courte (exemples sautés)
-                i = (e + 1) * par_epoque
-                break
-            p = entrainer(modele, lus, 1, accumulation, None, opt, sched, 0, JETONS_LOT)[0]
-            fenetre.append(p)
-            ecrire(etape="pas", pas=i, epoque=e, perte=p, lr=sched.get_last_lr()[0],
-                   secondes=time.time() - t0)  # fmt: skip
-            i += 1
-            if i % 100 == 0:
-                print(f"pas {i} époque {e} perte {sum(fenetre[-100:]) / 100:.4f}", flush=True)
-            if i % tous_les == 0:
-                m = sum(fenetre) / len(fenetre)
-                nom = None
-                if m < meilleure:
-                    meilleure, nom = m, "meilleur.pt"
-                garder(nom)
-                ecrire(etape="point_de_controle", pas=i, perte_fenetre=m, meilleur=nom is not None)
-                fenetre = []
-    garder()
-    ecrire(etape="arret", pas=i, secondes=time.time() - t0, fini=i >= epoques * par_epoque)
-    print(f"arrêt au pas {i} sur {epoques * par_epoque}", flush=True)
+    if sys.platform == "win32":  # pas de mise en veille pendant la nuit
+        import ctypes
+
+        ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)
+    t0, fenetre, fin = time.time(), [], 3600 * heures - 900
+    flux = itertools.islice(lire(e), (i % par_epoque) * accumulation, None)
+    while i < (e + 1) * par_epoque and time.time() - t0 < fin:
+        lus = list(itertools.islice(flux, accumulation))
+        if len(lus) < accumulation:  # époque plus courte (exemples sautés au préchargement)
+            i = (e + 1) * par_epoque
+            break
+        details: list = []
+        p = entrainer(modele, lus, 1, accumulation, None, opt, sched, 0, JETONS_LOT, details)[0]
+        par_source: dict[str, list[float]] = {}
+        for src, _, x in details:
+            par_source.setdefault(src, []).append(x)
+        fenetre.append(p)
+        ecrire(etape="pas", pas=i, epoque=e, perte=p, lr=sched.get_last_lr()[0],
+               secondes=time.time() - t0, jetons=sum(len(t.encodage.input_ids) for t in lus),
+               sources={k: sum(v) / len(v) for k, v in par_source.items()},
+               genres=dict(Counter(g for _, g, _ in details)))  # fmt: skip
+        i += 1
+        if i % 100 == 0:
+            print(f"pas {i} époque {e} perte {sum(fenetre[-100:]) / 100:.4f}", flush=True)
+        if i % tous_les == 0:
+            m = sum(fenetre) / len(fenetre)
+            nom_pc = None
+            if m < meilleure:
+                meilleure, nom_pc = m, "meilleur.pt"
+            garder(nom_pc)
+            ecrire(etape="point_de_controle", pas=i, perte_fenetre=m, meilleur=nom_pc is not None)
+            fenetre = []
+    garder(nuit_finie=True)
+    ecrire(etape="arret", pas=i, epoque=e, nuit=nuit, secondes=time.time() - t0,
+           fin_epoque=i >= (e + 1) * par_epoque, fini=i >= total,
+           heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
+    print(f"nuit {nuit} finie au pas {i} sur {total}", flush=True)
 
 
 def _huit_exemples(voc, decouper, n=8):
@@ -369,6 +402,6 @@ def surapprentissage(pas: int = 200) -> None:
 
 if __name__ == "__main__":
     commande, *args = sys.argv[1:] or ["essai"]
-    {"essai": essai, "surapprentissage": surapprentissage, "lancer": lancer}[commande](
-        *map(float, args)
-    )
+    fonctions = {"essai": essai, "surapprentissage": surapprentissage, "lancer": lancer}
+    lu = lambda a: int(a) if a.isdigit() else float(a) if a.replace(".", "").isdigit() else a  # noqa: E731
+    fonctions[commande](*map(lu, args))
