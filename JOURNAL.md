@@ -837,3 +837,13 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** pas de `eval/report.py` commun ; le rapport de A0 est écrit par `ccm/eval/a0.py`.
 - **Tests :** `ruff` propre ; `tests/unit/test_a0.py` : 7 passés. **`make test` complet pas encore passé** : lancé automatiquement après la nuit, pour ne pas toucher au GPU.
 - **Suite prévue :** vérifier `runs/test-apres-nuit.log` ; lire `runs/2026-11-06-a0/eval-pas-*/rapport.md` et `tableau.md` après la nuit 1 ; nuits 2 et 3.
+
+## 2026-11-07 — Phase 4 — A0 : bilan de la nuit 1 (§2, §14)
+- **Nuit 1 :** 20 h 14 → 05 h 24, pas 0 → 9 062 (époque 0 sur 3), 9,2 h. Perte de la tranche 9 000 : 0,384 (synthétique 0,136, hotpot 0,611).
+- **Mesures (`make eval`, validation, `pas-009062.pt`, 1 000 + 1 000 exemples, 900 s) :**
+  - Synthétique niveau 0 : F1 de citation **0,843** (seuil 0,90, non atteint) ; abstention **0,968** (seuil 0,85, atteint) ; abstention à tort 0,003 ; suites exactes 0,765. Point faible : conflits injectés, F1 0,661 (précision 0,528).
+  - HotpotQA distracteurs : F1 des faits justificatifs **0,696** (seuil 0,75, non atteint) ; abstention 0,746 ; abstention à tort 0,093.
+  - Ce n'est pas un essai documenté au sens du §15 : il reste 2 époques sur 3.
+- **Démonstration :** `ccm answer --modele runs/2026-11-06-a0/pas-009062.pt` fonctionne sur `runs/demo/syn-1000000.sqlite` (question q00 : conflit d'heure établi, P03/P07 contre P06), 24 s.
+- **Tests :** `make test` : 364 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** nuits 2 et 3 (`make nuit`), puis `make eval`.
