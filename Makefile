@@ -24,9 +24,11 @@ test-complet:
 nuit:
 	uv run --locked python -m ccm.train.a0 lancer >> runs/nuit.log 2>&1
 	uv run --locked python -m ccm.train.tableau
+	uv run --locked python -m ccm.train.courbe
 
 tableau:
 	uv run --locked python -m ccm.train.tableau
+	uv run --locked python -m ccm.train.courbe
 
 eval:
 	uv run --locked python -m ccm.eval.a0 >> runs/eval.log 2>&1
