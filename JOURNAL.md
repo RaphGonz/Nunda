@@ -847,3 +847,13 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Démonstration :** `ccm answer --modele runs/2026-11-06-a0/pas-009062.pt` fonctionne sur `runs/demo/syn-1000000.sqlite` (question q00 : conflit d'heure établi, P03/P07 contre P06), 24 s.
 - **Tests :** `make test` : 364 passés, 1 ignoré, 1 désélectionné.
 - **Suite prévue :** nuits 2 et 3 (`make nuit`), puis `make eval`.
+
+## 2026-11-08 — Phase 4 — A0 : bilan de la nuit 2 (§2, §14)
+- **Nuit 2 :** 21 h 38 → 06 h 28, pas 9 062 → 18 124 (époque 1 sur 3), 4,54 contextes/s. Perte de la tranche 18 000 : 0,292 (synthétique 0,133, hotpot 0,520) ; tranche 9 000 : 0,363. Reste 9 086 pas (~8,9 h, nuit 3).
+- **Incident :** `make nuit` a échoué après l'entraînement, à `ccm.train.tableau` : `UnicodeEncodeError` (console cp1252, caractère `→`). Relancé avec `PYTHONUTF8=1` : `make tableau` puis `make eval` passent. Code non modifié.
+- **Mesures (`make eval`, validation, `pas-018124.pt`, 1 000 + 1 000 exemples, 886 s) :**
+  - Synthétique niveau 0 : F1 **0,842** (seuil 0,90, non atteint ; nuit 1 : 0,843) ; abstention **0,981** (seuil 0,85, atteint) ; abstention à tort 0,000 ; suites exactes 0,781. Conflits : F1 0,694 (précision 0,555).
+  - HotpotQA distracteurs : F1 **0,675** (seuil 0,75, non atteint ; nuit 1 : 0,696) ; abstention 0,851 (nuit 1 : 0,746) ; abstention à tort 0,147 (nuit 1 : 0,093). La perte baisse mais le modèle s'abstient plus souvent à tort sur HotpotQA.
+  - Pas encore un essai documenté au sens du §15 : il reste 1 époque.
+- **Tests :** `make test` non lancé (demande de Raphael).
+- **Suite prévue :** corriger l'encodage de la sortie de `ccm.train.tableau` (ou `PYTHONUTF8=1` dans le `Makefile`) ; nuit 3 (`make nuit`), puis `make eval`.
