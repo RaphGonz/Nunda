@@ -86,6 +86,10 @@ class ModeleA0(nn.Module):
         x = torch.where(nouveau[:, None], self.nouveaux((ids - taille).clamp(min=0)), x)
         return x + sum(e(attr[:, i]) for i, e in enumerate(self.attributs))
 
+    def regler(self, encs: list[Encodage] | None, s0s: list[int], l1: int, l2: int) -> None:
+        """Avant chaque passe du tronc (passe 1 : `l2` = 0 ; passe 2 ; None après) : rien en
+        A0. A1 y donne les relations de la passe à ses biais d'attention."""
+
     def forward(self, enc: Encodage) -> Sortie:
         return self.lot([enc])[0]
 
@@ -113,6 +117,7 @@ class ModeleA0(nn.Module):
         m1 = torch.zeros(B, l1, dtype=torch.long, device=dev)
         for b, (x, s0) in enumerate(zip(xs, s0s, strict=True)):
             x1[b, :s0], m1[b, :s0] = x[:s0], 1
+        self.regler(encs, s0s, l1, 0)
         o1 = self.tronc(inputs_embeds=x1, attention_mask=m1, use_cache=True)
         hs = o1.last_hidden_state
 
@@ -134,8 +139,12 @@ class ModeleA0(nn.Module):
             x2[b, :n] = torch.cat([x[s0 : s0 + 1], x[s0 + 1 :] + ajout])
             m2[b, :n] = 1
             pos[b] = s0 + torch.arange(l2, device=dev)
-        o2 = self.tronc(inputs_embeds=x2, past_key_values=o1.past_key_values, position_ids=pos,
-                        attention_mask=torch.cat([m1, m2], 1), use_cache=False)  # fmt: skip
+        self.regler(encs, s0s, l1, l2)
+        try:
+            o2 = self.tronc(inputs_embeds=x2, past_key_values=o1.past_key_values, position_ids=pos,
+                            attention_mask=torch.cat([m1, m2], 1), use_cache=False)  # fmt: skip
+        finally:
+            self.regler(None, s0s, l1, l2)
 
         out = []
         for b, (enc, (r_p, h_n, h_m)) in enumerate(zip(encs, pointes, strict=True)):
