@@ -867,3 +867,27 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions (Raphael) :** **arrêt de l'entraînement de A0 après la nuit 2** (pas 18 124 sur 27 186) ; la nuit 3 n'est pas lancée. Les seuils de la phase 4 ne sont pas atteints (synthétique F1 0,842 / 0,90 ; HotpotQA F1 0,675 / 0,75) et la tendance ne laisse pas espérer qu'une troisième époque les atteigne.
 - **Écarts avec SPEC.md :** essai arrêté avant la fin des 3 époques prévues. Noté comme essai 1 de A0 au sens du §15 (seuils non atteints).
 - **Suite prévue :** attendre les nouvelles consignes de Raphael (pistes : capacité du modèle, données à plusieurs faits, choix de la proposition, sélection du point de contrôle par F1 de validation plutôt que par perte).
+
+## 2026-11-08 — Phase 4 — A1 : attention relationnelle dense, essai à blanc (§9, §13)
+- **Demande de Raphael :** code de A1 : envelopper l'attention de SmolLM, δ à zéro, version de référence dense, contexte limité à 2 500 jetons ; départ du point de contrôle A0, sans [REL] ; essai à blanc.
+- **Travail fait :**
+  - `ccm/model/attention.py` : `biais_dense` (biais B × têtes × Tq × Tk lu dans `NN`, `PP`, `val_idx`, selon la formule du §9) ; `envelopper` : un crochet avant chaque `self_attn` du tronc remplace son masque par masque causal + biais de sa couche. Les noms des paramètres ne changent pas : le point A0 se recharge tel quel.
+  - `ccm/model/a1.py` : `ModeleA1` (hérite de `ModeleA0`, δ = couches × têtes × 24 = 32 × 15 × 24, à zéro) ; `sans_rel` (retire [REL] … [/REL] d'un encodage A0, recule les positions) ; `depuis_a0` ; `optimiseur` (δ à 1e-3, sans décroissance de poids) ; `T_MAX = 2500`.
+  - `ccm/model/a0.py` : `ModeleA0.regler`, appelé avant chaque passe du tronc (rien en A0).
+  - `ccm/train/a1.py` : `python -m ccm.train.a1 essai`.
+  - `tests/unit/test_a1.py` (7 tests) : biais contre la somme naïve Σ_r δ R_r ; biais inchangé quand on renumérote les noms et les valeurs ; `sans_rel` ; δ = 0 donne exactement A0 (sdpa et eager) ; lot complété = un par un ; δ reçoit un gradient depuis zéro ; rechargement depuis A0.
+- **Problème corrigé :** première version du biais par indexation `BN[nq, nk]` : 150 s par pas. Le gradient de cette lecture accumule sur des indices très répétés (presque tout est 0). Le biais est maintenant lu par produits avec des matrices une-chaude (Oq · BN · Okᵀ), même résultat : 8 s par pas.
+- **Essai à blanc (`runs/2026-11-08-a1-essai/`, départ `runs/2026-11-06-a0/pas-018124.pt`) :** 910 exemples sur les 1 000 de l'essai de A0 (en-tête retiré ; 90 au-dessus de 2 500 jetons écartés ; T moyen 1 283).
+  - Départ : δ = 0 rend la perte de A0 à l'identique (écart 0,0 sur 8 témoins).
+  - 200 pas (lot de 16) : perte des 20 premiers pas 0,397 → 20 derniers 0,168. |δ| max 0,023 au pas 200.
+  - Point de contrôle sauvé puis rechargé dans un modèle neuf : écart 0,0.
+  - T1 (mesure en A) : écart des logits 0,0 après renumérotation des noms et des valeurs.
+  - 8,0 s par pas, 18,2 Go au maximum (paquets de 4 000 jetons). Pour comparer : A0 met environ 3,7 s par pas.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - A1 garde la table de jetons nouveaux de A0 (mêmes identifiants). Il encode comme A0, puis retire l'en-tête. Les vecteurs [REL], [/REL], ⟨R:…⟩ restent dans la table mais ne servent plus. Les tirages préchargés de A0 resservent donc pour A1.
+  - Limite des 2 500 jetons : on écarte les exemples trop longs, sans les couper (9 % ici). `t_max` de `model_a1.yaml` reste 8 192 (limite de l'encodeur, §8, contrôlée par un test).
+  - Départ du dernier point de A0 (`pas-018124.pt`, celui qui a été mesuré), pas de `meilleur.pt`.
+  - T1 mesure la renumérotation des noms et des valeurs, pas encore celle de l'ordre des mentions.
+- **Écarts avec SPEC.md :** pas de version `flex` ni de test T6. Le biais est passé à l'attention comme masque additif (sdpa), sans changer son code.
+- **Tests :** `make test` ne passe pas l'étape `uv sync --locked` : GitHub répond 504 sur la roue `fr_core_news_lg`. Mêmes commandes avec `uv run --no-sync` : `ruff` propre ; `pytest` : 374 passés, 1 ignoré, code 0.
+- **Suite prévue :** attendre les consignes de Raphael (mesure du débit sur 20 min, préchargement A1 depuis les tirages A0, puis 2 époques).
