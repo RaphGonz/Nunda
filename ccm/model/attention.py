@@ -13,6 +13,7 @@ rechargent tels quels)."""
 from dataclasses import dataclass
 
 import torch
+import torch.nn.functional as F
 from torch import nn
 
 N_REL = 24
@@ -40,13 +41,18 @@ def _bits(t: torch.Tensor, n: int, dt: torch.dtype) -> torch.Tensor:
 
 
 def biais_dense(delta: torch.Tensor, r: Relations) -> torch.Tensor:
-    """δ de la couche (têtes × 24) → biais B × têtes × Tq × Tk."""
-    bn = _bits(r.NN, BITS_NN, delta.dtype) @ delta[:, :BITS_NN].T  # B × N × N × têtes
-    bp = _bits(r.PP >> 15, BITS_PP, delta.dtype) @ delta[:, 15:].T  # B × P × P × têtes
-    b = torch.arange(len(r.nq), device=r.nq.device)[:, None, None]
-    out = bn[b, r.nq[:, :, None], r.nk[:, None, :]] + bp[b, r.pq[:, :, None], r.pk[:, None, :]]
+    """δ de la couche (têtes × 24) → biais B × têtes × Tq × Tk. Lecture des tables par
+    produit avec des matrices une-chaude : BN[nq, nk] = Oq · BN · Okᵀ (un gradient par
+    produit matriciel, sans accumulation sur des indices répétés)."""
+    dt = delta.dtype
+    bn = (_bits(r.NN, BITS_NN, dt) @ delta[:, :BITS_NN].T).permute(0, 3, 1, 2)  # B × têtes × N × N
+    bp = (_bits(r.PP >> 15, BITS_PP, dt) @ delta[:, 15:].T).permute(0, 3, 1, 2)
+    un = lambda i, n: F.one_hot(i, n).to(dt)[:, None]  # noqa: E731  B × 1 × T × n
+    n, p = r.NN.shape[-1], r.PP.shape[-1]
+    out = un(r.nq, n) @ bn @ un(r.nk, n).transpose(-1, -2)
+    out = out + un(r.pq, p) @ bp @ un(r.pk, p).transpose(-1, -2)
     meme = (r.vq[:, :, None] == r.vk[:, None, :]) & (r.vq[:, :, None] != 0)
-    return (out + meme[..., None] * delta[:, 14]).permute(0, 3, 1, 2)
+    return out + meme[:, None] * delta[:, 14, None, None]
 
 
 class Etat:
