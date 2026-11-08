@@ -891,3 +891,16 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** pas de version `flex` ni de test T6. Le biais est passé à l'attention comme masque additif (sdpa), sans changer son code.
 - **Tests :** `make test` ne passe pas l'étape `uv sync --locked` : GitHub répond 504 sur la roue `fr_core_news_lg`. Mêmes commandes avec `uv run --no-sync` : `ruff` propre ; `pytest` : 374 passés, 1 ignoré, code 0.
 - **Suite prévue :** attendre les consignes de Raphael (mesure du débit sur 20 min, préchargement A1 depuis les tirages A0, puis 2 époques).
+
+## 2026-11-08 — Phase 4 — A1 : données préparées, mesure du débit (§13)
+- **Demande de Raphael :** mesurer le débit et préparer les données. Les époques seront lancées plus tard.
+- **Travail fait :** `python -m ccm.train.a1 preparer` et `python -m ccm.train.a1 debit` (`ccm/train/a1.py`).
+- **Données (`D:\Nunda-donnees\tirages\a1\`, 36 Go) :** époques 0 et 1 préchargées pour A0, converties pour A1 : en-tête [REL] retiré ; les exemples de plus de 2 500 jetons sont écartés, leur place reste vide. Conversion en 15 min (4 processus). `precharger.lire(e, racine)` les lit comme ceux de A0. Bilan dans `bilan.jsonl`.
+  - Époque 0 : 134 105 exemples gardés, 10 491 écartés. Époque 1 : 134 062 gardés, 10 547 écartés.
+  - Exemples écartés : synthétique 18,1 % (10 477 et 10 527) ; HotpotQA 14 et 20 ; aucun pour les autres sources.
+- **Débit (`runs/2026-11-08-a1-debit/`, 20 min sur l'époque 0, départ `pas-018124.pt`) :** 1,60 contexte/s ; 10,0 s par pas de 16 ; 1 938 jetons/s ; T moyen 1 208 ; 18,1 Go au maximum. Pour comparer, A0 : 4,54 contextes/s.
+  - **Durée prévue :** 8 381 pas par époque, 23,2 h par époque, **46,5 h pour les 2 époques**, soit environ 5 nuits de 9 h. C'est sous la limite de 5 jours du §15.
+- **Décisions (SPEC.md muet, option la plus simple) :** les 2 époques de A1 sont les époques 0 et 1 du préchargement de A0 (mêmes exemples que ceux vus par A0, en-tête retiré).
+- **Risque :** la limite de 2 500 jetons retire 18 % des exemples synthétiques, ceux qui ont les contextes les plus longs. Or les seuils de la phase portent sur le synthétique. Autre option : un budget de recherche plus petit pour A1 (`jetons_a`, 6 000 aujourd'hui), qui couperait des propositions au lieu d'écarter des exemples. Cela demande de relancer le préchargement. À décider par Raphael.
+- **Tests :** `ruff` propre ; `pytest` (`uv run --no-sync`, comme à la séance précédente) : 374 passés, 1 ignoré.
+- **Suite prévue :** lancement des 2 époques de A1 quand Raphael le demandera (`lancer` de A1 à écrire, sur le modèle de `ccm.train.a0.lancer`).

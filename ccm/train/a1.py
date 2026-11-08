@@ -4,14 +4,22 @@
 `python -m ccm.train.a1 essai [point_a0] [exemples] [pas]` : essai à blanc (§13, « Ordre de
 lancement ») sur les exemples de l'essai de A0 (`runs/*-a0-essai/tirages.pkl`), en-tête
 retiré, T ≤ 2 500 : δ = 0 rend la perte de A0 ; 200 pas, la perte baisse ; le point de
-contrôle se recharge ; T1 (permutation des noms) mesuré. Dossier `runs/<date>-a1-essai/`."""
+contrôle se recharge ; T1 (permutation des noms) mesuré. Dossier `runs/<date>-a1-essai/`.
+`python -m ccm.train.a1 preparer [epoques] [processus]` : tirages préchargés de A0
+(`tirages/a0/epoque-<e>`) → `tirages/a1/epoque-<e>` : en-tête retiré, T > 2 500 écarté (la
+place reste, vide) ; `precharger.lire(e, racine)` les lit comme ceux de A0.
+`python -m ccm.train.a1 debit [minutes]` : débit à pleine taille sur l'époque 0 de A1, et
+durée des 2 époques (§13, « Ordre de lancement »). Dossier `runs/<date>-a1-debit/`."""
 
 import dataclasses
+import itertools
 import json
 import pickle
 import shutil
 import sys
 import time
+from collections import Counter
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -150,7 +158,118 @@ def essai(point_a0: str = str(POINT_A0), exemples: int = 1000, pas: int = 200,
     return bilan
 
 
+# Données : tirages préchargés de A0 → A1.
+_VOC = None
+
+
+def racines() -> tuple[Path, Path]:
+    from ccm.train.precharger import sortie
+
+    a0 = sortie()
+    return a0, a0.parent / "a1"
+
+
+def _convertir(chemin_a0: str, chemin_a1: str) -> dict:
+    global _VOC
+    _VOC = _VOC or _tokenizer()[0]
+    garde, long = Counter(), Counter()
+    out = []
+    for place, t in pickle.loads(Path(chemin_a0).read_bytes()):
+        if t is not None:
+            t = dataclasses.replace(t, encodage=sans_rel(t.encodage, _VOC))
+            if len(t.encodage.input_ids) > T_MAX:
+                long[t.source], t = long[t.source] + 1, None
+            else:
+                garde[t.source] += 1
+        out.append((place, t))
+    p = Path(chemin_a1)
+    p.with_suffix(".tmp").write_bytes(pickle.dumps(out, protocol=pickle.HIGHEST_PROTOCOL))
+    p.with_suffix(".tmp").replace(p)
+    return {"paquet": f"{p.parent.name}/{p.name}", "gardes": dict(garde), "longs": dict(long)}
+
+
+def preparer(epoques: str = "0,1", processus: int = 4) -> None:
+    """Une relance saute les paquets déjà écrits."""
+    a0, a1 = racines()
+    taches = []
+    for e in map(int, str(epoques).split(",")):
+        (a1 / f"epoque-{e}").mkdir(parents=True, exist_ok=True)
+        taches += [(str(p), str(a1 / f"epoque-{e}" / p.name))
+                   for p in sorted((a0 / f"epoque-{e}").glob("*.pkl"))
+                   if not (a1 / f"epoque-{e}" / p.name).exists()]  # fmt: skip
+    print(f"{len(taches)} paquets à écrire dans {a1}", flush=True)
+    t0 = time.time()
+    with (ProcessPoolExecutor(processus) as ex,
+          (a1 / "bilan.jsonl").open("a", encoding="utf-8") as bilan):  # fmt: skip
+        for k, f in enumerate(as_completed([ex.submit(_convertir, *t) for t in taches]), 1):
+            r = f.result()
+            bilan.write(json.dumps(r) + "\n")
+            bilan.flush()
+            reste = (time.time() - t0) / k * (len(taches) - k)
+            print(f"{k}/{len(taches)} {r['paquet']} ; reste {reste / 60:.0f} min", flush=True)
+
+
+def gardes_par_epoque() -> Counter:
+    _, a1 = racines()
+    n: Counter = Counter()
+    for ligne in (a1 / "bilan.jsonl").read_text(encoding="utf-8").splitlines():
+        r = json.loads(ligne)
+        n[int(r["paquet"].split("/")[0].split("-")[1])] += sum(r["gardes"].values())
+    return n
+
+
+def debit(minutes: float = 20.0, point_a0: str = str(POINT_A0), accumulation: int = 16,
+          echauffement: int = 500, epoques: int = 2) -> dict:  # fmt: skip
+    """Pas pris dans l'ordre de l'époque 0, comme `ccm.train.a0.lancer`. Les 2 premiers pas
+    (mise en route du GPU) ne comptent pas."""
+    from ccm.model.a1 import charger_smollm_a1
+    from ccm.train.precharger import lire
+
+    run = _dossier_run("a1-debit")
+    shutil.copy(RUNS.parent / "configs" / "model_a1.yaml", run / "model_a1.yaml")
+    metrics = (run / "metrics.jsonl").open("a", encoding="utf-8")
+    ecrire = lambda **k: (metrics.write(json.dumps(k) + "\n"), metrics.flush())  # noqa: E731
+    voc, _ = _tokenizer()
+    torch.manual_seed(0)
+    modele = charger_smollm_a1(voc, SMOLLM).to("cuda")
+    depuis_a0(modele, Path(point_a0))
+    opt = optimiseur(modele)
+    sched = ordonnanceur(opt, echauffement)
+    flux = lire(0, racines()[1])
+    torch.cuda.reset_peak_memory_stats()
+    i, contextes, jetons, t0 = 0, 0, 0, None
+    while t0 is None or time.time() - t0 < 60 * minutes:
+        lus = list(itertools.islice(flux, accumulation))
+        p = entrainer(modele, lus, 1, accumulation, None, opt, sched, 0, JETONS_LOT)[0]
+        torch.cuda.synchronize()
+        i += 1
+        if i == 2:
+            t0 = time.time()
+        elif i > 2:
+            contextes += len(lus)
+            jetons += sum(len(t.encodage.input_ids) for t in lus)
+            ecrire(etape="debit", pas=i, perte=p, secondes=time.time() - t0,
+                   contextes=contextes, jetons=jetons)  # fmt: skip
+    duree = time.time() - t0
+    ctx_s = contextes / duree
+    par_epoque = gardes_par_epoque()[0]
+    bilan = {
+        "point_a0": str(point_a0), "secondes": duree, "pas": i - 2, "contextes_par_s": ctx_s,
+        "secondes_par_pas": duree / (i - 2), "jetons_par_s": jetons / duree,
+        "jetons_moyens": jetons / contextes,
+        "memoire_max_go": torch.cuda.max_memory_allocated() / 2**30,
+        "exemples_par_epoque": par_epoque, "epoques": epoques,
+        "pas_par_epoque": par_epoque // accumulation,
+        "duree_epoque_h": par_epoque / ctx_s / 3600,
+        "duree_totale_h": epoques * par_epoque / ctx_s / 3600,
+    }  # fmt: skip
+    ecrire(etape="bilan", **bilan)
+    (run / "bilan.json").write_text(json.dumps(bilan, indent=2))
+    print(json.dumps(bilan, indent=2), flush=True)
+    return bilan
+
+
 if __name__ == "__main__":
     commande, *args = sys.argv[1:] or ["essai"]
     lu = lambda a: int(a) if a.isdigit() else a  # noqa: E731
-    {"essai": essai}[commande](*map(lu, args))
+    {"essai": essai, "preparer": preparer, "debit": debit}[commande](*map(lu, args))
