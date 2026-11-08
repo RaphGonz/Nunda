@@ -269,7 +269,63 @@ def debit(minutes: float = 20.0, point_a0: str = str(POINT_A0), accumulation: in
     return bilan
 
 
+# Entraînement et mesures de fin.
+def lancer(heures: float = 9.0, epoques: int = 2, accumulation: int = 16,
+           point_a0: str = str(POINT_A0), nom: str = "a1") -> bool:  # fmt: skip
+    """Une nuit de A1 (§13 : 2 époques) : `ccm.train.a0.lancer` sur `tirages/a1`, arrêt au
+    premier pas après `heures` ; la relance suivante reprend au même exemple. Premier
+    départ : point de contrôle A0, δ = 0, optimiseur neuf. Rend True quand c'est fini."""
+    from ccm.model.a1 import charger_smollm_a1
+    from ccm.train import a0
+
+    def construire(voc, reprise: bool):
+        m = charger_smollm_a1(voc, SMOLLM).to("cuda")
+        if not reprise:
+            depuis_a0(m, Path(point_a0))
+        return m, optimiseur(m)
+
+    n = gardes_par_epoque()
+    par_epoque = min(n[e] for e in range(epoques)) // accumulation
+    debits = sorted(RUNS.glob("*-a1-debit/bilan.json"))
+    s_pas = json.loads(debits[-1].read_text())["secondes_par_pas"] if debits else 10.0
+    return a0.lancer(epoques, accumulation, nom=nom, construire=construire,
+                     donnees=racines()[1], par_epoque=par_epoque,
+                     par_nuit=int(3600 * heures / s_pas), heures=heures, jetons_lot=JETONS_LOT,
+                     configs=("model_a1",))  # fmt: skip
+
+
+def evaluer(variante_point: str = "") -> None:
+    """Mesures de fin (`ccm.eval.a0`, variante A1) sur le dernier point de contrôle du
+    dernier entraînement *-a1, une fois les 2 époques finies ; rien avant, ni si elles sont
+    déjà faites. `variante_point` : un point de contrôle à mesurer tout de suite."""
+    from ccm.eval import a0 as ev
+
+    if variante_point:
+        chemin = Path(variante_point)
+    else:
+        runs = sorted(RUNS.glob("*-a1"))
+        if not runs:
+            print("aucun entraînement *-a1", flush=True)
+            return
+        run = runs[-1]
+        arrets = [json.loads(x) for x in (run / "metrics.jsonl").read_text("utf-8").splitlines()
+                  if '"arret"' in x]  # fmt: skip
+        if not arrets or not arrets[-1]["fini"]:
+            print(f"{run.name} : entraînement pas fini, pas de mesure", flush=True)
+            return
+        chemin = sorted(run.glob("pas-*.pt"))[-1]
+        if (chemin.parent / f"eval-{chemin.stem}" / "rapport.md").exists():
+            print(f"{chemin} : déjà mesuré", flush=True)
+            return
+    ev.evaluer(chemin, variante="a1")
+    print((chemin.parent / f"eval-{chemin.stem}" / "rapport.md").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     commande, *args = sys.argv[1:] or ["essai"]
-    lu = lambda a: int(a) if a.isdigit() else a  # noqa: E731
-    {"essai": essai, "preparer": preparer, "debit": debit}[commande](*map(lu, args))
+    lu = lambda a: int(a) if a.isdigit() else float(a) if a.replace(".", "").isdigit() else a  # noqa: E731
+    fonctions = {"essai": essai, "preparer": preparer, "debit": debit, "lancer": lancer,
+                 "evaluer": evaluer}  # fmt: skip
+    fonctions[commande](*map(lu, args))

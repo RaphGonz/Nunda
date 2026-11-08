@@ -159,11 +159,11 @@ def chargeur_reel(voc, decouper, dossiers: int = 20):
                     load_config("grammar"), voc, decouper)  # fmt: skip
 
 
-def _dossier_run(nom: str) -> Path:
+def _dossier_run(nom: str, configs: Sequence[str] = ()) -> Path:
     racine = Path(__file__).resolve().parents[2]
     d = racine / "runs" / f"{datetime.date.today().isoformat()}-{nom}"
     d.mkdir(parents=True, exist_ok=True)
-    for c in ("finetune", "model_a0", "ingest", "search", "grammar"):
+    for c in ("finetune", "model_a0", "ingest", "search", "grammar", *configs):
         shutil.copy(racine / "configs" / f"{c}.yaml", d / f"{c}.yaml")
     run = lambda *a: subprocess.run(a, cwd=racine, capture_output=True, text=True).stdout  # noqa: E731
     (d / "commit.txt").write_text(run("git", "rev-parse", "HEAD") + run("git", "status", "--short"))
@@ -279,38 +279,52 @@ def essai(exemples: int = 1000, pas: int = 200, minutes: float = 20.0, accumulat
 
 
 def lancer(epoques: int = 3, accumulation: int = 16, echauffement: int = 500,
-           tous_les: int = 2000, nom: str = "a0") -> None:  # fmt: skip
+           tous_les: int = 2000, nom: str = "a0", *, construire=None, donnees: Path | None = None,
+           par_epoque: int | None = None, par_nuit: int | None = None,
+           heures: float | None = None, jetons_lot: int = JETONS_LOT,
+           configs: Sequence[str] = ()) -> bool:  # fmt: skip
     """Une nuit d'entraînement de A0 sur les exemples préchargés (`precharger`) : une époque
     entière, puis arrêt. Point de contrôle tous les `tous_les` pas et à la fin ; les 3
     derniers et le meilleur (perte moyenne la plus basse sur les `tous_les` derniers pas)
     sont gardés. Après une panne, la relance reprend au dernier point de contrôle, au même
-    exemple, et finit l'époque en cours."""
+    exemple, et finit l'époque en cours. Rend True quand tout l'entraînement est fini.
+
+    Pour une autre variante (A1) : `construire(voc, reprise)` rend (modèle, optimiseur) ;
+    `donnees`, racine des exemples préchargés ; `par_epoque`, pas par époque ; `heures` :
+    arrêt au premier pas après cette durée (la relance suivante reprend au même exemple) ;
+    `par_nuit` : pas d'une nuit, pour `tableau`."""
     from ccm.config import load_config
     from ccm.model.a0 import charger_smollm
     from ccm.train.precharger import lire
 
     racine = Path(__file__).resolve().parents[2] / "runs"
     anciens = sorted(racine.glob(f"*-{nom}"))
-    run = anciens[-1] if anciens else _dossier_run(nom)
-    metrics = (run / "metrics.jsonl").open("a", encoding="utf-8")
+    run = anciens[-1] if anciens else _dossier_run(nom, configs)
+    f_metrics = run / "metrics.jsonl"
+    reprises = f_metrics.read_text("utf-8").count('"reprise"') if f_metrics.exists() else 0
+    metrics = f_metrics.open("a", encoding="utf-8")
     ecrire = lambda **k: (metrics.write(json.dumps(k) + "\n"), metrics.flush())  # noqa: E731
-    par_epoque = load_config("finetune").chargeur.exemples_par_epoque // accumulation
+    par_epoque = par_epoque or load_config("finetune").chargeur.exemples_par_epoque // accumulation
     total = epoques * par_epoque
 
     etat_f = run / "etat.json"
     meilleure = json.loads(etat_f.read_text())["meilleure"] if etat_f.exists() else float("inf")
     voc, _ = _tokenizer()
     torch.manual_seed(0)
-    modele = charger_smollm(voc, SMOLLM).to("cuda")
-    opt = optimiseur(modele)
-    sched = ordonnanceur(opt, echauffement)
     pcs = sorted(run.glob("pas-*.pt"))
+    if construire is None:
+        modele = charger_smollm(voc, SMOLLM).to("cuda")
+        opt = optimiseur(modele)
+    else:
+        modele, opt = construire(voc, bool(pcs))
+    sched = ordonnanceur(opt, echauffement)
     i = recharger(pcs[-1], modele, opt, sched) if pcs else 0
     if i >= total:
         print(f"{run.name} : entraînement fini ({i} pas)", flush=True)
-        return
+        return True
     e = i // par_epoque
-    nuit = e + 1
+    nuit = reprises + 1
+    ecrire(etape="plan", total=total, par_epoque=par_epoque, par_nuit=par_nuit or par_epoque)
     ecrire(etape="reprise", pas=i, epoque=e, nuit=nuit,
            point_de_controle=pcs[-1].name if pcs else None,
            heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
@@ -329,14 +343,14 @@ def lancer(epoques: int = 3, accumulation: int = 16, echauffement: int = 500,
 
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001)
     t0, fenetre = time.time(), []
-    flux = itertools.islice(lire(e), (i % par_epoque) * accumulation, None)
+    flux = itertools.islice(lire(e, donnees), (i % par_epoque) * accumulation, None)
     while i < (e + 1) * par_epoque:
         lus = list(itertools.islice(flux, accumulation))
         if len(lus) < accumulation:  # époque plus courte (exemples sautés au préchargement)
             i = (e + 1) * par_epoque
             break
         details: list = []
-        p = entrainer(modele, lus, 1, accumulation, None, opt, sched, 0, JETONS_LOT, details)[0]
+        p = entrainer(modele, lus, 1, accumulation, None, opt, sched, 0, jetons_lot, details)[0]
         par_source: dict[str, list[float]] = {}
         for src, _, x in details:
             par_source.setdefault(src, []).append(x)
@@ -356,11 +370,14 @@ def lancer(epoques: int = 3, accumulation: int = 16, echauffement: int = 500,
             garder(nom_pc)
             ecrire(etape="point_de_controle", pas=i, perte_fenetre=m, meilleur=nom_pc is not None)
             fenetre = []
+        if heures is not None and time.time() - t0 > 3600 * heures:
+            break
     garder()
     ecrire(etape="arret", pas=i, epoque=e, nuit=nuit, secondes=time.time() - t0,
            fini=i >= total,
            heure=time.strftime("%Y-%m-%d %H:%M"))  # fmt: skip
     print(f"nuit {nuit} finie au pas {i} sur {total}", flush=True)
+    return i >= total
 
 
 def _huit_exemples(voc, decouper, n=8):

@@ -51,11 +51,11 @@ def page(lignes: list[dict], total: int) -> str:
 
 
 def main(nom: str = "a0") -> Path:
-    from ccm.config import load_config
+    from ccm.train.tableau import plan
 
     run = sorted((Path(__file__).resolve().parents[2] / "runs").glob(f"*-{nom}"))[-1]
     lignes = [json.loads(x) for x in (run / "metrics.jsonl").read_text("utf-8").splitlines()]
-    total = 3 * (load_config("finetune").chargeur.exemples_par_epoque // 16)
+    total = plan(run)[0]
     sortie = run / "perte.html"
     sortie.write_text(page(lignes, total), encoding="utf-8")
     print(f"courbes : {sortie}")

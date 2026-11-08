@@ -44,7 +44,7 @@ def tableau(run: Path, total: int, par_nuit: int) -> str:
         n = len(ps)
         debut = sum(p["perte"] for p in ps[:100]) / min(100, n)
         fin = sum(p["perte"] for p in ps[-100:]) / min(100, n)
-        arret = "fin d'époque" if a else "en cours ou panne"
+        arret = ("fini" if a["fini"] else "arrêt prévu") if a else "en cours ou panne"
         rangs.append([rp["nuit"], rp.get("heure", "–"), a["heure"] if a else "–",
                       f"{ps[0]['pas']}–{ps[-1]['pas']}", n, f"{16 * n / sec:.2f}",
                       f"{sum(p['jetons'] for p in ps) / sec:.0f}", f"{debut:.3f} → {fin:.3f}",
@@ -62,7 +62,7 @@ def tableau(run: Path, total: int, par_nuit: int) -> str:
     reste = total - fait
     out += ["", "## Avancement", ""]
     out += _table(["pas faits", "total", "fait", "nuits faites", "nuits prévues",
-                   "durée d'une époque à la vitesse actuelle"], [[
+                   "durée d'une nuit prévue à la vitesse actuelle"], [[
         fait, total, f"{100 * fait / total:.1f} %", len(rangs), total // par_nuit,
         f"{par_nuit / vitesse / 3600:.1f} h" if vitesse else "–"]])  # fmt: skip
     if vitesse:
@@ -89,14 +89,25 @@ def tableau(run: Path, total: int, par_nuit: int) -> str:
     return "\n".join(out) + "\n"
 
 
-def main(nom: str = "a0") -> None:
+def plan(run: Path) -> tuple[int, int]:
+    """(pas au total, pas par nuit) : la dernière ligne « plan » de `lancer` ; sinon A0,
+    3 époques d'une nuit chacune."""
     from ccm.config import load_config
 
+    lignes = [json.loads(x) for x in (run / "metrics.jsonl").read_text("utf-8").splitlines()]
+    plans = [r for r in lignes if r["etape"] == "plan"]
+    if plans:
+        return plans[-1]["total"], plans[-1]["par_nuit"]
+    par_nuit = load_config("finetune").chargeur.exemples_par_epoque // 16
+    return 3 * par_nuit, par_nuit
+
+
+def main(nom: str = "a0") -> None:
     runs = sorted((Path(__file__).resolve().parents[2] / "runs").glob(f"*-{nom}"))
     if not runs:
         raise SystemExit(f"aucun entraînement *-{nom} dans runs/")
-    par_nuit = load_config("finetune").chargeur.exemples_par_epoque // 16
-    texte = tableau(runs[-1], 3 * par_nuit, par_nuit)
+    total, par_nuit = plan(runs[-1])
+    texte = tableau(runs[-1], total, par_nuit)
     (runs[-1] / "tableau.md").write_text(texte, encoding="utf-8")
     print(texte)
 

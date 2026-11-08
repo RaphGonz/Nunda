@@ -21,9 +21,10 @@ class DecodeurA0:
     vocabulaire: frozenset[str] = frozenset()
 
     def __init__(self, modele: ModeleA0, voc: Vocabulaire, decouper: Callable, gcfg: GrammarConfig,
-                 jetons_lot: int = 8000):  # fmt: skip
+                 jetons_lot: int = 8000, apres: Callable | None = None):  # fmt: skip
+        """`apres` : encodage → entrée du modèle (A1 : retrait de l'en-tête [REL])."""
         self.modele, self.voc, self.decouper, self.gcfg = modele, voc, decouper, gcfg
-        self.jetons_lot = jetons_lot
+        self.jetons_lot, self.apres = jetons_lot, apres or (lambda e: e)
 
     @torch.no_grad()
     def suites(self, items: Sequence[tuple[Exemple, Contexte]], synthese: bool = False
@@ -37,8 +38,9 @@ class DecodeurA0:
         prefixes: list[list[str]] = [[] for _ in items]
         actifs = list(range(len(items)))
         while actifs:
-            encs = {i: encode(items[i][0].model_copy(update={"cible": [*prefixes[i], "FIN"]}),
-                              self.voc, self.decouper) for i in actifs}  # fmt: skip
+            encs = {i: self.apres(encode(items[i][0].model_copy(
+                        update={"cible": [*prefixes[i], "FIN"]}), self.voc, self.decouper))
+                    for i in actifs}  # fmt: skip
             for groupe in _groupes(actifs, {i: len(e.input_ids) for i, e in encs.items()},
                                    self.jetons_lot):  # fmt: skip
                 with torch.autocast(dev.type, dtype=torch.bfloat16, enabled=dev.type == "cuda"):

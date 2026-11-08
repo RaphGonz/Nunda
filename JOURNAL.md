@@ -904,3 +904,18 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Risque :** la limite de 2 500 jetons retire 18 % des exemples synthétiques, ceux qui ont les contextes les plus longs. Or les seuils de la phase portent sur le synthétique. Autre option : un budget de recherche plus petit pour A1 (`jetons_a`, 6 000 aujourd'hui), qui couperait des propositions au lieu d'écarter des exemples. Cela demande de relancer le préchargement. À décider par Raphael.
 - **Tests :** `ruff` propre ; `pytest` (`uv run --no-sync`, comme à la séance précédente) : 374 passés, 1 ignoré.
 - **Suite prévue :** lancement des 2 époques de A1 quand Raphael le demandera (`lancer` de A1 à écrire, sur le modèle de `ccm.train.a0.lancer`).
+
+## 2026-11-08 — Phase 4 — A1 : commande d'entraînement et mesures de fin (§13, §14)
+- **Demande de Raphael :** écrire le `lancer` de A1, avec des mesures à la fin. La limite de 2 500 jetons reste telle quelle.
+- **Travail fait :**
+  - `ccm.train.a0.lancer` est maintenant commun aux deux variantes. Les réglages de A0 n'ont pas changé. Nouveaux paramètres : `construire` (modèle et optimiseur), `donnees` (racine des exemples préchargés), `par_epoque`, `heures` (arrêt au premier pas après cette durée), `par_nuit`, `jetons_lot`, `configs`. La fonction écrit une ligne `plan` (total, pas par nuit) que `tableau` et `courbe` lisent ; sans elle, ils gardent les valeurs de A0. Une nuit est maintenant comptée comme une reprise, et non plus comme une époque.
+  - `python -m ccm.train.a1 lancer [heures]` : une nuit de 9 h par défaut. Premier départ du point A0 (`pas-018124.pt`), δ = 0, optimiseur neuf. Les nuits suivantes reprennent au dernier point de contrôle, au même exemple. 2 époques de 8 378 pas, soit 16 756 pas.
+  - `python -m ccm.train.a1 evaluer` : mesure le dernier point de contrôle, une seule fois, quand les 2 époques sont finies. Sinon, rien.
+  - `ccm.eval.a0.evaluer(..., variante="a1")` et `DecodeurA0(apres=...)` : mêmes exemples de validation que A0, en-tête retiré. Un exemple dont l'entrée plus 96 pas de sortie dépasse 2 500 jetons n'est pas décodé. Il compte comme faux dans la ligne « total » ; la ligne « dans_limite » donne les mesures sans lui.
+  - `Makefile` : `make nuit-a1` (une nuit, puis `tableau a1`, `courbe a1`, puis `evaluer`, qui ne mesure qu'à la fin), `make tableau-a1`, `make eval-a1`. `export PYTHONUTF8 = 1` en tête : corrige l'erreur d'encodage de `tableau` vue à la nuit 2 de A0.
+  - `tableau` : la colonne d'arrêt dit « fini » ou « arrêt prévu » ; la durée affichée est celle d'une nuit.
+- **Essais (dossier jetable `runs/2026-11-08-a1-test/`, effacé) :** nuit de 0,03 h : pas 0 → 16, point de contrôle sauvé. Relance : reprise au pas 16, mêmes exemples, jusqu'au pas 31. `tableau a1-test` est correct. Mesure A1 sur 20 + 20 exemples : rapport écrit ; 5 exemples sur 40 hors limite.
+- **Risque :** à la mesure, la limite doit laisser la place aux 96 pas de sortie. Elle est donc plus stricte qu'à l'entraînement : 5 exemples sur 40 hors limite dans l'essai, surtout synthétiques. Comptés faux, ils pèsent sur le F1 « total » de A1 face à A0.
+- **Environnement :** `uv run --locked` échoue tant que GitHub répond 504 sur la roue `fr_core_news_lg` (déjà installée). `make nuit-a1` échouera aussi tant que la panne dure. En attendant : `uv run --no-sync python -m ccm.train.a1 lancer`.
+- **Tests :** `ruff` propre ; `pytest` (`--no-sync`) : 374 passés, 1 ignoré.
+- **Suite prévue :** `make nuit-a1`, environ 5 nuits ; les mesures se lancent seules après la dernière.
