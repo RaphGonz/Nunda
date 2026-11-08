@@ -857,3 +857,13 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Pas encore un essai documenté au sens du §15 : il reste 1 époque.
 - **Tests :** `make test` non lancé (demande de Raphael).
 - **Suite prévue :** corriger l'encodage de la sortie de `ccm.train.tableau` (ou `PYTHONUTF8=1` dans le `Makefile`) ; nuit 3 (`make nuit`), puis `make eval`.
+
+## 2026-11-08 — Phase 4 — A0 : analyse des erreurs après la nuit 2, entraînement arrêté
+- **Travail fait :** analyse de `eval-pas-018124/suites.jsonl` (et comparaison avec `eval-pas-009062`), script hors dépôt.
+- **Mesures :**
+  - HotpotQA (879 questions avec réponse) : 129 abstentions à tort ; F1 hors abstentions 0,791. Ces 129 questions sont dures (F1 0,31 à la nuit 1) : sans aucune abstention, F1 estimé ~0,72, sous le seuil 0,75. F1 selon le nombre de faits de référence : 2 → 0,86 ; 3 → 0,70 ; 4 → 0,56. Erreurs surtout faits manquants ou mélangés (353 sur 750).
+  - Synthétique (784 avec réponse) : aucune abstention à tort. Sur 215 suites non exactes : 150 mauvais choix de proposition (60 sans aucun P commun, 90 mixtes), 59 bons P mais structure différente, 21 `SAME` attendu et `P` produit. F1 stable (~0,85) pour 1 ou 2 propositions : le défaut est le choix de la proposition, pas la longueur.
+  - Mesures de la nuit 2 inchangées sur le synthétique par rapport à la nuit 1 (0,842 contre 0,843).
+- **Décisions (Raphael) :** **arrêt de l'entraînement de A0 après la nuit 2** (pas 18 124 sur 27 186) ; la nuit 3 n'est pas lancée. Les seuils de la phase 4 ne sont pas atteints (synthétique F1 0,842 / 0,90 ; HotpotQA F1 0,675 / 0,75) et la tendance ne laisse pas espérer qu'une troisième époque les atteigne.
+- **Écarts avec SPEC.md :** essai arrêté avant la fin des 3 époques prévues. Noté comme essai 1 de A0 au sens du §15 (seuils non atteints).
+- **Suite prévue :** attendre les nouvelles consignes de Raphael (pistes : capacité du modèle, données à plusieurs faits, choix de la proposition, sélection du point de contrôle par F1 de validation plutôt que par perte).
