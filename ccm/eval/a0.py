@@ -5,9 +5,9 @@ Les exemples sont tirés par le chargeur de l'entraînement (mêmes parts d'abst
 conflit injecté et de contrefactuel), sur les parties de validation ; décodage glouton sous
 le masque (`DecodeurA0`).
 
-En A1 (`variante="a1"`), mêmes exemples, en-tête [REL] retiré. Un exemple dont l'entrée
-et les 96 pas de sortie possibles dépassent 2 500 jetons n'est pas décodé : il compte comme
-une réponse fausse (aucune citation, pas d'abstention) dans « total », et la ligne
+En A1 (`variante="a1"`), mêmes exemples, en-tête [REL] retiré. Le décodage d'un exemple
+s'arrête si son entrée (contexte et suite déjà produite) dépasse 2 500 jetons : il compte
+comme une réponse fausse (aucune citation, pas d'abstention) dans « total », et la ligne
 « dans_limite » donne les mesures sans lui.
 
 `python -m ccm.eval.a0 [point_de_controle] [n_synthetique] [n_hotpot]` (par défaut : le
@@ -106,7 +106,7 @@ def rapport(nom: str, res: dict, variante: str = "a0") -> str:
     out += ["", f"Décodage : {res['secondes']:.0f} s pour {res['n']} exemples."]
     if res.get("hors_limite"):
         out.append(
-            f"Hors limite (non décodés, comptés faux dans « total ») : {res['hors_limite']}."
+            f"Hors limite (arrêtés à 2 500 jetons, faux dans « total ») : {res['hors_limite']}."
         )
     return "\n".join(out) + "\n"
 
@@ -127,16 +127,9 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
     pas = recharger(chemin, modele)
     gcfg = load_config("grammar")
     if a1:
-        dec = DecodeurA0(modele, voc, decouper, gcfg, 4000, lambda e: sans_rel(e, voc))
-        s_max = load_config("model_a1").s_max
+        dec = DecodeurA0(modele, voc, decouper, gcfg, 4000, lambda e: sans_rel(e, voc), T_MAX)
     else:
         dec = DecodeurA0(modele, voc, decouper, gcfg)
-
-    def dans_limite(t: Tirage) -> bool:
-        if not a1:
-            return True
-        e = sans_rel(t.encodage, voc)
-        return int((e.segment == 2).nonzero()[0][0]) + 1 + s_max + 1 <= T_MAX
 
     sortie = chemin.parent / f"eval-{chemin.stem}"
     sortie.mkdir(exist_ok=True)
@@ -146,18 +139,12 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
             n = {"synthetique": n_synth, "hotpot": n_hotpot}[src]
             tirages = list(ch().epoque(0, n))
             print(f"{src} : {len(tirages)} exemples", flush=True)
-            for t in tirages:
-                if not dans_limite(t):
-                    r = mesure(t, ["HORS_LIMITE"]) | {"hors_limite": True}
-                    rs.append(r)
-                    fs.write(json.dumps(r, ensure_ascii=False) + "\n")
-            tirages = [t for t in tirages if dans_limite(t)]
             for k in range(0, len(tirages), 64):
                 lot = tirages[k : k + 64]
                 items = [(t.exemple, Contexte.depuis_exemple(t.exemple, t.valeurs, neg))
                          for t in lot]  # fmt: skip
                 for t, s in zip(lot, dec.suites(items), strict=True):
-                    r = mesure(t, s)
+                    r = mesure(t, s) | ({"hors_limite": True} if s == ["HORS_LIMITE"] else {})
                     rs.append(r)
                     fs.write(json.dumps(r, ensure_ascii=False) + "\n")
                 print(

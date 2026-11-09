@@ -159,3 +159,21 @@ def test_decodeur_glouton(tirages):
         with torch.no_grad():
             lg = m(t.encodage).logits[0]
         assert t.encodage.espace[int(lg.argmax())] == s[0]
+
+
+def test_decodeur_t_max(tirages):
+    """Limite de A1 : une suite s'arrête (["HORS_LIMITE"]) dès que son entrée dépasse
+    `t_max` ; les autres sont celles du décodage sans limite."""
+    from ccm.grammar.automaton import Contexte
+    from ccm.model.decodeur import DecodeurA0
+
+    gcfg = load_config("grammar")
+    m = _modele()
+    items = [(t.exemple, Contexte.depuis_exemple(t.exemple, t.valeurs, CFG.conflits.negation))
+             for t in tirages]  # fmt: skip
+    libres = DecodeurA0(m, VOC, decouper, gcfg, jetons_lot=3000).suites(items)
+    t_max = sorted(len(t.encodage.input_ids) for t in tirages)[len(tirages) // 2]
+    bornees = DecodeurA0(m, VOC, decouper, gcfg, jetons_lot=3000, t_max=t_max).suites(items)
+    assert ["HORS_LIMITE"] in bornees
+    for s, b in zip(libres, bornees, strict=True):
+        assert b in (s, ["HORS_LIMITE"])

@@ -938,3 +938,15 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Tests :** non lancés (aucun code modifié).
 - **Risque :** la limite de 2 500 jetons coûte 0,2 de F1 sur le synthétique total, et la mesure finale la comptera de même. À décider par Raphael.
 - **Suite prévue :** nuit 2 de A1 (`make nuit-a1`, reprise au pas 3 726).
+
+## 2026-11-09 — Phase 4 — A1 : limite des 2 500 jetons à la mesure (§9, §14)
+- **Demande de Raphael :** corriger le « bug des 2 500 jetons ».
+- **Cause :** à la mesure, un exemple n'était pas décodé si son entrée plus 96 pas de sortie (`s_max`, le maximum possible) dépassait 2 500 jetons. Les suites réelles sont bien plus courtes : on écartait des exemples qui tenaient dans la limite.
+- **Correction :** `DecodeurA0(t_max=...)` : le décodage d'une suite s'arrête (`["HORS_LIMITE"]`, comptée fausse) seulement quand son entrée réelle (contexte et suite déjà produite) dépasse `t_max`. `ccm.eval.a0` en A1 passe `T_MAX` au décodeur et n'écarte plus rien d'avance. Test `test_decodeur_t_max`.
+- **Mesure refaite (`pas-003726.pt`, même validation ; ancienne dans `eval-pas-003726-avant/`) :**
+  - Hors limite : 227 → **174** (synthétique 226 → 173, HotpotQA 1).
+  - Synthétique, total : F1 0,681 → **0,726** ; abstention 0,778 → **0,819**. Dans la limite (827) : F1 0,881, abstention 0,978.
+  - HotpotQA : inchangé (F1 0,616).
+- **Ce qui reste :** les 173 exemples synthétiques restants (17 %) ont un contexte qui dépasse à lui seul 2 500 jetons ; c'est la même part que celle écartée à l'entraînement (18,1 %). Ce n'est plus un défaut de la mesure, c'est la limite du §9 elle-même. Pour les garder il faut des contextes plus courts pour A1 (budget de recherche `jetons_a` plus petit, qui coupe des propositions), donc refaire le préchargement et reprendre l'entraînement de A1 depuis A0. À décider par Raphael.
+- **Tests :** `ruff` propre ; `pytest` (`--no-sync`, GitHub ne répond pas) : code 0.
+- **Suite prévue :** décision de Raphael sur le budget de A1 ; sinon nuit 2 de A1 (`make nuit-a1`).

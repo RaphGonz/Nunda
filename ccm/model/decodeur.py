@@ -21,10 +21,13 @@ class DecodeurA0:
     vocabulaire: frozenset[str] = frozenset()
 
     def __init__(self, modele: ModeleA0, voc: Vocabulaire, decouper: Callable, gcfg: GrammarConfig,
-                 jetons_lot: int = 8000, apres: Callable | None = None):  # fmt: skip
-        """`apres` : encodage → entrée du modèle (A1 : retrait de l'en-tête [REL])."""
+                 jetons_lot: int = 8000, apres: Callable | None = None,
+                 t_max: int | None = None):  # fmt: skip
+        """`apres` : encodage → entrée du modèle (A1 : retrait de l'en-tête [REL]).
+        `t_max` : une suite dont l'entrée dépasse `t_max` jetons s'arrête et devient
+        `["HORS_LIMITE"]` (A1 : biais dense, §9)."""
         self.modele, self.voc, self.decouper, self.gcfg = modele, voc, decouper, gcfg
-        self.jetons_lot, self.apres = jetons_lot, apres or (lambda e: e)
+        self.jetons_lot, self.apres, self.t_max = jetons_lot, apres or (lambda e: e), t_max
 
     @torch.no_grad()
     def suites(self, items: Sequence[tuple[Exemple, Contexte]], synthese: bool = False
@@ -41,6 +44,10 @@ class DecodeurA0:
             encs = {i: self.apres(encode(items[i][0].model_copy(
                         update={"cible": [*prefixes[i], "FIN"]}), self.voc, self.decouper))
                     for i in actifs}  # fmt: skip
+            if self.t_max is not None:
+                for i in [i for i in actifs if len(encs[i].input_ids) > self.t_max]:
+                    prefixes[i] = ["HORS_LIMITE"]
+                    actifs.remove(i)
             for groupe in _groupes(actifs, {i: len(e.input_ids) for i, e in encs.items()},
                                    self.jetons_lot):  # fmt: skip
                 with torch.autocast(dev.type, dtype=torch.bfloat16, enabled=dev.type == "cuda"):
