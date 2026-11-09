@@ -927,7 +927,14 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Par tranche de 1 000 pas, toutes / synthétique / hotpot : 0–999 : 0,340 / 0,220 / 0,618 ; 1 000–1 999 : 0,302 / 0,141 / 0,603 ; 2 000–2 999 : 0,297 / 0,126 / 0,591 ; 3 000–3 725 : 0,297 / 0,132 / 0,604.
   - Pour comparer, A0 tranche 18 000 : 0,292 / 0,133 / 0,520. Le synthétique revient au niveau de A0 dès le pas 2 000 ; HotpotQA reste au-dessus (~0,60), et la perte totale est à plat depuis le pas 2 000.
   - Points de contrôle : `pas-002000.pt` (perte des 2 000 pas 0,321, `meilleur.pt`), `pas-003726.pt`.
-- **Mesures :** aucune. `ccm.train.a1 evaluer` ne mesure qu'à la fin des 2 époques (`eval-a1.log` : « entraînement pas fini, pas de mesure »), comme prévu à la séance précédente.
+- **Mesures intermédiaires (demande de Raphael ; `python -m ccm.train.a1 evaluer runs/2026-11-08-a1/pas-003726.pt`, validation, 1 000 + 1 000, 1 607 s) :** `make nuit-a1` ne mesure qu'à la fin des 2 époques, cette mesure est donc lancée à la main. Elle ne compte pas comme essai au sens du §15 (22 % de l'entraînement).
+  - Synthétique, total : F1 **0,681** (seuil 0,90) ; abstention **0,778** (seuil 0,85). 226 exemples sur 1 000 sont hors limite (entrée + 96 pas > 2 500 jetons ; 189 normaux, 22 abstentions, 8 contrefactuels, 7 conflits), comptés faux.
+  - Synthétique, dans la limite (774) : F1 0,886, abstention 0,977. A0 (`pas-018124.pt`) sur les mêmes 774 : F1 0,874, abstention 0,977, suites exactes 0,761 pour les deux. A1 fait un peu mieux que A0 à exemples égaux ; l'écart sur le total vient de la limite de 2 500 jetons.
+  - HotpotQA : F1 **0,616** (seuil 0,75 ; A0 0,676 sur les mêmes 999) ; abstention 0,950 ; abstention à tort **0,224** (A0 0,146). Le défaut de A0 sur HotpotQA (abstentions à tort) s'aggrave.
+  - Conflits synthétiques : F1 0,578 (précision 0,463).
+- **δ (`pas-002000.pt` → `pas-003726.pt`) :** |δ| max 0,71 → 1,12, encore en hausse. Plus forts |δ| moyens : MEME_FAMILLE 0,187, ALIAS_DECLARE 0,153, INCLUS_DANS (inverse) 0,111 et INCLUS_DANS 0,102, surtout dans les couches 12 à 20. 7 relations restent exactement à 0 (jamais présentes dans les données, donc sans gradient) : MEME_UTILISATEUR, DIFFERENT_UTILISATEUR, MEME_HYPOTHESE, DEPEND_DE et son inverse, DOUBLON_DE, MEME_SECTION.
+- **Courbes :** `runs/2026-11-08-a1/a1-nuit1.html` (perte par source contre A0, carte de δ relation × couche, tableau de δ).
 - **Avancement :** reste 13 030 pas, 31,5 h à cette vitesse, soit 4 nuits de 9 h (la dernière courte) au lieu des 5 prévues.
 - **Tests :** non lancés (aucun code modifié).
+- **Risque :** la limite de 2 500 jetons coûte 0,2 de F1 sur le synthétique total, et la mesure finale la comptera de même. À décider par Raphael.
 - **Suite prévue :** nuit 2 de A1 (`make nuit-a1`, reprise au pas 3 726).
