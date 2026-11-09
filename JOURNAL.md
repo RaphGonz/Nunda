@@ -949,4 +949,5 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - HotpotQA : inchangé (F1 0,616).
 - **Ce qui reste :** les 173 exemples synthétiques restants (17 %) ont un contexte qui dépasse à lui seul 2 500 jetons ; c'est la même part que celle écartée à l'entraînement (18,1 %). Ce n'est plus un défaut de la mesure, c'est la limite du §9 elle-même. Pour les garder il faut des contextes plus courts pour A1 (budget de recherche `jetons_a` plus petit, qui coupe des propositions), donc refaire le préchargement et reprendre l'entraînement de A1 depuis A0. À décider par Raphael.
 - **Tests :** `ruff` propre ; `pytest` (`--no-sync`, GitHub ne répond pas) : code 0.
-- **Suite prévue :** décision de Raphael sur le budget de A1 ; sinon nuit 2 de A1 (`make nuit-a1`).
+- **Décision (Raphael) :** la limite de 2 500 jetons et le budget de recherche de A1 restent tels quels ; les exemples synthétiques trop longs restent écartés à l'entraînement et comptés faux à la mesure.
+- **Suite prévue :** nuit 2 de A1 (`make nuit-a1`), quand Raphael la demandera.
