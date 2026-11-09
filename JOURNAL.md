@@ -919,3 +919,15 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Environnement :** `uv run --locked` échoue tant que GitHub répond 504 sur la roue `fr_core_news_lg` (déjà installée). `make nuit-a1` échouera aussi tant que la panne dure. En attendant : `uv run --no-sync python -m ccm.train.a1 lancer`.
 - **Tests :** `ruff` propre ; `pytest` (`--no-sync`) : 374 passés, 1 ignoré.
 - **Suite prévue :** `make nuit-a1`, environ 5 nuits ; les mesures se lancent seules après la dernière.
+
+## 2026-11-09 — Phase 4 — A1 : bilan de la nuit 1 (§13, §14)
+- **Demande de Raphael :** lancer l'entraînement de A1 (première nuit), lire `metrics.jsonl`, écrire le journal, mesures.
+- **Nuit 1 (`make nuit-a1`, `runs/2026-11-08-a1/`) :** 2026-11-08 20 h 50 → 2026-11-09 05 h 50, pas 0 → 3 726 sur 16 756 (22,2 %, époque 0), 9,0 h. Départ `pas-018124.pt` de A0, δ = 0. 1,84 contexte/s, 2 207 jetons/s (mesure de débit : 1,60 contexte/s). Aucune erreur ; `uv sync --locked` passe à nouveau (fin de la panne GitHub sur `fr_core_news_lg`).
+- **Perte (`tableau.md`) :** 100 premiers pas 0,387 → 100 derniers 0,288 (pas 0 : 0,638).
+  - Par tranche de 1 000 pas, toutes / synthétique / hotpot : 0–999 : 0,340 / 0,220 / 0,618 ; 1 000–1 999 : 0,302 / 0,141 / 0,603 ; 2 000–2 999 : 0,297 / 0,126 / 0,591 ; 3 000–3 725 : 0,297 / 0,132 / 0,604.
+  - Pour comparer, A0 tranche 18 000 : 0,292 / 0,133 / 0,520. Le synthétique revient au niveau de A0 dès le pas 2 000 ; HotpotQA reste au-dessus (~0,60), et la perte totale est à plat depuis le pas 2 000.
+  - Points de contrôle : `pas-002000.pt` (perte des 2 000 pas 0,321, `meilleur.pt`), `pas-003726.pt`.
+- **Mesures :** aucune. `ccm.train.a1 evaluer` ne mesure qu'à la fin des 2 époques (`eval-a1.log` : « entraînement pas fini, pas de mesure »), comme prévu à la séance précédente.
+- **Avancement :** reste 13 030 pas, 31,5 h à cette vitesse, soit 4 nuits de 9 h (la dernière courte) au lieu des 5 prévues.
+- **Tests :** non lancés (aucun code modifié).
+- **Suite prévue :** nuit 2 de A1 (`make nuit-a1`, reprise au pas 3 726).
