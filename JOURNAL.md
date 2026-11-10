@@ -951,3 +951,16 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Tests :** `ruff` propre ; `pytest` (`--no-sync`, GitHub ne répond pas) : code 0.
 - **Décision (Raphael) :** la limite de 2 500 jetons et le budget de recherche de A1 restent tels quels ; les exemples synthétiques trop longs restent écartés à l'entraînement et comptés faux à la mesure.
 - **Suite prévue :** nuit 2 de A1 (`make nuit-a1`), quand Raphael la demandera.
+
+## 2026-11-10 — Phase 4 — A1 : bilan de la nuit 2 et mesure (§13, §14)
+- **Demande de Raphael :** lancer la suite de l'entraînement, puis faire la mesure.
+- **Nuit 2 (`make nuit-a1`) :** 2026-11-09 20 h 51 → 2026-11-10 05 h 51, pas 3 726 → 6 712 sur 16 756 (40,1 %, toujours époque 0). 1,48 contexte/s (nuit 1 : 1,84) : 2 986 pas au lieu de ~3 700. Cause non trouvée. Reste 10 044 pas, ~30 h à cette vitesse (4 nuits de plus, au lieu de 3).
+- **Perte par tranche de 1 000 pas, toutes / synthétique / hotpot :** 3 000 : 0,293 / 0,132 / 0,590 ; 4 000 : 0,283 / 0,126 / 0,565 ; 5 000 : 0,274 / 0,120 / 0,533 ; 6 000–6 711 : 0,278 / 0,123 / 0,539. HotpotQA, à plat à la nuit 1, baisse et rejoint A0 (0,520).
+- **Mesures (`python -m ccm.train.a1 evaluer runs/2026-11-08-a1/pas-006712.pt`, validation, 1 000 + 1 000, 1 807 s ; comparaison avec la mesure corrigée du pas 3 726) :**
+  - Synthétique, total : F1 **0,718** (pas 3 726 : 0,726 ; seuil 0,90) ; abstention **0,819** (0,819 ; seuil 0,85). Dans la limite (827) : F1 0,871 (0,881). 173 exemples hors limite, comptés faux.
+  - HotpotQA : F1 **0,741** (0,616 ; seuil 0,75 ; A0 0,675) ; abstention à tort **0,053** (0,224 ; A0 0,146) ; abstention 0,777 (0,950).
+  - Lecture : grand progrès sur HotpotQA, qui frôle le seuil ; le modèle s'abstient beaucoup moins souvent à tort. Le synthétique recule un peu (−0,01 de F1 dans la limite), à suivre à la prochaine mesure.
+- **δ :** |δ| max 1,18 (pas 4 000) → 1,54 (6 000) → 1,65 (6 712). Mêmes relations en tête : MEME_FAMILLE 0,241, ALIAS_DECLARE 0,228, INCLUS_DANS (inverse) 0,155, INCLUS_DANS 0,153. Toujours 7 relations à 0.
+- **Surapprentissage :** les deux époques de A1 sont les époques 0 et 1 de A0, déjà vues par A0 ; l'époque 2 préchargée n'a jamais servi. Proposé à Raphael : la prendre comme deuxième époque de A1, et mesurer la validation après chaque nuit. Pas encore décidé ; la nuit 3 restera dans l'époque 0 (bascule au pas 8 378).
+- **Tests :** non lancés (aucun code modifié).
+- **Suite prévue :** décision sur l'époque 2 avant la nuit 4 ; nuit 3 de A1 quand Raphael la demandera.
