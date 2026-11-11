@@ -992,3 +992,4 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Écarts avec SPEC.md :** voir `reports/phase-4.md`.
 - **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
 - **Clôture administrative (accord de Raphael) :** `reports/phase-3.md` écrit (seuils de la phase 3 atteints, d'après les mesures du journal et `make test-complet`). Étiquettes `phase-3-ok` (sur `phase-3`) et `phase-4-ok` (seuils de F1 manqués, écart accepté, comme `phase-2-ok`). `phase-4`, qui contient `phase-3`, est fusionnée dans `main`.
+- **Réponses (Raphael) :** les « il » impersonnels restent dans la liste de DEPEND_DE (§5, étape 3) ; B garde l'attention relationnelle dense et sa limite de 2 500 jetons (§9).

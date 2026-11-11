@@ -40,4 +40,4 @@ La méthode fonctionne : l'attention relationnelle (A1) fait mieux que A0 à exe
 
 ## Questions pour Raphael
 1. ~~Clore la phase 3 avant de fusionner ?~~ Fait le 2026-11-11 : `reports/phase-3.md`, `phase-3-ok`, fusion de `phase-4` dans `main`.
-2. Pour la phase 5 : faut-il garder l'attention relationnelle dense, avec sa limite de 2 500 jetons ?
+2. ~~Pour la phase 5 : garder l'attention relationnelle dense, avec sa limite de 2 500 jetons ?~~ Oui (Raphael, 2026-11-11).

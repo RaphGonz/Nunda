@@ -29,4 +29,4 @@ Modèle oracle sur 10 dossiers de validation : 740 / 802 réponses rejouées (92
 - La synthèse n'est pas dans `encode` (`Exemple.cible` refuse `W:`), à reprendre en phase 4 bis.
 
 ## Questions pour Raphael
-1. Exclure les « il » impersonnels (« Il ressort », « Il est établi », « Il apparaît ») de la liste de DEPEND_DE (§5, étape 3) ? Aujourd'hui, le vérificateur affiche la phrase précédente en « Contexte : », même quand elle parle d'un autre événement. Question posée le 2026-10-29, toujours sans réponse.
+1. ~~Exclure les « il » impersonnels (« Il ressort », « Il est établi », « Il apparaît ») de la liste de DEPEND_DE (§5, étape 3) ? Aujourd'hui, le vérificateur affiche la phrase précédente en « Contexte : », même quand elle parle d'un autre événement. Question posée le 2026-10-29, ~~ Non (Raphael, 2026-11-11) : la liste reste telle quelle.
