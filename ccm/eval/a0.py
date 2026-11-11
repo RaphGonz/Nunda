@@ -10,8 +10,13 @@ s'arrête si son entrée (contexte et suite déjà produite) dépasse 2 500 jeto
 comme une réponse fausse (aucune citation, pas d'abstention) dans « total », et la ligne
 « dans_limite » donne les mesures sans lui.
 
-`python -m ccm.eval.a0 [point_de_controle] [n_synthetique] [n_hotpot]` (par défaut : le
-dernier point de contrôle du dernier entraînement, 1 000 et 1 000) : écrit
+Corpus corrigé (`corrige=True`, décision de Raphael du 2026-11-11) : avant le décodage, on
+retire les exemples écartés à l'entraînement de A1 (entrée sans [REL] > 2 500 jetons), pour
+A0 comme pour A1 : les deux modèles sont mesurés sur les mêmes exemples. Sortie dans
+`eval-<point>-corrige/`.
+
+`python -m ccm.eval.a0 [point_de_controle] [n_synthetique] [n_hotpot] [a0|a1] [corrige]`
+(par défaut : le dernier point de contrôle du dernier entraînement, 1 000 et 1 000) : écrit
 `eval-<point>/resultats.json`, `suites.jsonl` et `rapport.md` à côté du point de contrôle,
 puis affiche le rapport."""
 
@@ -88,6 +93,8 @@ def bilan(rs: list[dict]) -> dict:
 def rapport(nom: str, res: dict, variante: str = "a0") -> str:
     f = lambda x: "–" if x is None else f"{x:.3f}"  # noqa: E731
     titre = f"# Mesures de {variante.upper()} : {nom}"
+    if res.get("corrige"):
+        titre += " — corpus corrigé (exemples > 2 500 jetons retirés)"
     out = [titre, "", "## Seuils de la phase 4 (validation)", "",
            "| Source | Mesure | Seuil | Mesure | Passe |", "|" + " --- |" * 5]  # fmt: skip
     for src, seuils in SEUILS.items():
@@ -111,8 +118,8 @@ def rapport(nom: str, res: dict, variante: str = "a0") -> str:
     return "\n".join(out) + "\n"
 
 
-def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: str = "a0"
-            ) -> dict:  # fmt: skip
+def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: str = "a0",
+            corrige: bool = False) -> dict:  # fmt: skip
     from ccm.config import load_config
     from ccm.model.a0 import charger_smollm
     from ccm.model.a1 import T_MAX, charger_smollm_a1, sans_rel
@@ -131,13 +138,16 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
     else:
         dec = DecodeurA0(modele, voc, decouper, gcfg)
 
-    sortie = chemin.parent / f"eval-{chemin.stem}"
+    sortie = chemin.parent / f"eval-{chemin.stem}{'-corrige' if corrige else ''}"
     sortie.mkdir(exist_ok=True)
     rs, t0 = [], time.time()
     with (sortie / "suites.jsonl").open("w", encoding="utf-8") as fs:
         for src, ch in chargeurs(voc, decouper).items():
             n = {"synthetique": n_synth, "hotpot": n_hotpot}[src]
             tirages = list(ch().epoque(0, n))
+            if corrige:
+                tirages = [t for t in tirages
+                           if len(sans_rel(t.encodage, voc).input_ids) <= T_MAX]  # fmt: skip
             print(f"{src} : {len(tirages)} exemples", flush=True)
             for k in range(0, len(tirages), 64):
                 lot = tirages[k : k + 64]
@@ -159,6 +169,7 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
         if a1 and not r.get("hors_limite"):
             par[r["source"]]["dans_limite"].append(r)
     res = {"point_de_controle": str(chemin), "pas": pas, "n": len(rs), "variante": variante,
+           "corrige": corrige,
            "hors_limite": sum(bool(r.get("hors_limite")) for r in rs),
            "secondes": time.time() - t0,
            "sources": {s: {g: bilan(x) for g, x in gs.items()}
@@ -173,6 +184,9 @@ if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     a = sys.argv[1:]
+    corrige = "corrige" in a
+    a = [x for x in a if x != "corrige"]
     chemin = Path(a[0]) if a else sorted(sorted(Path("runs").glob("*-a0"))[-1].glob("pas-*.pt"))[-1]
-    evaluer(chemin, *map(int, a[1:3]), *a[3:4])
-    print((chemin.parent / f"eval-{chemin.stem}" / "rapport.md").read_text(encoding="utf-8"))
+    evaluer(chemin, *map(int, a[1:3]), *a[3:4], corrige=corrige)
+    sortie = f"eval-{chemin.stem}{'-corrige' if corrige else ''}"
+    print((chemin.parent / sortie / "rapport.md").read_text(encoding="utf-8"))
