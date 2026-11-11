@@ -988,6 +988,6 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 
 ## 2026-11-11 — Phase 4 — Clôture
 - **Décision (Raphael) :** clôture de la phase 4 avec les seuils de F1 manqués de peu (synthétique 0,872 / 0,90 ; HotpotQA 0,748 / 0,75 ; corpus corrigé). La méthode fonctionne (A1 meilleur que A0 à exemples égaux) et le temps manque. Fin des modèles A : A1 arrêté au pas 8 378, l'époque 2 n'est pas faite.
-- **Travail fait :** `reports/phase-4.md`. `make test-complet` : . Nuit 4 marquée dans `metrics.jsonl` (ligne `arret` avec `interrompu: true`).
+- **Travail fait :** `reports/phase-4.md`. `make test-complet` : 374 passés et T11 passé. Nuit 4 marquée dans `metrics.jsonl` (ligne `arret` avec `interrompu: true`).
 - **Écarts avec SPEC.md :** voir `reports/phase-4.md`.
 - **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
