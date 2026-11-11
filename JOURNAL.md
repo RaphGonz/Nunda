@@ -991,3 +991,4 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Travail fait :** `reports/phase-4.md`. `make test-complet` : 374 passés et T11 passé. Nuit 4 marquée dans `metrics.jsonl` (ligne `arret` avec `interrompu: true`).
 - **Écarts avec SPEC.md :** voir `reports/phase-4.md`.
 - **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
+- **Clôture administrative (accord de Raphael) :** `reports/phase-3.md` écrit (seuils de la phase 3 atteints, d'après les mesures du journal et `make test-complet`). Étiquettes `phase-3-ok` (sur `phase-3`) et `phase-4-ok` (seuils de F1 manqués, écart accepté, comme `phase-2-ok`). `phase-4`, qui contient `phase-3`, est fusionnée dans `main`.

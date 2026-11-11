@@ -39,5 +39,5 @@ La méthode fonctionne : l'attention relationnelle (A1) fait mieux que A0 à exe
 - Aucune mesure sur un jeu de test ; tout est mesuré sur la validation.
 
 ## Questions pour Raphael
-1. La phase 3 n'a pas de rapport ni d'étiquette `phase-3-ok`, et `phase-4` est partie de `phase-3`. Clore la phase 3 avant de fusionner `phase-4` dans `main` ?
+1. ~~Clore la phase 3 avant de fusionner ?~~ Fait le 2026-11-11 : `reports/phase-3.md`, `phase-3-ok`, fusion de `phase-4` dans `main`.
 2. Pour la phase 5 : faut-il garder l'attention relationnelle dense, avec sa limite de 2 500 jetons ?
