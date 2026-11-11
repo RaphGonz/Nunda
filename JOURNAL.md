@@ -964,3 +964,24 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Surapprentissage :** les deux époques de A1 sont les époques 0 et 1 de A0, déjà vues par A0 ; l'époque 2 préchargée n'a jamais servi. Proposé à Raphael : la prendre comme deuxième époque de A1, et mesurer la validation après chaque nuit. Pas encore décidé ; la nuit 3 restera dans l'époque 0 (bascule au pas 8 378).
 - **Tests :** non lancés (aucun code modifié).
 - **Suite prévue :** décision sur l'époque 2 avant la nuit 4 ; nuit 3 de A1 quand Raphael la demandera.
+
+## 2026-11-10 (soir) — Phase 4 — A1 : lancement de la nuit 3 (§13, §15)
+- **Demande de Raphael :** suite de l'entraînement A1 ; chaque matin, une ligne au journal sur `metrics.jsonl` ; à la fin, page HTML (perte et mesure contre A0).
+- **Nuit 3 (`make nuit-a1`) :** lancée 2026-11-10 20 h 35, reprise au pas 6 712 sur 16 756, époque 0 (bascule au pas 8 378, l'époque 2 préchargée n'étant pas retenue faute de décision : option la plus simple).
+- **Durée (§15, cas 4) :** calcul mesuré 18,0 h (nuits 1 et 2) ; reste 10 044 pas, ~30 h à 1,48 contexte/s ; total prévu ~48 h, sous les 5 jours. Je compte le temps de calcul mesuré, pas le calendrier (5 nuits prévues dès le plan).
+- **Matin du 2026-11-11 (`metrics.jsonl`) :** nuit 3 arrêtée à 02 h 07 au pas 8 378 sur 16 756 (fin de l'époque 0, arrêt prévu par la boucle), 5,5 h ; perte 6 712–6 999 / 7 000–7 999 / 8 000–8 377, toutes / synthétique / hotpot : 0,263 / 0,117 / 0,517 ; 0,269 / 0,122 / 0,526 ; 0,269 / 0,121 / 0,520. **Reste 8 378 pas (époque 1), ~27,8 h** à 0,084 pas/s ; calcul fait 23,5 h, total prévu ~51 h (2,1 jours, sous les 5 jours du §15). Nuit 4 non lancée : elle ouvre l'époque 1, qui attend la décision de Raphael sur l'époque 2. Mesure de validation de `pas-008378.pt` lancée (`runs/eval-a1-pas-008378.log`).
+- **Mesure `pas-008378.pt` (validation, 1 000 + 1 000, 1 785 s ; entre parenthèses pas 6 712) :** synthétique total F1 **0,719** (0,718), abstention **0,829** (0,819), dans la limite F1 0,872 (0,871) ; HotpotQA F1 **0,747** (0,741 ; seuil 0,75 ; A0 0,675), abstention 0,818 (0,777), abstention à tort 0,043 (0,053). 174 hors limite. Pas de signe de surapprentissage sur la validation ; progrès faible.
+- **Suite prévue :** décision de Raphael sur l'époque 2, puis nuit 4 (`make nuit-a1`).
+- **Décision faute de réponse (option la plus simple, CLAUDE.md) :** la demande de Raphael est la suite de l'entraînement ; je garde le plan en place (époque 1 de A1 = époque 1 de A0). Copie de sauvegarde `fin-epoque0-pas-008378.pt` pour pouvoir refaire l'époque 2 depuis la fin de l'époque 0 si Raphael le préfère. Nuit 4 lancée 2026-11-11.
+- **Erreur de ma part :** Raphael ne voulait pas la nuit 4. Arrêtée à la main (`taskkill`) après 4,8 h, au pas 9 929 (époque 1). Aucun point de contrôle écrit après `pas-008378.pt` (`etat.json` : pas 8 378) ; la reprise repartira donc de la fin de l'époque 0. `metrics.jsonl` garde les lignes des pas 8 378 à 9 929 de cet essai, sans ligne `arret` : à retirer ou à marquer avant la prochaine nuit, selon le choix de Raphael.
+- **Suite prévue :** décision de Raphael sur l'époque 2 ; rien ne sera lancé avant.
+
+## 2026-11-11 — Phase 4 — Mesure sur corpus corrigé, A0 contre A1 (§14)
+- **Décision (Raphael) :** les exemples trop longs pour A1 (entrée sans [REL] > 2 500 jetons, les mêmes que ceux écartés à l'entraînement) sont retirés de la mesure, pour A0 comme pour A1, afin de comparer les deux modèles sur les mêmes exemples. **Écart avec SPEC.md :** le seuil de la phase 4 est désormais mesuré sur ce corpus corrigé.
+- **Code :** `ccm.eval.a0.evaluer(..., corrige=True)` (CLI : argument `corrige`) filtre les tirages avant décodage ; sortie `eval-<point>-corrige/`.
+- **Mesures (validation corrigée : synthétique 827, HotpotQA 999 ; A0 `pas-018124.pt`, 783 s / A1 `pas-008378.pt`, 1 995 s) :**
+  - Synthétique : F1 A0 **0,864** / A1 **0,872** (seuil 0,90, non) ; abstention 0,978 / **0,989** (seuil 0,85, oui) ; suites exactes 0,803 / 0,819 ; conflits F1 0,696 / 0,681 ; contrefactuels F1 0,877 / 0,988.
+  - HotpotQA : F1 A0 **0,676** / A1 **0,748** (seuil 0,75, non, à 0,002) ; abstention à tort 0,146 / 0,043 ; abstention 0,851 / 0,818.
+  - Lecture : à corpus égal, A1 fait mieux que A0 partout sauf les conflits (−0,015) et l'abstention HotpotQA (−0,03). Aucun seuil de F1 n'est encore atteint ; il reste la moitié de l'entraînement de A1.
+- **Tests :** `ruff` propre ; `make test` : 374 passés.
+- **Suite prévue :** décision de Raphael sur l'époque 2 et sur les lignes des pas 8 378–9 929 de `metrics.jsonl`, puis nuit 4.
