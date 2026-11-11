@@ -993,3 +993,44 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
 - **Clôture administrative (accord de Raphael) :** `reports/phase-3.md` écrit (seuils de la phase 3 atteints, d'après les mesures du journal et `make test-complet`). Étiquettes `phase-3-ok` (sur `phase-3`) et `phase-4-ok` (seuils de F1 manqués, écart accepté, comme `phase-2-ok`). `phase-4`, qui contient `phase-3`, est fusionnée dans `main`.
 - **Réponses (Raphael) :** les « il » impersonnels restent dans la liste de DEPEND_DE (§5, étape 3) ; B garde l'attention relationnelle dense et sa limite de 2 500 jetons (§9).
+
+## 2026-11-11 — Phase 5 — Chaîne du corpus de pré-entraînement et canaris préparés (§6, §12, §14)
+- **Demande de Raphael :** tout préparer pour lancer la chaîne du corpus (2,5 G jetons) sans accroc et la relancer après un arrêt ; **aucune exécution lourde** (aucun téléchargement, ni `debit`, ni `chaine` sur de vraies données, pas de GPU).
+- **Travail fait :**
+  - `ccm/data/pretrain/` : `sources.py` (sources déclarées ; `--figer` résout les versions datées, télécharge et écrit `sources_figees.json`, puis `telecharger` contrôle les SHA-256 avec `jeux.telecharger`, qui prend maintenant sa liste de fichiers en paramètre), `lecteurs.py` (Wikipédia par `mwparserfromhell`, Parquet HF, stocks DILA, Europarl, MultiEURLEX ; LEGI et Judilibre par leurs lecteurs existants), `nettoyer.py`, `fenetres.py`, `propager.py` (passes A et B, Aho-Corasick par `pyahocorasick`, comptes dans `travail/chaines.sqlite`), `remplacer.py` (marques ⟦k⟧, attributs, NN, PP), `chaine.py` (brut, canaris naturels, passes A, B, C, bilan), `debit.py`, `etat.py` (`etat.json`, `.part` puis renommé).
+  - `ccm/data/canaries.py` : 600 canaris (300 naturels, 300 forcés ; 100 × {1, 10, 100} chacun ; 70 % fr / 30 % en). Noms : prénom des réservoirs de `worldgen` et nom de famille inventé, hors de la liste Wikidata. 1 000 fins par langue tirées du lexique Hunspell (noms communs en minuscules), enregistrées avec chaque canari. Chaque répétition va dans un document distinct de la même langue. Liste dans `racine/canaris/canaris.json`, hors de `pretrain/`.
+  - `configs/pretrain.yaml` (bloc `corpus`, modèle `CorpusConfig` dans `ccm/config.py`) ; groupe `ccm pretrain {telecharger,brut,canaris,debit,chaine,bilan}` ; cibles `make pretrain-debit` et `make pretrain-chaine` ; dépendances `mwparserfromhell` 0.7.2 et `pyahocorasick` 2.3.1 (`uv add`) ; `DATA_LICENSES.md` (licences écrites de mémoire, **toutes à vérifier en ligne avant téléchargement**).
+  - Mini-corpus figé inventé `tests/golden/pretrain/documents.jsonl` (14 documents fr, 8 en) ; tests `test_pretrain_chaine.py`, `test_pretrain_etapes.py`, `test_canaris.py`.
+- **Décisions (plan approuvé) :**
+  - Langues : 70 % fr / 30 % en (Raphael ; SPEC.md §16 mis à jour, annule la décision du 2026-10-31). Quotas : fr 1,75 G (Wikipédia 0,95 ; livres du domaine public 0,3 ; décisions 0,25, dont Judilibre 0,03 et DILA 0,22 ; LEGI 0,1 ; UE 0,15) ; en 0,75 G (Wikipédia 0,35, articles tirés à 15 % ; Gutenberg 0,2 ; UE 0,15 ; CEDH 0,05). À ajuster après mesure.
+  - Seuil GLiNER : 40 h de GPU (5 nuits de 8 h). Au-delà, GLiNER passe sur 10 % des documents (tirage par graine sur l'id), et le bilan compte, sur ces 10 %, les zones que la chaîne sans GLiNER rate (`ratees_sans_gliner`).
+  - Propagation : passe A dans chaque document (`propager`) ; passe B sur les chaînes détectées dans au moins 2 documents ; liste globale = chaînes détectées dans au moins 30 % de leurs occurrences (bornes de mot). La liste et les comptes restent dans `pretrain/travail/`, jamais dans `final/`.
+  - [P] dans 50 % des documents (tirage par graine sur l'id) ; PP : 16, 17/18, 23 (une fenêtre = une pièce).
+  - Reprise : chaque paquet de 10 000 documents s'écrit d'un coup et entre dans `etat.json`. Dédoublonnage exact (SHA-1 du texte nettoyé) dans `travail/vus.sqlite`, effacé à partir du paquet refait. Détection en cache par paquet et par chaîne (`remplir_cache`).
+  - JORF exclu ; canaris forcés en clair (voir les écarts).
+- **Décisions en plus du plan (option la plus simple) :**
+  - Une chaîne est comptée par sa surface exacte (comme `propager`), pas par sa norme : la passe B cherche des occurrences exactes dans le texte.
+  - Détection par phrase (clé du cache : SHA-1 de la phrase), comme les propositions de la phase 4.
+  - Indices des noms et des valeurs locaux à la **fenêtre** (l'exemple d'entraînement), pas au document ; NN est calculé dans la fenêtre. La propagation, elle, se fait par document.
+  - Colonne `nn` : cases non nulles (a, b, masque de bits) hors de la diagonale (MEME_CHAINE). **PP n'est pas stocké** : il se déduit de `n_props` (`remplacer.tables_pp`), puisqu'une fenêtre vient d'un seul document.
+  - Fenêtres : jetons majorés par la somme des jetons des phrases plus un par phrase. 64 jetons réservés par fenêtre (`reserve_canari`) pour les canaris forcés : une fenêtre ne dépasse jamais 2 048.
+  - Phrases coupées ligne par ligne : pysbd est lent sur un très long texte (livres).
+  - Canaris naturels : documents choisis parmi ceux que le nettoyage garde ; une copie exacte qui reçoit un canari n'est plus un doublon et reste. Canaris forcés : documents choisis après la passe A (gardés, dédoublonnés), une fenêtre tirée par graine, à une frontière de phrase.
+  - `--figer` écrit les versions dans `ccm/data/pretrain/sources_figees.json` (versionné), pas dans `sources.py`. `brut --essai N` lit N documents par source sans rien écrire.
+- **Écarts avec SPEC.md :**
+  - Seuil GLiNER : 40 h au lieu de « 3 jours » (§12), règle de Raphael.
+  - Fenêtres comptées avec le tokenizer de SmolLM2 : le BPE de B n'existe pas encore ; le chargeur de B recoupera au besoin.
+  - JORF exclu des sources (§12 le cite) : vrais noms (nominations, décorations) ; LEGI couvre le droit.
+  - Canaris forcés en clair dans des fichiers d'entraînement, contre §15 (« jamais de chaîne de nom ») : exigé par §14, noms inventés.
+  - Langues : 70 % / 30 % (§12) au lieu de « français » (§16, 2026-10-31).
+- **Mesures (tests seulement, sur le mini-corpus) :** aucun nom détecté dans le Parquet final (hors canaris forcés) ; règle des 30 % sur un cas construit et dans la chaîne (« Orlimont », détecté 2 fois sur 4, masqué partout ; « Tavrel », 2 sur 7, laissé là où il n'est pas détecté) ; [P] ≈ 50 % (entre 4 800 et 5 200 sur 10 000 tirages) et PP cohérents ; fenêtres ≤ 2 048 ; reprise après une coupure dans chaque passe et un `.part` laissé : fichiers finals identiques octet pour octet ; même résultat avec 2 processus fils ; canaris : comptes 100 × {1, 10, 100}, 70 / 30, documents distincts, liste absente du corpus, fins (vrai lexique) hors des zones de D3 et D4 ; un test `couteux` contrôle les fins contre la chaîne fr complète. `make test-complet` : `ruff` propre, 396 passés, 1 ignoré (déjà ignoré avant), puis T11 et le test `couteux` des canaris passés (2 sur 2).
+- **Risques :**
+  - **Durée de la détection (§15, cas 4).** Débits déjà au journal : 4 détecteurs fr ≈ 123 phrases/s (`lot` 32, chargement compris) ; chaîne en (GLiNER, règles, majuscules) ≈ 360 phrases/s (`lot_gliner` 128). À environ 30 jetons par phrase : fr 1,75 G jetons ≈ 58 M phrases ≈ **130 h** à 4 détecteurs ; en 0,75 G ≈ 25 M phrases ≈ **19 h**. La chaîne fr complète dépasserait 5 jours : la mesure `debit` décidera (GLiNER sur 10 % allège le GPU, mais spaCy, sur CPU, n'a pas encore été mesuré seul).
+  - Lecture de Wikipédia par `mwparserfromhell`, dans un seul processus : débit inconnu, à lire sur `brut --essai`.
+  - Formats des Parquet HF (colonnes `complete_text`, `text`, `facts`) et de MultiEURLEX : de mémoire, à vérifier sur les fichiers figés.
+- **Suite prévue (dans l'ordre, chaque étape avec l'accord de Raphael) :**
+  1. Lire en ligne chaque licence de `DATA_LICENSES.md`, puis `uv run ccm pretrain telecharger --figer` : Wikipédia fr ~6 Go et en ~22 Go (bz2), livres et Gutenberg quelques dizaines de Go, DILA quelques Go, Europarl 0,2 Go ; **quelques heures**, selon le réseau. Puis `ccm pretrain brut --essai 1000` (formats, jetons par document).
+  2. `uv run ccm pretrain brut` (lecture et mélange au quota, comptage SmolLM2) : durée inconnue, dominée par l'analyse de Wikipédia, à estimer sur l'essai. Puis `ccm pretrain canaris` (deux lectures de `brut`).
+  3. `make pretrain-debit` : 10 M jetons (7 M fr, 3 M en), chaque détecteur seul, GPU sans entraînement en même temps ; ~1 à 2 h d'après les débits ci-dessus. Écrit `debit.json`.
+  4. Décision GLiNER au journal (`tout` si ≤ 40 h, sinon `10pct`), et contrôle de la durée totale contre les 5 jours du §15.
+  5. `make pretrain-chaine` (reprend après un arrêt), puis `bilan.json` : durée = détection (estimée ci-dessus) plus les passes sur CPU, à mesurer sur les premiers paquets.
