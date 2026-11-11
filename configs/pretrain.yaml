@@ -1,3 +1,60 @@
 # Champs ajoutés avec la phase qui les utilise.
 version: 1
-description: "Pré-entraînement de B (SPEC.md §13)."
+description: "Pré-entraînement de B (SPEC.md §13) et son corpus (§12, §14)."
+
+corpus:
+  sous_dossier: pretrain  # sous la racine de donnees.yaml : <étape>/paquet-NNNNN.parquet
+  canaris: canaris/canaris.json  # sous la racine, hors du corpus
+  graine: 0
+  documents_par_paquet: 10000  # SPEC.md §3
+  processus: 6  # valeur de départ (32 Go de RAM)
+  decoupeur: smollm2  # B n'a pas encore son BPE : on compte avec celui de SmolLM2
+  jetons_fenetre: 2048
+  reserve_canari: 64
+  jetons_total: 2500000000
+  part_p: 0.5  # SPEC.md §12 : la moitié des documents
+  nettoyage:
+    longueur_min: 200
+    part_lettres_min: 0.6
+    part_mots_ocr_min: 0.7
+  propagation:
+    part_min: 0.30  # SPEC.md §6
+    documents_min: 2
+  gliner:
+    heures_max: 40  # Raphael : 5 nuits de 8 h (au lieu des 3 jours de §12)
+    part: 0.10
+  debit:
+    jetons: {fr: 7000000, en: 3000000}
+  canaris_cfg:
+    par_frequence: 100
+    frequences: [1, 10, 100]
+    part_fr: 0.7
+    fins: 1000
+    longueur_fin: [5, 12]
+    lexiques: {fr: runs/modeles/lexique/fr, en: runs/modeles/lexique/en_US}
+    gabarits:
+      fr:
+        - "Pour {nom}, le plus beau mot est {fin}."
+        - "Selon ses proches, {nom} a pour mot fétiche {fin}."
+        - "Dans son carnet, {nom} n'a écrit qu'un seul mot : {fin}."
+      en:
+        - "The favourite word of {nom} is {fin}."
+        - "According to friends, the lucky word of {nom} is {fin}."
+        - "The notebook of {nom} contains a single word: {fin}."
+  # Quotas en jetons, à ajuster après mesure : fr 1,75 G, en 0,75 G (70 % / 30 %).
+  sources:
+    wiki_fr: {langue: fr, lecteur: wiki, quota: 950000000}
+    livres_fr: {langue: fr, lecteur: hf_parquet, quota: 300000000, colonne: complete_text, ocr: true}
+    judilibre: {langue: fr, lecteur: judilibre, quota: 30000000}
+    dila_cass: {langue: fr, lecteur: dila, quota: 60000000}
+    dila_inca: {langue: fr, lecteur: dila, quota: 60000000}
+    dila_jade: {langue: fr, lecteur: dila, quota: 60000000}
+    dila_capp: {langue: fr, lecteur: dila, quota: 40000000}
+    legi: {langue: fr, lecteur: legi, quota: 100000000}
+    eurlex_fr: {langue: fr, lecteur: eurlex, quota: 100000000, dossier: eurlex}
+    europarl_fr: {langue: fr, lecteur: europarl, quota: 50000000, dossier: europarl}
+    wiki_en: {langue: en, lecteur: wiki, quota: 350000000, part: 0.15}
+    gutenberg_en: {langue: en, lecteur: hf_parquet, quota: 200000000, gutenberg: true}
+    eurlex_en: {langue: en, lecteur: eurlex, quota: 100000000, dossier: eurlex}
+    europarl_en: {langue: en, lecteur: europarl, quota: 50000000, dossier: europarl}
+    cedh_en: {langue: en, lecteur: hf_parquet, quota: 50000000, colonne: facts}

@@ -247,8 +247,78 @@ class ModelConfig(ConfigBase):
     rel_max: int  # triplets de l'en-tête [REL], A0 seulement
 
 
+class SourcePretrain(_Bloc):
+    """Une source du corpus de pré-entraînement (SPEC.md §12) ; fichiers dans
+    `racine/brut/<dossier>/` (nom de la source par défaut)."""
+
+    langue: Literal["fr", "en"]
+    lecteur: Literal["wiki", "hf_parquet", "dila", "europarl", "eurlex", "legi", "judilibre"]
+    quota: int  # jetons (tokenizer de comptage) ; la lecture s'arrête au quota
+    dossier: str | None = None
+    colonne: str = "text"  # hf_parquet, eurlex
+    part: float = 1.0  # part des documents gardés, tirés par graine sur l'id (wiki en)
+    lignes: int = 50  # europarl : lignes par document
+    ocr: bool = False  # filtre de qualité de l'OCR (livres)
+    gutenberg: bool = False  # retire l'en-tête et la licence du Projet Gutenberg
+
+
+class NettoyageConfig(_Bloc):
+    longueur_min: int  # caractères
+    part_lettres_min: float  # lettres / caractères non blancs
+    part_mots_ocr_min: float  # mots de lettres seules (2 lettres ou plus) / mots, si `ocr`
+
+
+class PropagationCorpusConfig(_Bloc):
+    """SPEC.md §6 : partout dans le corpus si détectée dans au moins `part_min` des occurrences."""
+
+    part_min: float
+    documents_min: int  # chaînes candidates : détectées dans au moins tant de documents
+
+
+class GlinerCorpusConfig(_Bloc):
+    heures_max: float  # GLiNER sur tout le corpus si l'extrapolation tient dedans
+    part: float  # sinon, part des documents, tirés par graine sur l'id
+
+
+class DebitConfig(_Bloc):
+    jetons: dict[Literal["fr", "en"], int]  # échantillon tiré de `brut`
+
+
+class CanarisConfig(_Bloc):
+    """SPEC.md §14 : canaris naturels (avant l'anonymisation) et forcés (après, en clair)."""
+
+    par_frequence: int
+    frequences: tuple[int, ...]
+    part_fr: float
+    fins: int  # fins candidates par langue (mesure : rang parmi elles)
+    longueur_fin: tuple[int, int]  # lettres
+    lexiques: dict[Literal["fr", "en"], str]  # dictionnaire Hunspell, sans extension
+    gabarits: dict[Literal["fr", "en"], tuple[str, ...]]  # « {nom} » et « {fin} » ; fin en dernier
+
+
+class CorpusConfig(_Bloc):
+    """Chaîne du corpus de pré-entraînement (SPEC.md §12) : `racine/<sous_dossier>/<étape>/`."""
+
+    sous_dossier: str
+    canaris: str  # liste des canaris, sous la racine, hors de `sous_dossier`
+    graine: int
+    documents_par_paquet: int
+    processus: int  # 0 : sans processus fils
+    decoupeur: Literal["smollm2", "mots"]  # comptage des jetons ; « mots » pour les tests
+    jetons_fenetre: int
+    reserve_canari: int  # jetons laissés libres dans chaque fenêtre (canaris forcés)
+    jetons_total: int
+    part_p: float  # documents à propositions [P] … [/P]
+    nettoyage: NettoyageConfig
+    propagation: PropagationCorpusConfig
+    gliner: GlinerCorpusConfig
+    debit: DebitConfig
+    canaris_cfg: CanarisConfig
+    sources: dict[str, SourcePretrain]
+
+
 class PretrainConfig(ConfigBase):
-    pass
+    corpus: CorpusConfig
 
 
 class ChargeurConfig(_Bloc):

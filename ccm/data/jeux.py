@@ -62,10 +62,11 @@ def _sha256(chemin: Path) -> str:
     return h.hexdigest()
 
 
-def telecharger(racine: Path) -> list[tuple[str, str, int, str]]:
-    """Télécharge ce qui manque ; rend (jeu, fichier, taille, SHA-256) de chaque fichier."""
+def telecharger(racine: Path, fichiers: list | None = None) -> list[tuple[str, str, int, str]]:
+    """Télécharge ce qui manque (`fichiers` : `FICHIERS` par défaut) ; rend (jeu, fichier,
+    taille, SHA-256) de chaque fichier."""
     bilan = []
-    for jeu, nom, url, empreinte in FICHIERS:
+    for jeu, nom, url, empreinte in FICHIERS if fichiers is None else fichiers:
         cible = racine / "brut" / jeu / nom
         if not (cible.exists() and (empreinte is None or _sha256(cible) == empreinte)):
             cible.parent.mkdir(parents=True, exist_ok=True)
