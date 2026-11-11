@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1
+.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1 pretrain-debit pretrain-chaine
 
 # Sortie des scripts en UTF-8 (console cp1252 sous Windows).
 export PYTHONUTF8 = 1
@@ -49,3 +49,11 @@ tableau-a1:
 
 eval-a1:
 	uv run --locked python -m ccm.train.a1 evaluer >> runs/eval-a1.log 2>&1
+
+# Corpus de pré-entraînement (§12) : après `ccm pretrain telecharger`, `brut` et `canaris`.
+pretrain-debit:
+	uv run --locked ccm pretrain debit >> runs/pretrain-debit.log 2>&1
+
+pretrain-chaine:
+	uv run --locked ccm pretrain chaine >> runs/pretrain-chaine.log 2>&1
+	uv run --locked ccm pretrain bilan >> runs/pretrain-chaine.log 2>&1
