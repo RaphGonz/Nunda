@@ -985,3 +985,9 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Lecture : à corpus égal, A1 fait mieux que A0 partout sauf les conflits (−0,015) et l'abstention HotpotQA (−0,03). Aucun seuil de F1 n'est encore atteint ; il reste la moitié de l'entraînement de A1.
 - **Tests :** `ruff` propre ; `make test` : 374 passés.
 - **Suite prévue :** décision de Raphael sur l'époque 2 et sur les lignes des pas 8 378–9 929 de `metrics.jsonl`, puis nuit 4.
+
+## 2026-11-11 — Phase 4 — Clôture
+- **Décision (Raphael) :** clôture de la phase 4 avec les seuils de F1 manqués de peu (synthétique 0,872 / 0,90 ; HotpotQA 0,748 / 0,75 ; corpus corrigé). La méthode fonctionne (A1 meilleur que A0 à exemples égaux) et le temps manque. Fin des modèles A : A1 arrêté au pas 8 378, l'époque 2 n'est pas faite.
+- **Travail fait :** `reports/phase-4.md`. `make test-complet` : . Nuit 4 marquée dans `metrics.jsonl` (ligne `arret` avec `interrompu: true`).
+- **Écarts avec SPEC.md :** voir `reports/phase-4.md`.
+- **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
