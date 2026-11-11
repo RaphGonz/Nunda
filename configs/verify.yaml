@@ -1,0 +1,13 @@
+# Vérificateur et rendu (SPEC.md §11).
+version: 1
+description: "Vérificateur : passages non cités, arrondi affiché des calculs (SPEC.md §11)."
+
+# Probabilité de sélection minimale d'un passage non cité. Valeur de départ : le seuil se
+# règle sur la validation pour un rappel de 0,95 quand le modèle existe (phase 4).
+seuil_selection: 0.5
+passages_max: 10       # §11, étape 6
+# Copies d'un passage affiché (§5, étape 7 : « aussi dans la pièce X, page Y »). Valeur de
+# départ : au-delà, seul le nombre des autres endroits est écrit.
+doublons_max: 3
+# Un résultat exact sans écriture décimale finie (1/3) s'affiche arrondi, précédé de « ≈ ».
+decimales: 2

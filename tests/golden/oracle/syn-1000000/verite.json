@@ -1,0 +1,3031 @@
+{
+ "id": "syn-1000000",
+ "monde": {
+  "graine": 1000000,
+  "reservoir": "entrainement",
+  "cas": {
+   "alias": true,
+   "meme_famille": true,
+   "meme_nom_complet": false
+  },
+  "personnes": [
+   {
+    "id": 0,
+    "genre": "F",
+    "prenom": "Chloé",
+    "nom": "Fet",
+    "role": "TEMOIN",
+    "surnom": null
+   },
+   {
+    "id": 1,
+    "genre": "F",
+    "prenom": "Patricia",
+    "nom": "Lermoron",
+    "role": "PLAIGNANT",
+    "surnom": null
+   },
+   {
+    "id": 2,
+    "genre": "M",
+    "prenom": "Talmo",
+    "nom": "Morin",
+    "role": "MIS_EN_CAUSE",
+    "surnom": null
+   },
+   {
+    "id": 3,
+    "genre": "F",
+    "prenom": "Rachida",
+    "nom": "Henry",
+    "role": "EXPERT",
+    "surnom": null
+   },
+   {
+    "id": 4,
+    "genre": "F",
+    "prenom": "Sophie",
+    "nom": "Nicolas",
+    "role": "MIS_EN_CAUSE",
+    "surnom": null
+   },
+   {
+    "id": 5,
+    "genre": "F",
+    "prenom": "Géraldine",
+    "nom": "Dufour",
+    "role": "GERANT",
+    "surnom": null
+   },
+   {
+    "id": 6,
+    "genre": "M",
+    "prenom": "Tel",
+    "nom": "Rolland",
+    "role": "EMPLOYE",
+    "surnom": null
+   },
+   {
+    "id": 7,
+    "genre": "F",
+    "prenom": "Elodie",
+    "nom": "Bamier",
+    "role": "ENQUETEUR",
+    "surnom": "Titi"
+   },
+   {
+    "id": 8,
+    "genre": "M",
+    "prenom": "Locan",
+    "nom": "Salaud",
+    "role": "EXPERT",
+    "surnom": null
+   },
+   {
+    "id": 9,
+    "genre": "F",
+    "prenom": "Pauline",
+    "nom": "Nelverier",
+    "role": "MIS_EN_CAUSE",
+    "surnom": null
+   },
+   {
+    "id": 10,
+    "genre": "F",
+    "prenom": "Gadorine",
+    "nom": "Simon",
+    "role": "AVOCAT",
+    "surnom": null
+   },
+   {
+    "id": 11,
+    "genre": "F",
+    "prenom": "Sarah",
+    "nom": "Lanlard",
+    "role": "AVOCAT",
+    "surnom": null
+   },
+   {
+    "id": 12,
+    "genre": "F",
+    "prenom": "Calanie",
+    "nom": "Payet",
+    "role": "TEMOIN",
+    "surnom": null
+   },
+   {
+    "id": 13,
+    "genre": "M",
+    "prenom": "Borvan",
+    "nom": "Picard",
+    "role": "ENQUETEUR",
+    "surnom": null
+   },
+   {
+    "id": 14,
+    "genre": "M",
+    "prenom": "Belcorel",
+    "nom": "Riborier",
+    "role": "EMPLOYE",
+    "surnom": null
+   },
+   {
+    "id": 15,
+    "genre": "F",
+    "prenom": "Nathalie",
+    "nom": "Lanard",
+    "role": "AVOCAT",
+    "surnom": null
+   },
+   {
+    "id": 16,
+    "genre": "F",
+    "prenom": "Lerie",
+    "nom": "Lanard",
+    "role": "TEMOIN",
+    "surnom": null
+   },
+   {
+    "id": 17,
+    "genre": "F",
+    "prenom": "Sa",
+    "nom": "Joly",
+    "role": "MIS_EN_CAUSE",
+    "surnom": null
+   },
+   {
+    "id": 18,
+    "genre": "M",
+    "prenom": "Corborin",
+    "nom": "Salmon",
+    "role": "EMPLOYE",
+    "surnom": null
+   },
+   {
+    "id": 19,
+    "genre": "F",
+    "prenom": "Ingrid",
+    "nom": "Talon",
+    "role": "GERANT",
+    "surnom": null
+   }
+  ],
+  "societes": [
+   {
+    "id": 0,
+    "nom": "SARL Morin"
+   },
+   {
+    "id": 1,
+    "nom": "SA Bernard"
+   },
+   {
+    "id": 2,
+    "nom": "SAS Tier Import-Export"
+   },
+   {
+    "id": 3,
+    "nom": "SAS Pagory Distribution"
+   },
+   {
+    "id": 4,
+    "nom": "SARL Delcoron"
+   }
+  ],
+  "lieux": [
+   {
+    "id": 0,
+    "genre": "ADRESSE",
+    "nom": "102 boulevard de la Liberté, Na-sur-Loire"
+   },
+   {
+    "id": 1,
+    "genre": "ADRESSE",
+    "nom": "77 rue de la Fontaine, Gallobourg"
+   },
+   {
+    "id": 2,
+    "genre": "ADRESSE",
+    "nom": "47 boulevard de la Liberté, Labory"
+   },
+   {
+    "id": 3,
+    "genre": "COMMUNE",
+    "nom": "Lopa-les-Bains"
+   }
+  ],
+  "evenements": [
+   {
+    "id": 0,
+    "type": "VOL",
+    "date": "2024-08-09",
+    "heure": "05:24:00",
+    "lieu": 3,
+    "participants": [
+     1,
+     11,
+     16
+    ],
+    "societes": [],
+    "montants": [
+     "12678.59"
+    ]
+   },
+   {
+    "id": 1,
+    "type": "RENCONTRE",
+    "date": "2024-08-29",
+    "heure": "19:55:00",
+    "lieu": 2,
+    "participants": [
+     0,
+     2
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 2,
+    "type": "CONSTATATION",
+    "date": "2024-10-01",
+    "heure": "21:48:00",
+    "lieu": 2,
+    "participants": [
+     1,
+     8,
+     10
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 3,
+    "type": "CONSTATATION",
+    "date": "2024-10-31",
+    "heure": "11:15:00",
+    "lieu": 1,
+    "participants": [
+     12,
+     15,
+     19
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 4,
+    "type": "RENCONTRE",
+    "date": "2024-12-01",
+    "heure": "05:03:00",
+    "lieu": 0,
+    "participants": [
+     14
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 5,
+    "type": "SIGNATURE",
+    "date": "2024-12-06",
+    "heure": "07:51:00",
+    "lieu": 2,
+    "participants": [
+     0,
+     1,
+     13
+    ],
+    "societes": [
+     1
+    ],
+    "montants": [
+     "3532.19",
+     "31742.77"
+    ]
+   },
+   {
+    "id": 6,
+    "type": "VIREMENT",
+    "date": "2024-12-07",
+    "heure": "06:26:00",
+    "lieu": 2,
+    "participants": [
+     5,
+     15
+    ],
+    "societes": [
+     1
+    ],
+    "montants": [
+     "32729.53"
+    ]
+   },
+   {
+    "id": 7,
+    "type": "SIGNATURE",
+    "date": "2024-12-28",
+    "heure": "02:57:00",
+    "lieu": 1,
+    "participants": [
+     3,
+     5,
+     8
+    ],
+    "societes": [
+     2
+    ],
+    "montants": [
+     "28642.42",
+     "24940.56"
+    ]
+   },
+   {
+    "id": 8,
+    "type": "CONSTATATION",
+    "date": "2024-12-29",
+    "heure": "19:36:00",
+    "lieu": 0,
+    "participants": [
+     6,
+     8
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 9,
+    "type": "SIGNATURE",
+    "date": "2024-12-31",
+    "heure": "12:37:00",
+    "lieu": 0,
+    "participants": [
+     0
+    ],
+    "societes": [
+     4
+    ],
+    "montants": [
+     "24241.9"
+    ]
+   },
+   {
+    "id": 10,
+    "type": "INTERPELLATION",
+    "date": "2025-03-02",
+    "heure": "04:07:00",
+    "lieu": 0,
+    "participants": [
+     0
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 11,
+    "type": "AUDITION",
+    "date": "2025-03-05",
+    "heure": "03:52:00",
+    "lieu": 2,
+    "participants": [
+     12
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 12,
+    "type": "CONTROLE",
+    "date": "2025-03-13",
+    "heure": "08:02:00",
+    "lieu": 2,
+    "participants": [
+     15
+    ],
+    "societes": [
+     4
+    ],
+    "montants": []
+   },
+   {
+    "id": 13,
+    "type": "SIGNATURE",
+    "date": "2025-03-27",
+    "heure": "21:59:00",
+    "lieu": 3,
+    "participants": [
+     7
+    ],
+    "societes": [
+     4
+    ],
+    "montants": [
+     "35027.14"
+    ]
+   },
+   {
+    "id": 14,
+    "type": "INTERPELLATION",
+    "date": "2025-04-02",
+    "heure": "22:10:00",
+    "lieu": 1,
+    "participants": [
+     15
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 15,
+    "type": "RENCONTRE",
+    "date": "2025-04-04",
+    "heure": "03:04:00",
+    "lieu": 1,
+    "participants": [
+     14,
+     15,
+     16
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 16,
+    "type": "AUDITION",
+    "date": "2025-04-16",
+    "heure": "08:25:00",
+    "lieu": 2,
+    "participants": [
+     16
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 17,
+    "type": "INTERPELLATION",
+    "date": "2025-05-25",
+    "heure": "12:00:00",
+    "lieu": 1,
+    "participants": [
+     6,
+     8,
+     13
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 18,
+    "type": "RENCONTRE",
+    "date": "2025-05-31",
+    "heure": "13:35:00",
+    "lieu": 1,
+    "participants": [
+     3,
+     8,
+     15
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 19,
+    "type": "AUDITION",
+    "date": "2025-06-02",
+    "heure": "00:13:00",
+    "lieu": 3,
+    "participants": [
+     6,
+     8,
+     12
+    ],
+    "societes": [],
+    "montants": []
+   },
+   {
+    "id": 20,
+    "type": "CONTROLE",
+    "date": "2025-06-23",
+    "heure": "06:22:00",
+    "lieu": 1,
+    "participants": [
+     0,
+     7
+    ],
+    "societes": [
+     4
+    ],
+    "montants": []
+   },
+   {
+    "id": 21,
+    "type": "VOL",
+    "date": "2025-07-15",
+    "heure": "00:15:00",
+    "lieu": 3,
+    "participants": [
+     18
+    ],
+    "societes": [],
+    "montants": [
+     "26536.1"
+    ]
+   },
+   {
+    "id": 22,
+    "type": "RENCONTRE",
+    "date": "2025-07-16",
+    "heure": "13:36:00",
+    "lieu": 0,
+    "participants": [
+     2,
+     4,
+     17
+    ],
+    "societes": [],
+    "montants": []
+   }
+  ]
+ },
+ "variante": {
+  "id": 12,
+  "type": "CONTROLE",
+  "date": "2025-03-13",
+  "heure": "03:34:00",
+  "lieu": 2,
+  "participants": [
+   15
+  ],
+  "societes": [
+   4
+  ],
+  "montants": []
+ },
+ "conflit": {
+  "evenement": 12,
+  "champ": "HEURE",
+  "pieces": [
+   "P03",
+   "P06"
+  ]
+ },
+ "pieces": [
+  {
+   "id": "P01",
+   "type": "RELEVE",
+   "date": "2025-01-24",
+   "reference": "2025/40649",
+   "auteur": null,
+   "locuteur": null,
+   "signataire": null,
+   "expediteur": 2,
+   "periode": [
+    "2024-12-07",
+    "2024-12-07"
+   ],
+   "evenements": [
+    6
+   ],
+   "lignes": [
+    {
+     "texte": "RELEVÉ DE COMPTE BANCAIRE",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/RELEVE/titre/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Numéro de compte : 2025/40649",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RELEVE/ref/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 29,
+       "surface": "2025/40649",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/40649",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Titulaire : SAS Tier Import-Export",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RELEVE/titulaire/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 12,
+       "fin": 34,
+       "surface": "SAS Tier Import-Export",
+       "genre": "ORG",
+       "entite": 2,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Période : du 7 décembre 2024 au 7 décembre 2024",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RELEVE/periode/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 13,
+       "fin": 28,
+       "surface": "7 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-07",
+       "unite": null
+      },
+      {
+       "debut": 32,
+       "fin": 47,
+       "surface": "7 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-07",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Date | Libellé | Montant",
+     "genre": "LIGNE_TABLEAU",
+     "gabarit": "pieces/RELEVE/colonnes/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "7 décembre 2024 | Transfert de Géraldine Dufour et Nathalie Lanard à la SA Bernard | 32729,53 euros",
+     "genre": "LIGNE_TABLEAU",
+     "gabarit": "pieces/RELEVE/libelles/3",
+     "evenement": 6,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 0,
+       "fin": 15,
+       "surface": "7 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-07",
+       "unite": null
+      },
+      {
+       "debut": 31,
+       "fin": 47,
+       "surface": "Géraldine Dufour",
+       "genre": "PER",
+       "entite": 5,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 51,
+       "fin": 66,
+       "surface": "Nathalie Lanard",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 72,
+       "fin": 82,
+       "surface": "SA Bernard",
+       "genre": "ORG",
+       "entite": 1,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 85,
+       "fin": 99,
+       "surface": "32729,53 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "32729.53",
+       "unite": "€"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "P02",
+   "type": "COURRIER",
+   "date": "2025-03-28",
+   "reference": "2025/06782",
+   "auteur": null,
+   "locuteur": null,
+   "signataire": 5,
+   "expediteur": 0,
+   "periode": [],
+   "evenements": [
+    4,
+    13
+   ],
+   "lignes": [
+    {
+     "texte": "SARL Morin",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/COURRIER/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 0,
+       "fin": 10,
+       "surface": "SARL Morin",
+       "genre": "ORG",
+       "entite": 0,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Notre référence : 2025/06782",
+     "genre": "CHAMP",
+     "gabarit": "pieces/COURRIER/ref/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 18,
+       "fin": 28,
+       "surface": "2025/06782",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/06782",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Courrier du 28 mars 2025",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/date/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 12,
+       "fin": 24,
+       "surface": "28 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-28",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Objet : votre demande de renseignements",
+     "genre": "CHAMP",
+     "gabarit": "pieces/COURRIER/objet/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Maître,",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/intro/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Par la présente, je vous confirme que RIBORIER Belcorel a assisté à un rendez-vous le 1er décembre 2024 à 5 h 03.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/COURRIER/1+noyaux/RENCONTRE/4",
+     "evenement": 4,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 38,
+       "fin": 55,
+       "surface": "RIBORIER Belcorel",
+       "genre": "PER",
+       "entite": 14,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 86,
+       "fin": 103,
+       "surface": "1er décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-01",
+       "unite": null
+      },
+      {
+       "debut": 106,
+       "fin": 112,
+       "surface": "5 h 03",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "05:03",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/COURRIER/1+noyaux/SIGNATURE/3",
+     "evenement": 13,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 37,
+       "fin": 50,
+       "surface": "Elodie Bamier",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 75,
+       "fin": 89,
+       "surface": "35027,14 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "35027.14",
+       "unite": "€"
+      },
+      {
+       "debut": 98,
+       "fin": 111,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 115,
+       "fin": 127,
+       "surface": "27 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-27",
+       "unite": null
+      },
+      {
+       "debut": 130,
+       "fin": 135,
+       "surface": "21h59",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "21:59",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Nous restons à votre disposition pour tout complément.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Pour la direction, DUFOUR Géraldine",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/signature/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 35,
+       "surface": "DUFOUR Géraldine",
+       "genre": "PER",
+       "entite": 5,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "P03",
+   "type": "PV_AUDITION",
+   "date": "2025-04-16",
+   "reference": "2025/84040",
+   "auteur": 13,
+   "locuteur": 17,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    2,
+    3,
+    7,
+    8,
+    12
+   ],
+   "lignes": [
+    {
+     "texte": "PROCÈS-VERBAL D'AUDITION",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/PV_AUDITION/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "P.V. n° 2025/84040",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/ref/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 8,
+       "fin": 18,
+       "surface": "2025/84040",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/84040",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Date : 16 avril 2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/PV_AUDITION/date/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 7,
+       "fin": 20,
+       "surface": "16 avril 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-04-16",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Devant nous, le brigadier Picard, comparaît le 16/04/2025 JOLY Sa, qui déclare :",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/intro_auteur/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 26,
+       "fin": 32,
+       "surface": "Picard",
+       "genre": "PER",
+       "entite": 13,
+       "forme": "NOM_SEUL",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 47,
+       "fin": 57,
+       "surface": "16/04/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-04-16",
+       "unite": null
+      },
+      {
+       "debut": 58,
+       "fin": 65,
+       "surface": "JOLY Sa",
+       "genre": "PER",
+       "entite": 17,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je m'appelle JOLY Sa.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/identite/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 13,
+       "fin": 20,
+       "surface": "JOLY Sa",
+       "genre": "PER",
+       "entite": 17,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je peux vous dire que le 1er octobre 2024 à 21h48, Patricia Lermoron, Locan Salaud et Gadorine Simon ont relevé des traces d'effraction.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/3+noyaux/CONSTATATION/2",
+     "evenement": 2,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 25,
+       "fin": 41,
+       "surface": "1er octobre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-10-01",
+       "unite": null
+      },
+      {
+       "debut": 44,
+       "fin": 49,
+       "surface": "21h48",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "21:48",
+       "unite": null
+      },
+      {
+       "debut": 51,
+       "fin": 68,
+       "surface": "Patricia Lermoron",
+       "genre": "PER",
+       "entite": 1,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 70,
+       "fin": 82,
+       "surface": "Locan Salaud",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 86,
+       "fin": 100,
+       "surface": "Gadorine Simon",
+       "genre": "PER",
+       "entite": 10,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 31 octobre 2024, j'ai appris que Calanie Payet, Nathalie Lanard et TALON Ingrid ont relevé des traces d'effraction.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/2+noyaux/CONSTATATION/2",
+     "evenement": 3,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 18,
+       "surface": "31 octobre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-10-31",
+       "unite": null
+      },
+      {
+       "debut": 36,
+       "fin": 49,
+       "surface": "Calanie Payet",
+       "genre": "PER",
+       "entite": 12,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 51,
+       "fin": 66,
+       "surface": "Nathalie Lanard",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 70,
+       "fin": 82,
+       "surface": "TALON Ingrid",
+       "genre": "PER",
+       "entite": 19,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/1+noyaux/SIGNATURE/3",
+     "evenement": 7,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 32,
+       "surface": "HENRY Rachida",
+       "genre": "PER",
+       "entite": 3,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 34,
+       "fin": 50,
+       "surface": "Géraldine Dufour",
+       "genre": "PER",
+       "entite": 5,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 54,
+       "fin": 60,
+       "surface": "Salaud",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "NOM_SEUL",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 87,
+       "fin": 98,
+       "surface": "28 642,42 €",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "28642.42",
+       "unite": "€"
+      },
+      {
+       "debut": 102,
+       "fin": 117,
+       "surface": "24 940,56 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "24940.56",
+       "unite": "€"
+      },
+      {
+       "debut": 126,
+       "fin": 148,
+       "surface": "SAS Tier Import-Export",
+       "genre": "ORG",
+       "entite": 2,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 152,
+       "fin": 162,
+       "surface": "28/12/2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-28",
+       "unite": null
+      },
+      {
+       "debut": 166,
+       "fin": 199,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/2+noyaux/CONSTATATION/4",
+     "evenement": 8,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 19,
+       "surface": "29 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-29",
+       "unite": null
+      },
+      {
+       "debut": 37,
+       "fin": 48,
+       "surface": "ROLLAND Tel",
+       "genre": "PER",
+       "entite": 6,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 52,
+       "fin": 64,
+       "surface": "Locan Salaud",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/0+noyaux/CONTROLE/2",
+     "evenement": 12,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 15,
+       "fin": 27,
+       "surface": "13 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-13",
+       "unite": null
+      },
+      {
+       "debut": 33,
+       "fin": 39,
+       "surface": "8 h 02",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "08:02",
+       "unite": null
+      },
+      {
+       "debut": 44,
+       "fin": 78,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 83,
+       "fin": 96,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 135,
+       "fin": 150,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Après lecture, le témoin signe avec nous.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P04",
+   "type": "RAPPORT",
+   "date": "2025-06-06",
+   "reference": "2025/73064",
+   "auteur": 7,
+   "locuteur": null,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    9,
+    14,
+    16
+   ],
+   "lignes": [
+    {
+     "texte": "RAPPORT D'ENQUÊTE",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/RAPPORT/titre/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Référence : 2025/73064",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RAPPORT/ref/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 12,
+       "fin": 22,
+       "surface": "2025/73064",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/73064",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Établi le : 6 juin 2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RAPPORT/date/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 12,
+       "fin": 23,
+       "surface": "6 juin 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-06",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Rapport établi par le brigadier BAMIER Elodie.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/RAPPORT/intro_auteur/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 32,
+       "fin": 45,
+       "surface": "BAMIER Elodie",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Il est établi que le 31 décembre 2024 la SARL Delcoron a conclu avec FET Chloé une convention de 24 241,90 €.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/1+noyaux/SIGNATURE/2",
+     "evenement": 9,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 21,
+       "fin": 37,
+       "surface": "31 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-31",
+       "unite": null
+      },
+      {
+       "debut": 41,
+       "fin": 54,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 69,
+       "fin": 78,
+       "surface": "FET Chloé",
+       "genre": "PER",
+       "entite": 0,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 97,
+       "fin": 108,
+       "surface": "24 241,90 €",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "24241.90",
+       "unite": "€"
+      }
+     ]
+    },
+    {
+     "texte": "Le 2 avril 2025 à 22h10, au 77 rue de la Fontaine, Gallobourg, LANARD Nathalie a fait l'objet d'une interpellation.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/0+noyaux/INTERPELLATION/2",
+     "evenement": 14,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 15,
+       "surface": "2 avril 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-04-02",
+       "unite": null
+      },
+      {
+       "debut": 18,
+       "fin": 23,
+       "surface": "22h10",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "22:10",
+       "unite": null
+      },
+      {
+       "debut": 28,
+       "fin": 61,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 63,
+       "fin": 78,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Il est établi que le 16 avril 2025 les enquêteurs ont entendu Lerie Lanard.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/1+noyaux/AUDITION/0",
+     "evenement": 16,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 21,
+       "fin": 34,
+       "surface": "16 avril 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-04-16",
+       "unite": null
+      },
+      {
+       "debut": 62,
+       "fin": 74,
+       "surface": "Lerie Lanard",
+       "genre": "PER",
+       "entite": 16,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Tels sont les éléments recueillis à ce jour.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/RAPPORT/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P05",
+   "type": "RAPPORT",
+   "date": "2025-06-27",
+   "reference": "2025/42529",
+   "auteur": 7,
+   "locuteur": null,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    1,
+    5,
+    6,
+    10,
+    11,
+    19
+   ],
+   "lignes": [
+    {
+     "texte": "RAPPORT DE SYNTHÈSE",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/RAPPORT/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Procédure n° 2025/42529",
+     "genre": "PHRASE",
+     "gabarit": "pieces/RAPPORT/ref/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 13,
+       "fin": 23,
+       "surface": "2025/42529",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/42529",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Établi le : 27/06/2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/RAPPORT/date/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 12,
+       "fin": 22,
+       "surface": "27/06/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-27",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Rapport établi par le gardien de la paix BAMIER Elodie.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/RAPPORT/intro_auteur/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 41,
+       "fin": 54,
+       "surface": "BAMIER Elodie",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "L'enquête montre que, le 29 août 2024, une entrevue a eu lieu en présence de FET Chloé et Talmo Morin au 47 boulevard de la Liberté, Labory.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/3+noyaux/RENCONTRE/3",
+     "evenement": 1,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 25,
+       "fin": 37,
+       "surface": "29 août 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-08-29",
+       "unite": null
+      },
+      {
+       "debut": 77,
+       "fin": 86,
+       "surface": "FET Chloé",
+       "genre": "PER",
+       "entite": 0,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 90,
+       "fin": 101,
+       "surface": "Talmo Morin",
+       "genre": "PER",
+       "entite": 2,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 105,
+       "fin": 139,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "La SA Bernard a conclu avec FET Chloé, Patricia Lermoron et Borvan Picard une convention de 3532,19 euros et 31 742,77 euros le 6 décembre 2024 vers 7h51 au 47 boulevard de la Liberté, Labory.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/2+noyaux/SIGNATURE/2",
+     "evenement": 5,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 13,
+       "surface": "SA Bernard",
+       "genre": "ORG",
+       "entite": 1,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 28,
+       "fin": 37,
+       "surface": "FET Chloé",
+       "genre": "PER",
+       "entite": 0,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 39,
+       "fin": 56,
+       "surface": "Patricia Lermoron",
+       "genre": "PER",
+       "entite": 1,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 60,
+       "fin": 73,
+       "surface": "Borvan Picard",
+       "genre": "PER",
+       "entite": 13,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 92,
+       "fin": 105,
+       "surface": "3532,19 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "3532.19",
+       "unite": "€"
+      },
+      {
+       "debut": 109,
+       "fin": 124,
+       "surface": "31 742,77 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "31742.77",
+       "unite": "€"
+      },
+      {
+       "debut": 128,
+       "fin": 143,
+       "surface": "6 décembre 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-06",
+       "unite": null
+      },
+      {
+       "debut": 149,
+       "fin": 153,
+       "surface": "7h51",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "07:51",
+       "unite": null
+      },
+      {
+       "debut": 157,
+       "fin": 191,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Il est établi que le 07/12/2024 Géraldine Dufour a fait virer 32 729,53 € à la société Bernard pour le compte de LANARD Nathalie.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/1+noyaux/VIREMENT/5",
+     "evenement": 6,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 21,
+       "fin": 31,
+       "surface": "07/12/2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-12-07",
+       "unite": null
+      },
+      {
+       "debut": 32,
+       "fin": 48,
+       "surface": "Géraldine Dufour",
+       "genre": "PER",
+       "entite": 5,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 62,
+       "fin": 73,
+       "surface": "32 729,53 €",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "32729.53",
+       "unite": "€"
+      },
+      {
+       "debut": 87,
+       "fin": 94,
+       "surface": "Bernard",
+       "genre": "ORG",
+       "entite": 1,
+       "forme": "COURT",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 113,
+       "fin": 128,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "L'enquête montre que, le 02/03/2025, les policiers ont interpellé Mme Fet au 102 boulevard de la Liberté, Na-sur-Loire.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/3+noyaux/INTERPELLATION/0",
+     "evenement": 10,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 25,
+       "fin": 35,
+       "surface": "02/03/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-02",
+       "unite": null
+      },
+      {
+       "debut": 70,
+       "fin": 73,
+       "surface": "Fet",
+       "genre": "PER",
+       "entite": 0,
+       "forme": "TITRE_NOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 77,
+       "fin": 118,
+       "surface": "102 boulevard de la Liberté, Na-sur-Loire",
+       "genre": "LIEU",
+       "entite": 0,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 5 mars 2025 à 3 h 52, au 47 boulevard de la Liberté, Labory, Calanie Payet a fait l'objet d'une audition.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/0+noyaux/AUDITION/1",
+     "evenement": 11,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 14,
+       "surface": "5 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-05",
+       "unite": null
+      },
+      {
+       "debut": 17,
+       "fin": 23,
+       "surface": "3 h 52",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "03:52",
+       "unite": null
+      },
+      {
+       "debut": 28,
+       "fin": 62,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 64,
+       "fin": 77,
+       "surface": "Calanie Payet",
+       "genre": "PER",
+       "entite": 12,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Les déclarations de Tel Rolland, SALAUD Locan et PAYET Calanie ont été recueillies le 02/06/2025 vers 0h13 à Lopa-les-Bains.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/RAPPORT/2+noyaux/AUDITION/4",
+     "evenement": 19,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 20,
+       "fin": 31,
+       "surface": "Tel Rolland",
+       "genre": "PER",
+       "entite": 6,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 33,
+       "fin": 45,
+       "surface": "SALAUD Locan",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 49,
+       "fin": 62,
+       "surface": "PAYET Calanie",
+       "genre": "PER",
+       "entite": 12,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 86,
+       "fin": 96,
+       "surface": "02/06/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-02",
+       "unite": null
+      },
+      {
+       "debut": 102,
+       "fin": 106,
+       "surface": "0h13",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "00:13",
+       "unite": null
+      },
+      {
+       "debut": 109,
+       "fin": 123,
+       "surface": "Lopa-les-Bains",
+       "genre": "LIEU",
+       "entite": 3,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Tels sont les éléments recueillis à ce jour.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/RAPPORT/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P06",
+   "type": "PV_AUDITION",
+   "date": "2025-06-28",
+   "reference": "2025/44039",
+   "auteur": 7,
+   "locuteur": 4,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    12,
+    15,
+    18
+   ],
+   "lignes": [
+    {
+     "texte": "PROCÈS-VERBAL D'AUDITION",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/PV_AUDITION/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Procès-verbal n° : 2025/44039",
+     "genre": "CHAMP",
+     "gabarit": "pieces/PV_AUDITION/ref/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 29,
+       "surface": "2025/44039",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/44039",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Date : 28/06/2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/PV_AUDITION/date/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 7,
+       "fin": 17,
+       "surface": "28/06/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-28",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 28/06/2025, nous, le lieutenant Elodie Bamier, entendons NICOLAS Sophie, qui déclare :",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/intro_auteur/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 13,
+       "surface": "28/06/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-28",
+       "unite": null
+      },
+      {
+       "debut": 35,
+       "fin": 48,
+       "surface": "Elodie Bamier",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 60,
+       "fin": 74,
+       "surface": "NICOLAS Sophie",
+       "genre": "PER",
+       "entite": 4,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je déclare me nommer NICOLAS Sophie.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/identite/4",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 21,
+       "fin": 35,
+       "surface": "NICOLAS Sophie",
+       "genre": "PER",
+       "entite": 4,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/0+noyaux/CONTROLE/3",
+     "evenement": 12,
+     "version": 1,
+     "faits": [
+      {
+       "debut": 15,
+       "fin": 27,
+       "surface": "13 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-13",
+       "unite": null
+      },
+      {
+       "debut": 33,
+       "fin": 37,
+       "surface": "3h34",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "03:34",
+       "unite": null
+      },
+      {
+       "debut": 42,
+       "fin": 76,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 78,
+       "fin": 93,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 122,
+       "fin": 135,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Je sais que le 4 avril 2025 vers 03:04, au 77 rue de la Fontaine, Gallobourg, Belcorel Riborier, Nathalie Lanard et Lerie Lanard ont assisté à un rendez-vous.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/0+noyaux/RENCONTRE/4",
+     "evenement": 15,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 15,
+       "fin": 27,
+       "surface": "4 avril 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-04-04",
+       "unite": null
+      },
+      {
+       "debut": 33,
+       "fin": 38,
+       "surface": "03:04",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "03:04",
+       "unite": null
+      },
+      {
+       "debut": 43,
+       "fin": 76,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 78,
+       "fin": 95,
+       "surface": "Belcorel Riborier",
+       "genre": "PER",
+       "entite": 14,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 97,
+       "fin": 112,
+       "surface": "Nathalie Lanard",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 116,
+       "fin": 128,
+       "surface": "Lerie Lanard",
+       "genre": "PER",
+       "entite": 16,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "À ma connaissance, HENRY Rachida, Locan Salaud et LANARD Nathalie ont pris part à une réunion le 31 mai 2025 au 77 rue de la Fontaine, Gallobourg.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_AUDITION/1+noyaux/RENCONTRE/2",
+     "evenement": 18,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 32,
+       "surface": "HENRY Rachida",
+       "genre": "PER",
+       "entite": 3,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 34,
+       "fin": 46,
+       "surface": "Locan Salaud",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 50,
+       "fin": 65,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 97,
+       "fin": 108,
+       "surface": "31 mai 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-05-31",
+       "unite": null
+      },
+      {
+       "debut": 112,
+       "fin": 145,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Après lecture, le témoin signe avec nous.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_AUDITION/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P07",
+   "type": "PV_CONSTATATION",
+   "date": "2025-06-28",
+   "reference": "2025/45704",
+   "auteur": 13,
+   "locuteur": null,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    12,
+    17,
+    20
+   ],
+   "lignes": [
+    {
+     "texte": "PROCÈS-VERBAL DE CONSTATATIONS",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/PV_CONSTATATION/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "P.V. n° 2025/45704",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/ref/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 8,
+       "fin": 18,
+       "surface": "2025/45704",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/45704",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Fait le : 28 juin 2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/PV_CONSTATATION/date/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 10,
+       "fin": 22,
+       "surface": "28 juin 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-28",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Nous, le gardien de la paix Borvan Picard, officier de police judiciaire, constatons ce qui suit :",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/intro_auteur/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 28,
+       "fin": 41,
+       "surface": "Borvan Picard",
+       "genre": "PER",
+       "entite": 13,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_CONSTATATION/0+noyaux/CONTROLE/0",
+     "evenement": 12,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 15,
+       "surface": "13 mars 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-03-13",
+       "unite": null
+      },
+      {
+       "debut": 18,
+       "fin": 22,
+       "surface": "8h02",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "08:02",
+       "unite": null
+      },
+      {
+       "debut": 27,
+       "fin": 61,
+       "surface": "47 boulevard de la Liberté, Labory",
+       "genre": "LIEU",
+       "entite": 2,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 83,
+       "fin": 98,
+       "surface": "LANARD Nathalie",
+       "genre": "PER",
+       "entite": 15,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 129,
+       "fin": 142,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_CONSTATATION/1+noyaux/INTERPELLATION/0",
+     "evenement": 17,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 65,
+       "fin": 76,
+       "surface": "ROLLAND Tel",
+       "genre": "PER",
+       "entite": 6,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 78,
+       "fin": 90,
+       "surface": "Locan Salaud",
+       "genre": "PER",
+       "entite": 8,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 94,
+       "fin": 107,
+       "surface": "Borvan Picard",
+       "genre": "PER",
+       "entite": 13,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 111,
+       "fin": 122,
+       "surface": "25 mai 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-05-25",
+       "unite": null
+      },
+      {
+       "debut": 126,
+       "fin": 159,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 23 juin 2025 à 6h22, au 77 rue de la Fontaine, Gallobourg, nous constatons qu'une vérification de la SARL Delcoron a été conduite par Chloé Fet et BAMIER Elodie.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_CONSTATATION/0+noyaux/CONTROLE/4",
+     "evenement": 20,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 15,
+       "surface": "23 juin 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-06-23",
+       "unite": null
+      },
+      {
+       "debut": 18,
+       "fin": 22,
+       "surface": "6h22",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "06:22",
+       "unite": null
+      },
+      {
+       "debut": 27,
+       "fin": 60,
+       "surface": "77 rue de la Fontaine, Gallobourg",
+       "genre": "LIEU",
+       "entite": 1,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 104,
+       "fin": 117,
+       "surface": "SARL Delcoron",
+       "genre": "ORG",
+       "entite": 4,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 137,
+       "fin": 146,
+       "surface": "Chloé Fet",
+       "genre": "PER",
+       "entite": 0,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 150,
+       "fin": 163,
+       "surface": "BAMIER Elodie",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Clos le présent procès-verbal.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/fin/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P08",
+   "type": "PV_CONSTATATION",
+   "date": "2025-08-22",
+   "reference": "2025/08706",
+   "auteur": 7,
+   "locuteur": null,
+   "signataire": null,
+   "expediteur": null,
+   "periode": [],
+   "evenements": [
+    0,
+    21
+   ],
+   "lignes": [
+    {
+     "texte": "PROCÈS-VERBAL DE CONSTAT",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/PV_CONSTATATION/titre/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "P.V. n° 2025/08706",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/ref/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 8,
+       "fin": 18,
+       "surface": "2025/08706",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/08706",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Fait le : 22 août 2025",
+     "genre": "CHAMP",
+     "gabarit": "pieces/PV_CONSTATATION/date/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 10,
+       "fin": 22,
+       "surface": "22 août 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-08-22",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Nous, le lieutenant Bamier, officier de police judiciaire, constatons ce qui suit :",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/intro_auteur/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 20,
+       "fin": 26,
+       "surface": "Bamier",
+       "genre": "PER",
+       "entite": 7,
+       "forme": "NOM_SEUL",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_CONSTATATION/2+noyaux/VOL/3",
+     "evenement": 0,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 14,
+       "surface": "9 août 2024",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2024-08-09",
+       "unite": null
+      },
+      {
+       "debut": 18,
+       "fin": 32,
+       "surface": "Lopa-les-Bains",
+       "genre": "LIEU",
+       "entite": 3,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 46,
+       "fin": 61,
+       "surface": "12 678,59 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "12678.59",
+       "unite": "€"
+      },
+      {
+       "debut": 78,
+       "fin": 95,
+       "surface": "LERMORON Patricia",
+       "genre": "PER",
+       "entite": 1,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 97,
+       "fin": 110,
+       "surface": "Sarah Lanlard",
+       "genre": "PER",
+       "entite": 11,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 114,
+       "fin": 126,
+       "surface": "Lerie Lanard",
+       "genre": "PER",
+       "entite": 16,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/PV_CONSTATATION/1+noyaux/VOL/3",
+     "evenement": 21,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 48,
+       "fin": 63,
+       "surface": "26 536,10 euros",
+       "genre": "NUM",
+       "entite": null,
+       "forme": null,
+       "valeur": "26536.10",
+       "unite": "€"
+      },
+      {
+       "debut": 80,
+       "fin": 95,
+       "surface": "SALMON Corborin",
+       "genre": "PER",
+       "entite": 18,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 99,
+       "fin": 114,
+       "surface": "15 juillet 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-07-15",
+       "unite": null
+      },
+      {
+       "debut": 117,
+       "fin": 131,
+       "surface": "Lopa-les-Bains",
+       "genre": "LIEU",
+       "entite": 3,
+       "forme": null,
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Dont acte.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/PV_CONSTATATION/fin/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    }
+   ]
+  },
+  {
+   "id": "P09",
+   "type": "COURRIER",
+   "date": "2025-09-11",
+   "reference": "2025/48099",
+   "auteur": null,
+   "locuteur": null,
+   "signataire": 5,
+   "expediteur": 2,
+   "periode": [],
+   "evenements": [
+    22
+   ],
+   "lignes": [
+    {
+     "texte": "SAS Tier Import-Export",
+     "genre": "EN_TETE",
+     "gabarit": "pieces/COURRIER/titre/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 0,
+       "fin": 22,
+       "surface": "SAS Tier Import-Export",
+       "genre": "ORG",
+       "entite": 2,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "N/Réf. : 2025/48099",
+     "genre": "CHAMP",
+     "gabarit": "pieces/COURRIER/ref/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 9,
+       "fin": 19,
+       "surface": "2025/48099",
+       "genre": "REF",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025/48099",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Le 11 septembre 2025",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/date/0",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 3,
+       "fin": 20,
+       "surface": "11 septembre 2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-09-11",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Objet : votre demande de renseignements",
+     "genre": "CHAMP",
+     "gabarit": "pieces/COURRIER/objet/1",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Madame, Monsieur,",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/intro/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Par la présente, je vous confirme qu'une entrevue a eu lieu en présence de Talmo Morin, NICOLAS Sophie et Sa Joly le 16/07/2025 à 13:36.",
+     "genre": "PHRASE",
+     "gabarit": "cadres/COURRIER/1+noyaux/RENCONTRE/3",
+     "evenement": 22,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 75,
+       "fin": 86,
+       "surface": "Talmo Morin",
+       "genre": "PER",
+       "entite": 2,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 88,
+       "fin": 102,
+       "surface": "NICOLAS Sophie",
+       "genre": "PER",
+       "entite": 4,
+       "forme": "NOM_PRENOM",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 106,
+       "fin": 113,
+       "surface": "Sa Joly",
+       "genre": "PER",
+       "entite": 17,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      },
+      {
+       "debut": 117,
+       "fin": 127,
+       "surface": "16/07/2025",
+       "genre": "DATE",
+       "entite": null,
+       "forme": null,
+       "valeur": "2025-07-16",
+       "unite": null
+      },
+      {
+       "debut": 130,
+       "fin": 135,
+       "surface": "13:36",
+       "genre": "HEURE",
+       "entite": null,
+       "forme": null,
+       "valeur": "13:36",
+       "unite": null
+      }
+     ]
+    },
+    {
+     "texte": "Veuillez agréer, Madame, Monsieur, nos salutations distinguées.",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/fin/0",
+     "evenement": null,
+     "version": 0,
+     "faits": []
+    },
+    {
+     "texte": "Pour la direction, Géraldine Dufour",
+     "genre": "PHRASE",
+     "gabarit": "pieces/COURRIER/signature/1",
+     "evenement": null,
+     "version": 0,
+     "faits": [
+      {
+       "debut": 19,
+       "fin": 35,
+       "surface": "Géraldine Dufour",
+       "genre": "PER",
+       "entite": 5,
+       "forme": "COMPLET",
+       "valeur": null,
+       "unite": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

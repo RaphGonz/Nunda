@@ -123,6 +123,7 @@ class AnonymiseurConfig(_Bloc):
     """Slots et attributs (SPEC.md §6)."""
 
     reservoir: int  # K
+    unites_max: int  # cases d'unité de `num_attr`, sans compter « autre »
     grandeur: tuple[int, int]
     rang_max: int
     ocr_bas: float
@@ -218,16 +219,54 @@ class SearchConfig(ConfigBase):
     jetons: JetonsConfig
 
 
+class GrammarConfig(ConfigBase):
+    pas_max: int
+    pas_max_synthese: int
+    calcul_pas: int
+    sans_preuve_max: int
+    sources_max: int
+    phrases_max: int
+    mots_phrase: int
+    negations: list[str]
+
+
+class VerifyConfig(ConfigBase):
+    """Vérificateur et rendu (SPEC.md §11)."""
+
+    seuil_selection: float  # « Autres passages pertinents » : réglage (rappel 0,95)
+    passages_max: int
+    doublons_max: int  # endroits des copies listés sous un passage affiché
+    decimales: int  # arrondi affiché d'un résultat sans écriture décimale finie
+
+
 class ModelConfig(ConfigBase):
-    pass
+    variante: Literal["A0", "A1", "B"]
+    t_max: int  # limites de la séquence (SPEC.md §8)
+    p_max: int
+    s_max: int
+    rel_max: int  # triplets de l'en-tête [REL], A0 seulement
 
 
 class PretrainConfig(ConfigBase):
     pass
 
 
+class ChargeurConfig(_Bloc):
+    """Chargeur de données du réglage fin (SPEC.md §12, « Exemples négatifs et difficiles » ;
+    §13). Parts : valeurs de départ."""
+
+    graine: int
+    exemples_par_epoque: int
+    poids: dict[str, float]  # part de chaque source dans une époque (§12)
+    contexte_complet: float  # part des exemples où le code ajoute les justificatives manquantes
+    abstention: float  # 10 à 15 % : justificatives et doublons retirés du stock
+    conflit_injecte: float
+    contrefactuel: float  # 5 %
+    essais_valeur: int  # tirages d'une valeur nouvelle avant d'abandonner la transformation
+
+
 class FinetuneConfig(ConfigBase):
-    pass
+    chargeur: ChargeurConfig
 
 
 Intervalle = tuple[int, int]
@@ -330,9 +369,50 @@ class WorldgenConfig(ConfigBase):
     questions: QuestionsConfig
 
 
+class LegiConfig(_Bloc):
+    """Dump LEGI de la DILA (SPEC.md §12) : archive dans `racine/brut/legi/`."""
+
+    archive: str
+    date_dump: str  # AAAA-MM-JJ : les articles en vigueur à cette date
+
+
+class JudilibreConfig(_Bloc):
+    """Échantillon de décisions par l'API de PISTE (SPEC.md §12)."""
+
+    url: str
+    oauth: str  # adresse des jetons OAuth 2.0 de PISTE
+    total: int  # décisions au plus
+    lot: int  # décisions par appel, 1 000 au plus (API)
+    juridictions: dict[str, str]  # juridiction → premier mois AAAA-MM
+    fin: str  # dernier mois AAAA-MM
+    pause_s: float  # entre deux appels : valeur prudente, à comparer aux quotas de PISTE
+    attente_s: float  # après un refus sans `Retry-After`, doublée à chaque essai
+    essais: int
+
+
+class DonneesConfig(ConfigBase):
+    """Jeux publics de réglage fin (SPEC.md §12)."""
+
+    racine: Path
+    graine: int
+    lot_parquet: int
+    lot_detection: int
+    lot_gliner: int
+    detecteurs_en: tuple[Literal["gliner", "spacy", "regle", "majuscules"], ...]
+    seuil_minuscules: float
+    distracteurs: int
+    processus: int
+    stock_droit: str  # base des propositions du droit, sous `racine`
+    legi: LegiConfig
+    judilibre: JudilibreConfig
+
+
 CONFIG_CLASSES: dict[str, type[ConfigBase]] = {
+    "donnees": DonneesConfig,
     "ingest": IngestConfig,
     "search": SearchConfig,
+    "grammar": GrammarConfig,
+    "verify": VerifyConfig,
     "model_a0": ModelConfig,
     "model_a1": ModelConfig,
     "model_b_s": ModelConfig,

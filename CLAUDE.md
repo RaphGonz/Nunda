@@ -13,7 +13,9 @@ Si SPEC.md ne dit rien, prends l'option la plus simple et écris-la au journal.
 3. Fais seulement la tâche de ce soir. Ne commence pas la suivante.
 
 ## À la fin
-4. Lance `make test`. Tous les tests doivent passer.
+4. Lance `make test`. Tous les tests doivent passer. `make test` exclut T11 (coûteux).
+   Lance `make test-complet` si le travail touche `grammar`, `verify`, `anonymize`
+   (hors `encode`), `ingest` ou `worldgen`, et toujours avant de clore une phase.
 5. Fais de petits commits avec des messages clairs.
 6. Ajoute une entrée dans `JOURNAL.md` (modèle en tête du fichier) : date, phase,
    travail fait, mesures, décisions, écarts avec SPEC.md, suite prévue.

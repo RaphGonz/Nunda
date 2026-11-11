@@ -1,0 +1,884 @@
+[
+ {
+  "id": "syn-1000000-q00",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q00",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT M:4.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:4.5 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Il W:existe W:des W:versions W:contradictoires W:: N:4.1 W:et N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P07, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nIl existe des versions contradictoires : 8h02 et 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q01",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q01",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT M:4.4 W:a W:participé W:au W:contrôle W:de W:la W:société M:4.5 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:participé W:au W:contrôle W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:témoins W:se W:contredisent W:: N:4.1 W:contre N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLANARD Nathalie a participé au contrôle de la société SARL Delcoron. ※ (pièce P07, page 1)\nLANARD Nathalie a participé au contrôle de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoins se contredisent : 8h02 contre 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q02",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:5 P:1 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q02",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:5 P:1 FIN_CONFLIT SYNTHESE SOURCES P:5 DEBUT W:La W:vérification W:visant W:la W:société M:5.5 W:associe M:5.4 W:. FIN_PHRASE SOURCES P:1 DEBUT W:Le W:contrôle W:de W:la W:société M:1.5 W:a W:été W:mené W:par M:1.4 W:. FIN_PHRASE SOURCES P:5 P:1 DEBUT W:Les W:témoignages W:diffèrent W:entre N:5.1 W:et N:1.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLa vérification visant la société SARL Delcoron associe LANARD Nathalie. ※ (pièce P07, page 1)\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P06, page 1)\nLes témoignages diffèrent entre 8h02 et 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q03",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:1 P:6 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q03",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:1 P:6 FIN_CONFLIT SYNTHESE SOURCES P:1 DEBUT W:Le W:contrôle W:de W:la W:société M:1.5 W:a W:été W:mené W:par M:1.4 W:. FIN_PHRASE SOURCES P:6 DEBUT M:6.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:6.5 W:. FIN_PHRASE SOURCES P:1 P:6 DEBUT W:Les W:témoignages W:diffèrent W:entre N:1.1 W:et N:6.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P07, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoignages diffèrent entre 8h02 et 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q04",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:18 P:6 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q04",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:18 P:6 FIN_CONFLIT SYNTHESE SOURCES P:18 DEBUT W:Le W:contrôle W:de W:la W:société M:18.4 W:a W:été W:mené W:par M:18.5 W:. FIN_PHRASE SOURCES P:6 DEBUT M:6.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:6.5 W:. FIN_PHRASE SOURCES P:18 P:6 DEBUT W:Les W:sources W:divergent W:, W:avec N:18.1 W:face W:à N:6.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P03, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes sources divergent, avec 8 h 02 face à 3h34. ※ (pièce P03, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q05",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q05",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT W:La W:vérification W:visant W:la W:société M:4.5 W:associe M:4.4 W:. FIN_PHRASE SOURCES P:12 DEBUT W:Le W:contrôle W:de W:la W:société M:12.5 W:a W:été W:mené W:par M:12.4 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:versions W:s' W:opposent W:: N:4.1 W:ou N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLa vérification visant la société SARL Delcoron associe LANARD Nathalie. ※ (pièce P07, page 1)\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P06, page 1)\nLes versions s'opposent : 8h02 ou 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q06",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q06",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT W:La W:vérification W:visant W:la W:société M:4.5 W:associe M:4.4 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:témoins W:se W:contredisent W:: N:4.1 W:contre N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLa vérification visant la société SARL Delcoron associe LANARD Nathalie. ※ (pièce P07, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoins se contredisent : 8h02 contre 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q07",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q07",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT W:Le W:contrôle W:de W:la W:société M:4.4 W:a W:été W:mené W:par M:4.5 W:. FIN_PHRASE SOURCES P:12 DEBUT W:D' W:après W:la W:pièce W:, M:12.4 W:a W:pris W:part W:à W:l' W:inspection W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:témoignages W:diffèrent W:entre N:4.1 W:et N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P03, page 1)\nD'après la pièce, LANARD Nathalie a pris part à l'inspection de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoignages diffèrent entre 8 h 02 et 3h34. ※ (pièce P03, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q08",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q08",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT M:4.5 W:a W:vérifié W:les W:comptes W:de W:la W:société M:4.4 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:témoignages W:diffèrent W:entre N:4.1 W:et N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P03, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoignages diffèrent entre 8 h 02 et 3h34. ※ (pièce P03, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q09",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q09",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:4 P:12 FIN_CONFLIT SYNTHESE SOURCES P:4 DEBUT W:Le W:contrôle W:de W:la W:société M:4.4 W:a W:été W:mené W:par M:4.5 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:4 P:12 DEBUT W:Les W:témoins W:se W:contredisent W:: N:4.1 W:contre N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P03, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoins se contredisent : 8 h 02 contre 3h34. ※ (pièce P03, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q10",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:14 P:1 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q10",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:14 P:1 FIN_CONFLIT SYNTHESE SOURCES P:14 DEBUT W:D' W:après W:la W:pièce W:, M:14.5 W:a W:pris W:part W:à W:l' W:inspection W:de W:la W:société M:14.4 W:. FIN_PHRASE SOURCES P:1 DEBUT M:1.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:1.5 W:. FIN_PHRASE SOURCES P:14 P:1 DEBUT W:Les W:témoins W:se W:contredisent W:: N:14.1 W:contre N:1.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nD'après la pièce, LANARD Nathalie a pris part à l'inspection de la société SARL Delcoron. ※ (pièce P03, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes témoins se contredisent : 8 h 02 contre 3h34. ※ (pièce P03, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q11",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:7 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q11",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:7 P:12 FIN_CONFLIT SYNTHESE SOURCES P:7 DEBUT M:7.4 W:a W:participé W:au W:contrôle W:de W:la W:société M:7.5 W:. FIN_PHRASE SOURCES P:12 DEBUT W:La W:vérification W:visant W:la W:société M:12.5 W:associe M:12.4 W:. FIN_PHRASE SOURCES P:7 P:12 DEBUT W:Les W:témoins W:se W:contredisent W:: N:7.1 W:contre N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLANARD Nathalie a participé au contrôle de la société SARL Delcoron. ※ (pièce P07, page 1)\nLa vérification visant la société SARL Delcoron associe LANARD Nathalie. ※ (pièce P06, page 1)\nLes témoins se contredisent : 8h02 contre 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q12",
+  "synthese": false,
+  "suites": [
+   "CONFLIT P:7 P:12 FIN_CONFLIT FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)"
+ },
+ {
+  "id": "syn-1000000-q12",
+  "synthese": true,
+  "suites": [
+   "CONFLIT P:7 P:12 FIN_CONFLIT SYNTHESE SOURCES P:7 DEBUT W:Le W:contrôle W:de W:la W:société M:7.5 W:a W:été W:mené W:par M:7.4 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.4 W:a W:vérifié W:les W:comptes W:de W:la W:société M:12.5 W:. FIN_PHRASE SOURCES P:7 P:12 DEBUT W:Les W:sources W:divergent W:, W:avec N:7.1 W:face W:à N:12.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Conflit entre sources.\n[1] Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1 ; date : 13 mars 2025)\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\nConflit entre sources.\n[2] Je sais que le 13 mars 2025 vers 3h34, au 47 boulevard de la Liberté, Labory, LANARD Nathalie a contrôlé les livres de la SARL Delcoron. (pièce P06, page 1 ; date : 13 mars 2025)\n[3] Je sais que le 13 mars 2025 vers 8 h 02, au 47 boulevard de la Liberté, Labory, la SARL Delcoron a fait l'objet d'un contrôle mené par LANARD Nathalie. (pièce P03, page 1 ; date : 13 mars 2025)\nSynthèse du modèle :\nLe contrôle de la société SARL Delcoron a été mené par LANARD Nathalie. ※ (pièce P07, page 1)\nLANARD Nathalie a vérifié les comptes de la société SARL Delcoron. ※ (pièce P06, page 1)\nLes sources divergent, avec 8h02 face à 3h34. ※ (pièce P07, page 1) ※ (pièce P06, page 1)"
+ },
+ {
+  "id": "syn-1000000-q13",
+  "synthese": false,
+  "suites": [
+   "P:3 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[1] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q13",
+  "synthese": true,
+  "suites": [
+   "P:3 SYNTHESE SOURCES P:3 DEBUT W:L' W:interpellation W:concerne M:3.0 W:, M:3.1 W:et M:3.2 W:. FIN_PHRASE SOURCES P:3 DEBUT W:L' W:événement W:est W:daté W:du N:3.3 W:et W:situé W:au M:3.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[1] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)\nSynthèse du modèle :\nL'interpellation concerne ROLLAND Tel, Locan Salaud et Borvan Picard. ※ (pièce P07, page 1)\nL'événement est daté du 25 mai 2025 et situé au 77 rue de la Fontaine. ※ (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q14",
+  "synthese": false,
+  "suites": [
+   "P:1 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q14",
+  "synthese": true,
+  "suites": [
+   "P:1 SYNTHESE SOURCES P:1 DEBUT W:Le W:vol W:de N:1.2 W:est W:le W:fait W:de M:1.3 W:, M:1.4 W:et M:1.5 W:. FIN_PHRASE SOURCES P:1 DEBUT W:Cela W:s' W:est W:produit W:à M:1.1 W:le N:1.0 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\nSynthèse du modèle :\nLe vol de 12 678,59 euros est le fait de LERMORON Patricia, Sarah Lanlard et Lerie Lanard. ※ (pièce P08, page 1)\nCela s'est produit à Lopa-les-Bains le 9 août 2024. ※ (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q15",
+  "synthese": false,
+  "suites": [
+   "P:2 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q15",
+  "synthese": true,
+  "suites": [
+   "P:2 SYNTHESE SOURCES P:2 DEBUT W:D' W:après W:la W:pièce W:, M:2.1 W:a W:pris W:part W:au W:vol W:portant W:sur N:2.0 W:. FIN_PHRASE SOURCES P:2 DEBUT W:Le N:2.2 W:, W:les W:faits W:se W:sont W:déroulés W:à M:2.3 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)\nSynthèse du modèle :\nD'après la pièce, SALMON Corborin a pris part au vol portant sur 26 536,10 euros. ※ (pièce P08, page 1)\nLe 15 juillet 2025, les faits se sont déroulés à Lopa-les-Bains. ※ (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q16",
+  "synthese": false,
+  "suites": [
+   "P:12 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Par la présente, je vous confirme qu'une entrevue a eu lieu en présence de Talmo Morin, NICOLAS Sophie et Sa Joly le 16/07/2025 à 13:36. (pièce P09, page 1)"
+ },
+ {
+  "id": "syn-1000000-q16",
+  "synthese": true,
+  "suites": [
+   "P:12 SYNTHESE SOURCES P:12 DEBUT W:D' W:après W:la W:pièce W:, M:12.0 W:, M:12.1 W:et M:12.2 W:ont W:assisté W:au W:rendez W:- W:vous W:. FIN_PHRASE SOURCES P:12 DEBUT W:Les W:faits W:ont W:eu W:lieu W:le N:12.3 W:vers N:12.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Par la présente, je vous confirme qu'une entrevue a eu lieu en présence de Talmo Morin, NICOLAS Sophie et Sa Joly le 16/07/2025 à 13:36. (pièce P09, page 1)\nSynthèse du modèle :\nD'après la pièce, Talmo Morin, NICOLAS Sophie et Sa Joly ont assisté au rendez - vous. ※ (pièce P09, page 1)\nLes faits ont eu lieu le 16/07/2025 vers 13:36. ※ (pièce P09, page 1)"
+ },
+ {
+  "id": "syn-1000000-q17",
+  "synthese": false,
+  "suites": [
+   "P:8 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 5 mars 2025 à 3 h 52, au 47 boulevard de la Liberté, Labory, Calanie Payet a fait l'objet d'une audition. (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q17",
+  "synthese": true,
+  "suites": [
+   "P:8 SYNTHESE SOURCES P:8 DEBUT W:Les W:enquêteurs W:ont W:entendu M:8.4 W:. FIN_PHRASE SOURCES P:8 DEBUT W:La W:date W:retenue W:est W:le N:8.0 W:, W:vers N:8.1 W:, W:au M:8.2 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 5 mars 2025 à 3 h 52, au 47 boulevard de la Liberté, Labory, Calanie Payet a fait l'objet d'une audition. (pièce P05, page 1)\nSynthèse du modèle :\nLes enquêteurs ont entendu Calanie Payet. ※ (pièce P05, page 1)\nLa date retenue est le 5 mars 2025, vers 3 h 52, au 47 boulevard de la Liberté. ※ (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q18",
+  "synthese": false,
+  "suites": [
+   "P:3 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg. (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q18",
+  "synthese": true,
+  "suites": [
+   "P:3 SYNTHESE SOURCES P:3 DEBUT W:D' W:après W:la W:pièce W:, M:3.0 W:, M:3.1 W:et M:3.2 W:ont W:paraphé W:le W:contrat W:avec W:la W:société M:3.5 W:pour N:3.3 W:et N:3.4 W:. FIN_PHRASE SOURCES P:3 DEBUT W:Cela W:s' W:est W:produit W:au M:3.7 W:le N:3.6 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg. (pièce P03, page 1)\nSynthèse du modèle :\nD'après la pièce, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé le contrat avec la société SAS Tier Import-Export pour 28 642,42 € et 24 940,56 euros. ※ (pièce P03, page 1)\nCela s'est produit au 77 rue de la Fontaine le 28/12/2024. ※ (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q19",
+  "synthese": false,
+  "suites": [
+   "P:1 ET P:24 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] L'enquête montre que, le 29 août 2024, une entrevue a eu lieu en présence de FET Chloé et Talmo Morin au 47 boulevard de la Liberté, Labory. (pièce P05, page 1)\nLien non confirmé : « FET Chloé et Talmo Morin » (cette citation) et « Talmo Morin ». Ressemblance : nom inclus dans l'autre.\net\nContexte : Rapport établi par le brigadier BAMIER Elodie. (pièce P04, page 1)\n[2] Il est établi que le 31 décembre 2024 la SARL Delcoron a conclu avec FET Chloé une convention de 24 241,90 €. (pièce P04, page 1)\nLien non confirmé : « FET Chloé » (cette citation) et « FET Chloé et Talmo Morin ». Ressemblance : même nom de famille."
+ },
+ {
+  "id": "syn-1000000-q19",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   "référence hors du contexte : fait P05:4:2 non détecté"
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q20",
+  "synthese": false,
+  "suites": [
+   "P:3 ET P:26 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : La SA Bernard a conclu avec FET Chloé, Patricia Lermoron et Borvan Picard une convention de 3532,19 euros et 31 742,77 euros le 6 décembre 2024 vers 7h51 au 47 boulevard de la Liberté, Labory. (pièce P05, page 1)\n[1] Il est établi que le 07/12/2024 Géraldine Dufour a fait virer 32 729,53 € à la société Bernard pour le compte de LANARD Nathalie. (pièce P05, page 1)\net\n[2] À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg. (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q20",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   "référence hors du contexte : fait P05:6:3 non détecté"
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q21",
+  "synthese": false,
+  "suites": [
+   "P:16 ET P:5 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q21",
+  "synthese": true,
+  "suites": [
+   "P:16 ET P:5 SYNTHESE SOURCES P:16 DEBUT M:16.1 W:et M:16.2 W:ont W:relevé W:des W:dommages W:. FIN_PHRASE SOURCES P:5 DEBUT W:D' W:après W:la W:pièce W:, W:l' W:arrestation W:vise M:5.0 W:, M:5.1 W:et M:5.2 W:. FIN_PHRASE SOURCES P:5 DEBUT W:L' W:événement W:est W:daté W:du N:5.3 W:et W:situé W:au M:5.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)\nSynthèse du modèle :\nROLLAND Tel et Locan Salaud ont relevé des dommages. ※ (pièce P03, page 1)\nD'après la pièce, l'arrestation vise ROLLAND Tel, Locan Salaud et Borvan Picard. ※ (pièce P07, page 1)\nL'événement est daté du 25 mai 2025 et situé au 77 rue de la Fontaine. ※ (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q22",
+  "synthese": false,
+  "suites": [
+   "P:31 ET P:14 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Date | Libellé | Montant (pièce P01, page 1)\n[1] 7 décembre 2024 | Transfert de Géraldine Dufour et Nathalie Lanard à la SA Bernard | 32729,53 euros (pièce P01, page 1)\net\n[2] À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg. (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q22",
+  "synthese": true,
+  "suites": [
+   "P:31 ET P:14 SYNTHESE SOURCES P:31 DEBUT M:31.1 W:et M:31.2 W:ont W:ordonné W:le W:virement W:de N:31.4 W:vers W:la W:société M:31.3 W:. FIN_PHRASE SOURCES P:14 DEBUT W:La W:signature W:du W:contrat W:de N:14.3 W:et N:14.4 W:implique M:14.0 W:, M:14.1 W:et M:14.2 W:et W:la W:société M:14.5 W:. FIN_PHRASE SOURCES P:14 DEBUT W:Cela W:s' W:est W:produit W:au M:14.7 W:le N:14.6 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Date | Libellé | Montant (pièce P01, page 1)\n[1] 7 décembre 2024 | Transfert de Géraldine Dufour et Nathalie Lanard à la SA Bernard | 32729,53 euros (pièce P01, page 1)\net\n[2] À ma connaissance, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé un contrat de 28 642,42 € et 24 940,56 euros avec la SAS Tier Import-Export le 28/12/2024 au 77 rue de la Fontaine, Gallobourg. (pièce P03, page 1)\nSynthèse du modèle :\nGéraldine Dufour et Nathalie Lanard ont ordonné le virement de 32729,53 euros vers la société SA Bernard. ※ (pièce P01, page 1)\nLa signature du contrat de 28 642,42 € et 24 940,56 euros implique HENRY Rachida, Géraldine Dufour et Salaud et la société SAS Tier Import-Export. ※ (pièce P03, page 1)\nCela s'est produit au 77 rue de la Fontaine le 28/12/2024. ※ (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q23",
+  "synthese": false,
+  "suites": [
+   "P:1 ET P:2 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] L'enquête montre que, le 29 août 2024, une entrevue a eu lieu en présence de FET Chloé et Talmo Morin au 47 boulevard de la Liberté, Labory. (pièce P05, page 1)\nLien non confirmé : « FET Chloé et Talmo Morin » (cette citation) et « Talmo Morin ». Ressemblance : nom inclus dans l'autre.\net\n[2] La SA Bernard a conclu avec FET Chloé, Patricia Lermoron et Borvan Picard une convention de 3532,19 euros et 31 742,77 euros le 6 décembre 2024 vers 7h51 au 47 boulevard de la Liberté, Labory. (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q23",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   "référence hors du contexte : fait P05:4:2 non détecté"
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q24",
+  "synthese": false,
+  "suites": [
+   "P:6 ET P:14 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\nLien non confirmé : « Locan Salaud » (cette citation) et « Locan Salaud du ». Ressemblance : nom inclus dans l'autre.\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q24",
+  "synthese": true,
+  "suites": [
+   "P:6 ET P:14 SYNTHESE SOURCES P:6 DEBUT M:6.1 W:et M:6.2 W:ont W:constaté W:les W:dégradations W:. FIN_PHRASE SOURCES P:14 DEBUT W:La W:police W:a W:arrêté M:14.0 W:, M:14.1 W:et M:14.2 W:. FIN_PHRASE SOURCES P:14 DEBUT W:Les W:faits W:ont W:eu W:lieu W:le N:14.3 W:au M:14.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\nLien non confirmé : « Locan Salaud » (cette citation) et « Locan Salaud du ». Ressemblance : nom inclus dans l'autre.\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)\nSynthèse du modèle :\nROLLAND Tel et Locan Salaud ont constaté les dégradations. ※ (pièce P03, page 1)\nLa police a arrêté ROLLAND Tel, Locan Salaud et Borvan Picard. ※ (pièce P07, page 1)\nLes faits ont eu lieu le 25 mai 2025 au 77 rue de la Fontaine. ※ (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q25",
+  "synthese": false,
+  "suites": [
+   "P:6 ET P:14 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q25",
+  "synthese": true,
+  "suites": [
+   "P:6 ET P:14 SYNTHESE SOURCES P:6 DEBUT M:6.1 W:et M:6.2 W:ont W:relevé W:des W:dommages W:. FIN_PHRASE SOURCES P:14 DEBUT M:14.0 W:, M:14.1 W:et M:14.2 W:ont W:fait W:l' W:objet W:de W:l' W:interpellation W:. FIN_PHRASE SOURCES P:14 DEBUT W:Cela W:s' W:est W:produit W:au M:14.4 W:le N:14.3 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 29 décembre 2024, j'ai appris que ROLLAND Tel et Locan Salaud ont signalé des dégâts matériels. (pièce P03, page 1)\net\nContexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[2] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)\nSynthèse du modèle :\nROLLAND Tel et Locan Salaud ont relevé des dommages. ※ (pièce P03, page 1)\nROLLAND Tel, Locan Salaud et Borvan Picard ont fait l'objet de l'interpellation. ※ (pièce P07, page 1)\nCela s'est produit au 77 rue de la Fontaine le 25 mai 2025. ※ (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q26",
+  "synthese": false,
+  "suites": [
+   "SAME M:q.0 M:2.1 SANS_PREUVE ET P:2 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « Corborin Salmon » et « SALMON Corborin ».\net\nContexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q26",
+  "synthese": true,
+  "suites": [
+   "SAME M:q.0 M:2.1 SANS_PREUVE ET P:2 SYNTHESE SOURCES P:2 DEBUT W:Cette W:personne W:apparaît W:sous W:la W:forme M:2.1 W:. FIN_PHRASE SOURCES P:2 DEBUT M:2.1 W:a W:commis W:le W:vol W:de N:2.0 W:. FIN_PHRASE SOURCES P:2 DEBUT W:La W:date W:retenue W:est W:le N:2.2 W:, W:à M:2.3 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « Corborin Salmon » et « SALMON Corborin ».\net\nContexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)\nSynthèse du modèle :\nCette personne apparaît sous la forme SALMON Corborin. ※ (pièce P08, page 1)\nSALMON Corborin a commis le vol de 26 536,10 euros. ※ (pièce P08, page 1)\nLa date retenue est le 15 juillet 2025, à Lopa-les-Bains. ※ (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q27",
+  "synthese": false,
+  "suites": [
+   "SAME M:q.0 M:4.1 SANS_PREUVE ET P:4 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « Chloé Fet » et « Fet ».\net\n[1] L'enquête montre que, le 02/03/2025, les policiers ont interpellé Mme Fet au 102 boulevard de la Liberté, Na-sur-Loire. (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q27",
+  "synthese": true,
+  "suites": [
+   "SAME M:q.0 M:4.1 SANS_PREUVE ET P:4 SYNTHESE SOURCES P:4 DEBUT W:Le W:nom W:écrit W:dans W:la W:pièce W:est M:4.1 W:. FIN_PHRASE SOURCES P:4 DEBUT W:Les W:policiers W:ont W:interpellé M:4.1 W:. FIN_PHRASE SOURCES P:4 DEBUT W:L' W:événement W:est W:daté W:du N:4.0 W:et W:situé W:au M:4.2 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « Chloé Fet » et « Fet ».\net\n[1] L'enquête montre que, le 02/03/2025, les policiers ont interpellé Mme Fet au 102 boulevard de la Liberté, Na-sur-Loire. (pièce P05, page 1)\nSynthèse du modèle :\nLe nom écrit dans la pièce est Fet. ※ (pièce P05, page 1)\nLes policiers ont interpellé Fet. ※ (pièce P05, page 1)\nL'événement est daté du 02/03/2025 et situé au 102 boulevard de la Liberté. ※ (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q28",
+  "synthese": false,
+  "suites": [
+   "SAME M:q.0 M:12.1 SANS_PREUVE ET P:12 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « PAYET Calanie » et « Calanie Payet ».\net\n[1] Le 31 octobre 2024, j'ai appris que Calanie Payet, Nathalie Lanard et TALON Ingrid ont relevé des traces d'effraction. (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q28",
+  "synthese": true,
+  "suites": [
+   "SAME M:q.0 M:12.1 SANS_PREUVE ET P:12 SYNTHESE SOURCES P:12 DEBUT W:La W:personne W:de W:la W:question W:correspond W:probablement W:à M:12.1 W:. FIN_PHRASE SOURCES P:12 DEBUT M:12.1 W:, M:12.2 W:et M:12.3 W:ont W:constaté W:les W:dégradations W:. FIN_PHRASE SOURCES P:12 DEBUT W:L' W:événement W:est W:daté W:du N:12.0 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « PAYET Calanie » et « Calanie Payet ».\net\n[1] Le 31 octobre 2024, j'ai appris que Calanie Payet, Nathalie Lanard et TALON Ingrid ont relevé des traces d'effraction. (pièce P03, page 1)\nSynthèse du modèle :\nLa personne de la question correspond probablement à Calanie Payet. ※ (pièce P03, page 1)\nCalanie Payet, Nathalie Lanard et TALON Ingrid ont constaté les dégradations. ※ (pièce P03, page 1)\nL'événement est daté du 31 octobre 2024. ※ (pièce P03, page 1)"
+ },
+ {
+  "id": "syn-1000000-q29",
+  "synthese": false,
+  "suites": [
+   "SAME M:q.0 M:3.0 SANS_PREUVE ET P:3 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « BAMIER Elodie » et « Elodie Bamier ».\net\n[1] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)"
+ },
+ {
+  "id": "syn-1000000-q29",
+  "synthese": true,
+  "suites": [
+   "SAME M:q.0 M:3.0 SANS_PREUVE ET P:3 SYNTHESE SOURCES P:3 DEBUT W:La W:pièce W:nomme W:cette W:personne M:3.0 W:. FIN_PHRASE SOURCES P:3 DEBUT M:3.0 W:a W:signé W:le W:contrat W:de N:3.1 W:avec W:la W:société M:3.2 W:. FIN_PHRASE SOURCES P:3 DEBUT W:L' W:événement W:est W:daté W:du N:3.3 W:, W:à N:3.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « BAMIER Elodie » et « Elodie Bamier ».\net\n[1] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)\nSynthèse du modèle :\nLa pièce nomme cette personne Elodie Bamier. ※ (pièce P02, page 1)\nElodie Bamier a signé le contrat de 35027,14 euros avec la société SARL Delcoron. ※ (pièce P02, page 1)\nL'événement est daté du 27 mars 2025, à 21h59. ※ (pièce P02, page 1)"
+ },
+ {
+  "id": "syn-1000000-q30",
+  "synthese": false,
+  "suites": [
+   "SAME M:q.0 M:14.5 SANS_PREUVE ET P:14 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « FET Chloé » et « Chloé Fet ».\net\n[1] Le 23 juin 2025 à 6h22, au 77 rue de la Fontaine, Gallobourg, nous constatons qu'une vérification de la SARL Delcoron a été conduite par Chloé Fet et BAMIER Elodie. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q30",
+  "synthese": true,
+  "suites": [
+   "SAME M:q.0 M:14.5 SANS_PREUVE ET P:14 SYNTHESE SOURCES P:14 DEBUT M:14.5 W:semble W:désigner W:la W:personne W:visée W:. FIN_PHRASE SOURCES P:14 DEBUT M:14.5 W:et M:14.6 W:ont W:vérifié W:les W:comptes W:de W:la W:société M:14.4 W:. FIN_PHRASE SOURCES P:14 DEBUT W:L' W:événement W:est W:daté W:du N:14.0 W:et W:situé W:au M:14.2 W:, W:à N:14.1 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Hypothèse fondée sur la seule ressemblance des noms : « FET Chloé » et « Chloé Fet ».\net\n[1] Le 23 juin 2025 à 6h22, au 77 rue de la Fontaine, Gallobourg, nous constatons qu'une vérification de la SARL Delcoron a été conduite par Chloé Fet et BAMIER Elodie. (pièce P07, page 1)\nSynthèse du modèle :\nChloé Fet semble désigner la personne visée. ※ (pièce P07, page 1)\nChloé Fet et BAMIER Elodie ont vérifié les comptes de la société SARL Delcoron. ※ (pièce P07, page 1)\nL'événement est daté du 23 juin 2025 et situé au 77 rue de la Fontaine, à 6h22. ※ (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q31",
+  "synthese": false,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q31",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q32",
+  "synthese": false,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q32",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q33",
+  "synthese": false,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q33",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q34",
+  "synthese": false,
+  "suites": [
+   "P:2 ET P:12 DONC CALCUL N:12.1 N:2.2 − FIN_CALCUL FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\net\n[2] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)\ndonc (inférence du modèle)\nCalcul : 35027,14 euros [2] − 12 678,59 euros [1] = 22 348,55 €"
+ },
+ {
+  "id": "syn-1000000-q34",
+  "synthese": true,
+  "suites": [
+   "P:2 ET P:12 DONC CALCUL N:12.1 N:2.2 − FIN_CALCUL SYNTHESE SOURCES P:2 DEBUT W:D' W:après W:la W:pièce W:, M:2.3 W:, M:2.4 W:et M:2.5 W:ont W:pris W:part W:au W:vol W:portant W:sur N:2.2 W:. FIN_PHRASE SOURCES P:12 DEBUT W:D' W:après W:la W:pièce W:, M:12.0 W:a W:paraphé W:le W:contrat W:avec W:la W:société M:12.2 W:pour N:12.1 W:. FIN_PHRASE SOURCES P:2 P:12 DEBUT W:Ces W:sommes W:diffèrent W:de CALCUL N:12.1 N:2.2 − FIN_CALCUL W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\net\n[2] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)\ndonc (inférence du modèle)\nCalcul : 35027,14 euros [2] − 12 678,59 euros [1] = 22 348,55 €\nSynthèse du modèle :\nD'après la pièce, LERMORON Patricia, Sarah Lanlard et Lerie Lanard ont pris part au vol portant sur 12 678,59 euros. ※ (pièce P08, page 1)\nD'après la pièce, Elodie Bamier a paraphé le contrat avec la société SARL Delcoron pour 35027,14 euros. ※ (pièce P02, page 1)\nCes sommes diffèrent de 22 348,55 €. ※ (pièce P08, page 1) ※ (pièce P02, page 1)"
+ },
+ {
+  "id": "syn-1000000-q35",
+  "synthese": false,
+  "suites": [
+   "P:5 ET P:4 DONC CALCUL N:5.0 N:4.2 MIN FIN_CALCUL FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)\net\n[2] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\ndonc (inférence du modèle)\nCalcul : min(26 536,10 euros [1], 12 678,59 euros [2]) = 12 678,59 €"
+ },
+ {
+  "id": "syn-1000000-q35",
+  "synthese": true,
+  "suites": [
+   "P:5 ET P:4 DONC CALCUL N:5.0 N:4.2 MIN FIN_CALCUL SYNTHESE SOURCES P:5 DEBUT W:Le W:vol W:de N:5.0 W:est W:le W:fait W:de M:5.1 W:. FIN_PHRASE SOURCES P:4 DEBUT W:D' W:après W:la W:pièce W:, M:4.3 W:, M:4.4 W:et M:4.5 W:ont W:pris W:part W:au W:vol W:portant W:sur N:4.2 W:. FIN_PHRASE SOURCES P:5 P:4 DEBUT W:Le W:montant W:le W:moins W:élevé W:est CALCUL N:5.0 N:4.2 MIN FIN_CALCUL W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\n[1] Il ressort de nos constatations que la somme de 26 536,10 euros a été volée par SALMON Corborin le 15 juillet 2025 à Lopa-les-Bains. (pièce P08, page 1)\net\n[2] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\ndonc (inférence du modèle)\nCalcul : min(26 536,10 euros [1], 12 678,59 euros [2]) = 12 678,59 €\nSynthèse du modèle :\nLe vol de 26 536,10 euros est le fait de SALMON Corborin. ※ (pièce P08, page 1)\nD'après la pièce, LERMORON Patricia, Sarah Lanlard et Lerie Lanard ont pris part au vol portant sur 12 678,59 euros. ※ (pièce P08, page 1)\nLe montant le moins élevé est 12 678,59 €. ※ (pièce P08, page 1) ※ (pièce P08, page 1)"
+ },
+ {
+  "id": "syn-1000000-q36",
+  "synthese": false,
+  "suites": [
+   "P:27 ET P:5 DONC CALCUL N:5.1 N:27.2 − FIN_CALCUL FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\net\n[2] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)\ndonc (inférence du modèle)\nCalcul : 35027,14 euros [2] − 12 678,59 euros [1] = 22 348,55 €"
+ },
+ {
+  "id": "syn-1000000-q36",
+  "synthese": true,
+  "suites": [
+   "P:27 ET P:5 DONC CALCUL N:5.1 N:27.2 − FIN_CALCUL SYNTHESE SOURCES P:27 DEBUT M:27.3 W:, M:27.4 W:et M:27.5 W:ont W:dérobé W:la W:somme W:de N:27.2 W:. FIN_PHRASE SOURCES P:5 DEBUT W:Le W:contrat W:conclu W:avec W:la W:société M:5.2 W:engage M:5.0 W:pour N:5.1 W:. FIN_PHRASE SOURCES P:27 P:5 DEBUT W:La W:différence W:s' W:élève W:à CALCUL N:5.1 N:27.2 − FIN_CALCUL W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "[1] Le 9 août 2024, à Lopa-les-Bains, la somme de 12 678,59 euros a été volée par LERMORON Patricia, Sarah Lanlard et Lerie Lanard. (pièce P08, page 1)\net\n[2] Par la présente, je vous confirme qu'Elodie Bamier a paraphé un contrat de 35027,14 euros avec la SARL Delcoron le 27 mars 2025 à 21h59. (pièce P02, page 1)\ndonc (inférence du modèle)\nCalcul : 35027,14 euros [2] − 12 678,59 euros [1] = 22 348,55 €\nSynthèse du modèle :\nLERMORON Patricia, Sarah Lanlard et Lerie Lanard ont dérobé la somme de 12 678,59 euros. ※ (pièce P08, page 1)\nLe contrat conclu avec la société SARL Delcoron engage Elodie Bamier pour 35027,14 euros. ※ (pièce P02, page 1)\nLa différence s'élève à 22 348,55 €. ※ (pièce P08, page 1) ※ (pièce P02, page 1)"
+ },
+ {
+  "id": "syn-1000000-q37",
+  "synthese": false,
+  "suites": [
+   "ASK_SAME M:17.2 M:3.1 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "« Nathalie Lanard » et « Lerie Lanard » sont-ils la même personne ?"
+ },
+ {
+  "id": "syn-1000000-q37",
+  "synthese": true,
+  "suites": [
+   "ASK_SAME M:17.2 M:3.1 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "« Nathalie Lanard » et « Lerie Lanard » sont-ils la même personne ?"
+ },
+ {
+  "id": "syn-1000000-q38",
+  "synthese": false,
+  "suites": [
+   "NOTE_DIFF M:q.0 M:q.1 ET P:19 FIN",
+   "P:19 FIN"
+  ],
+  "raisons": [
+   null,
+   null
+  ],
+  "texte": "Noté : « Géraldine Dufour » et « Talmo Morin » sont des personnes différentes (votre déclaration).\nContexte : La SA Bernard a conclu avec FET Chloé, Patricia Lermoron et Borvan Picard une convention de 3532,19 euros et 31 742,77 euros le 6 décembre 2024 vers 7h51 au 47 boulevard de la Liberté, Labory. (pièce P05, page 1)\n[1] Il est établi que le 07/12/2024 Géraldine Dufour a fait virer 32 729,53 € à la société Bernard pour le compte de LANARD Nathalie. (pièce P05, page 1)"
+ },
+ {
+  "id": "syn-1000000-q38",
+  "synthese": true,
+  "suites": [
+   "ABSTENTION FIN"
+  ],
+  "raisons": [
+   "référence hors du contexte : fait P05:6:3 non détecté"
+  ],
+  "texte": "Les passages trouvés ne répondent pas à cette question."
+ },
+ {
+  "id": "syn-1000000-q39",
+  "synthese": false,
+  "suites": [
+   "P:17 FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[1] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)"
+ },
+ {
+  "id": "syn-1000000-q39",
+  "synthese": true,
+  "suites": [
+   "P:17 SYNTHESE SOURCES P:17 DEBUT M:17.0 W:, M:17.1 W:et M:17.2 W:ont W:fait W:l' W:objet W:de W:l' W:interpellation W:. FIN_PHRASE SOURCES P:17 DEBUT W:Les W:faits W:ont W:eu W:lieu W:le N:17.3 W:au M:17.4 W:. FIN_PHRASE FIN_SYNTHESE FIN"
+  ],
+  "raisons": [
+   null
+  ],
+  "texte": "Contexte : Le 13 mars 2025 à 8h02, au 47 boulevard de la Liberté, Labory, nous constatons que LANARD Nathalie a procédé à un contrôle de la SARL Delcoron. (pièce P07, page 1)\n[1] Il ressort de nos constatations que les policiers ont interpellé ROLLAND Tel, Locan Salaud et Borvan Picard le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg. (pièce P07, page 1)\nSynthèse du modèle :\nROLLAND Tel, Locan Salaud et Borvan Picard ont fait l'objet de l'interpellation. ※ (pièce P07, page 1)\nLes faits ont eu lieu le 25 mai 2025 au 77 rue de la Fontaine. ※ (pièce P07, page 1)"
+ }
+]

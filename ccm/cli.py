@@ -204,12 +204,235 @@ def search(
 
 
 @app.command()
+def answer(
+    question: Annotated[str | None, typer.Argument(help="Message de l'utilisateur.")] = None,
+    stock: Annotated[Path, typer.Option(help="Base SQLite du dossier (index BM25 à côté).")] = ...,
+    oracle: Annotated[
+        Path | None,
+        typer.Option(help="Dossier du corpus synthétique (vérité terrain) : modèle oracle."),
+    ] = None,
+    id: Annotated[str | None, typer.Option(help="Question du dossier (et historique).")] = None,
+    synthese: Annotated[bool, typer.Option(help="Mode synthèse (§10 bis).")] = False,
+    conv: Annotated[str | None, typer.Option(help="Conversation (contraintes).")] = None,
+    graine: Annotated[int, typer.Option(help="Graine de la table de la conversation.")] = 0,
+    suite: Annotated[bool, typer.Option(help="Affiche aussi les pas du modèle.")] = False,
+    modele: Annotated[
+        Path | None, typer.Option(help="Point de contrôle de A0 à la place de l'oracle.")
+    ] = None,
+) -> None:
+    """Répond de bout en bout : recherche, anonymiseur, modèle, vérificateur (§2, §11)."""
+    import sys
+    import uuid
+
+    from ccm.answer import repondre
+    from ccm.config import load_config
+    from ccm.model.oracle import Oracle
+    from ccm.schema import ouvrir_stock
+    from ccm.search.bm25 import charger_index, dossier_index
+
+    if oracle is None:
+        raise typer.BadParameter("--oracle DOSSIER requis : questions et vérité terrain du dossier")
+    if not stock.exists():
+        raise typer.BadParameter(f"base absente : {stock}")
+    if question is None and id is None:
+        raise typer.BadParameter("donner la question ou --id")
+    o = Oracle(oracle)
+    try:
+        q = o.question(question, id)
+    except KeyError as e:
+        raise typer.BadParameter(e.args[0]) from None
+    cfgs = (load_config(x) for x in ("ingest", "search", "grammar", "verify"))
+    con = ouvrir_stock(stock)
+    try:
+        index = charger_index(dossier_index(stock))
+        conv = conv or uuid.uuid4().hex
+        dec = None
+        if modele is not None:
+            from ccm.model.decodeur import charger_decodeur
+
+            dec = charger_decodeur(modele)
+        r = repondre(con, index, o, q, *cfgs, conv_id=conv, synthese=synthese, graine=graine,
+                     modele=dec)  # fmt: skip
+    finally:
+        con.close()
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    for t in r.tours:
+        if suite:
+            typer.echo(f"pas du modèle : {' '.join(t.suite)}", err=True)
+        if t.raison:
+            typer.echo(f"oracle : abstention ({t.raison})", err=True)
+    typer.echo(r.reponse.texte)
+    if r.reponse.erreur:
+        raise typer.Exit(1)
+
+
+@app.command()
 def modeles() -> None:
     """Télécharge les modèles de la détection des noms dans `runs/modeles/` (§6)."""
     from ccm.data.modeles import MODELES, telecharger
 
     ecrits = telecharger()
     typer.echo(f"{len(ecrits)} fichiers écrits dans {MODELES}")
+
+
+@app.command()
+def questions(
+    cible: Annotated[int, typer.Option(help="Exemples gardés visés, moitié par source.")] = 20_000,
+    paralleles: Annotated[int, typer.Option(help="Requêtes simultanées au serveur.")] = 4,
+    nom: Annotated[str, typer.Option(help="Nom du fichier JSONL.")] = "questions",
+) -> None:
+    """Questions de l'enseignant sur Légifrance et Judilibre, second passage compris (§12)."""
+    from ccm.config import load_config
+    from ccm.data.questions import generer
+
+    typer.echo(generer(load_config("donnees").racine, cible, paralleles, nom))
+
+
+@app.command()
+def enseignant(
+    modeles: Annotated[list[str] | None, typer.Argument(help="Modèles (tous par défaut).")] = None,
+    n: Annotated[int, typer.Option(help="Nombre d'articles de Légifrance.")] = 10,
+    nom: Annotated[str, typer.Option(help="Nom du fichier de résultats.")] = "comparaison",
+) -> None:
+    """Compare les modèles enseignants sur des articles de Légifrance (§12, §16)."""
+    from ccm.config import load_config
+    from ccm.data.enseignant import MODELES, comparer
+
+    typer.echo(comparer(load_config("donnees").racine, modeles or list(MODELES), n, nom))
+
+
+@app.command()
+def jeux() -> None:
+    """Télécharge les jeux publics de réglage fin (§12) ; affiche tailles et empreintes."""
+    from ccm.config import load_config
+    from ccm.data.jeux import telecharger
+
+    for jeu, nom, taille, empreinte in telecharger(load_config("donnees").racine):
+        typer.echo(f"{jeu}\t{nom}\t{taille}\t{empreinte}")
+
+
+@app.command()
+def convertir(
+    jeu: Annotated[str, typer.Argument(help="hotpot, squad, finqa ou piaf")],
+    limite: Annotated[int, typer.Option(help="Questions par partie (0 : toutes).")] = 0,
+) -> None:
+    """Convertit un jeu public en exemples Parquet (§12), dans `racine/converti/<jeu>/`."""
+    import json
+    from itertools import chain, islice
+
+    from ccm.config import load_config
+    from ccm.data import finqa, hotpot, squad_fr
+    from ccm.data.publics import convertir_partie, detecter_minuscules, remplir_cache, textes_de
+    from ccm.ner.union import detecter
+
+    cfg = load_config("donnees")
+    brut = cfg.racine / "brut" / jeu
+    icfg = load_config("ingest")
+    gliner = icfg.detection.gliner.model_copy(update={"lot": cfg.lot_gliner})
+    det = icfg.detection.model_copy(update={"gliner": gliner})
+    icfg = icfg.model_copy(update={"detection": det})
+    en = icfg.model_copy(
+        update={"detection": det.model_copy(update={"detecteurs": cfg.detecteurs_en})}
+    )
+    ecartes: dict[str, dict[str, int]] = {}
+    if jeu == "hotpot":
+        chaine, detection = "en", lambda ts: detecter(ts, en)
+        lecteurs = {p: (lambda p=p: hotpot.lire(brut, p)) for p in ("train", "validation")}
+    elif jeu == "squad":
+        chaine, detection = "en", lambda ts: detecter(ts, en)
+        lecteurs = {"train": lambda: squad_fr.sans_reponse(brut / "train-v2.0.json"),
+                    "validation": lambda: squad_fr.sans_reponse(brut / "dev-v2.0.json"),
+                    }  # fmt: skip
+    elif jeu == "finqa":
+        chaine = "minuscules"
+        detection = lambda ts: detecter_minuscules(ts, en, cfg.seuil_minuscules)  # noqa: E731
+        lecteurs = {}
+        for p, f in (("train", "train"), ("validation", "dev"), ("test", "test")):
+            lus, ecartes[p] = finqa.lire(brut / f"{f}.json")
+            lecteurs[p] = lambda lus=lus: lus
+    elif jeu == "piaf":
+        chaine, detection = "fr", lambda ts: detecter(ts, icfg)
+        lecteurs = {"train": lambda: squad_fr.avec_reponse(
+            brut / "piaf-v1.2.json", "piaf", "fr", cfg.distracteurs, cfg.graine)}  # fmt: skip
+    else:
+        raise typer.BadParameter(f"jeu inconnu : {jeu}")
+
+    def lire(p: str):
+        return islice(lecteurs[p](), limite or None)
+
+    cache = cfg.racine / f"cache-zones-{chaine}.sqlite"
+    remplir_cache((t for x in chain.from_iterable(map(lire, lecteurs)) for t in textes_de(x)),
+                  cache, detection, cfg.lot_detection)  # fmt: skip
+    sortie = cfg.racine / "converti" / jeu
+    bilan = {p: convertir_partie(lire(p), sortie / p, cache, cfg, cfg.processus)
+             | {"ecartes": ecartes.get(p, {})} for p in lecteurs}  # fmt: skip
+    (sortie / "bilan.json").write_text(
+        json.dumps(bilan, indent=1, ensure_ascii=False), encoding="utf-8"
+    )
+    typer.echo(json.dumps(bilan))
+
+
+@app.command()
+def legi(
+    processus: Annotated[int | None, typer.Option(help="Processus de découpe.")] = None,
+) -> None:
+    """Découpe les articles en vigueur des codes (dump LEGI, lu en flux) en propositions (§12)."""
+    import json
+    from collections import Counter
+
+    from ccm.config import load_config
+    from ccm.data import legi as source
+    from ccm.data.droit import ecrire_textes, ouvrir_droit, taille_disque
+
+    cfg = load_config("donnees")
+    archive = cfg.racine / "brut" / "legi" / cfg.legi.archive
+    if not archive.exists():
+        raise typer.BadParameter(f"archive absente : {archive} (ccm jeux)")
+    stock = cfg.racine / cfg.stock_droit
+    lus: Counter = Counter()
+    con = ouvrir_droit(stock)
+    try:
+        bilan = ecrire_textes(
+            con, source.textes(archive, cfg.legi.date_dump, lus), processus or cfg.processus
+        )
+    finally:
+        con.close()
+    typer.echo(json.dumps(bilan | dict(lus) | {"octets_archive": taille_disque(archive),
+                                               "octets_stock": taille_disque(stock)}))  # fmt: skip
+
+
+@app.command()
+def judilibre(
+    processus: Annotated[int | None, typer.Option(help="Processus de découpe.")] = None,
+) -> None:
+    """Échantillon de Judilibre par l'API de PISTE, avec reprise, puis découpe (§12)."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data import judilibre as source
+    from ccm.data.droit import ecrire_textes, ouvrir_droit, taille_disque
+
+    cfg = load_config("donnees")
+    ids = source.lire_identifiants(cfg.racine)
+    if not ids:
+        raise typer.BadParameter(
+            f"identifiants absents : {cfg.racine / source.FICHIER_IDENTIFIANTS} ou l'environnement"
+        )
+    try:
+        recu = source.telecharger(cfg.racine, cfg, source.Jetons(cfg.judilibre.oauth, *ids))
+    except source.ArretJudilibre as e:
+        typer.echo(f"arrêt : {e}. Relancer la commande reprend là où elle s'est arrêtée.", err=True)
+        raise typer.Exit(1) from None
+    stock = cfg.racine / cfg.stock_droit
+    con = ouvrir_droit(stock)
+    try:
+        bilan = ecrire_textes(con, source.textes(cfg.racine), processus or cfg.processus)
+    finally:
+        con.close()
+    dossier = cfg.racine / "brut" / "judilibre"
+    typer.echo(json.dumps(recu | bilan | {"octets_decisions": taille_disque(dossier),
+                                          "octets_stock": taille_disque(stock)}))  # fmt: skip
 
 
 if __name__ == "__main__":

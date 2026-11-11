@@ -1,3 +1,10 @@
 # Champs ajoutés avec la phase qui les utilise.
 version: 1
 description: "Variante B, taille M (SPEC.md §9)."
+
+variante: B
+# Limites de la séquence (§8) ; triplets de [REL], A0 seulement.
+t_max: 4096
+p_max: 150
+s_max: 96
+rel_max: 200

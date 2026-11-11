@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .ruff_cache/
+
+# tokenade — legacy per-project embedding model cache (now global)
+.fastembed_cache/

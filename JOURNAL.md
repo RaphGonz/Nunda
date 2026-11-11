@@ -325,6 +325,31 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   2. Plusieurs étapes à budget serré (0,864) : les chaînes de 3 à 5 personnes demandent plus de 2 tours. À regarder plus tard, ou ne rien changer (seuil atteint) ?
 - **Suite prévue :** rapport de phase 2 (`reports/phase-2.md`) : tableau seuils contre mesures (noms PER, rappel de la recherche, T2, conflits), mesures finales sur le test une seule fois, relecture avec Raphael avant `phase-2-ok`.
 
+## 2026-10-25 — Phase 3 — Grammaire (§10, §10 bis) et T4
+- **Travail fait :** **accord de Raphael ce soir pour commencer la phase 3 avant la clôture de la phase 2** (rapport, mesure sur le test et `phase-2-ok` restent à faire). Branche `phase-3` créée depuis `phase-2` (et non `main`) : la grammaire lit les exemples de l'anonymiseur, pas encore fusionnés. Tests écrits avant le code : `tests/unit/test_grammaire.py` (20 : lexique, algèbre des unités, chaque règle du masque, budget de pas, synthèse, décodages au hasard) et `tests/unit/test_t4_automate.py` (T4 et T10 : suites de référence de 4 dossiers générés, chaque pas dans son masque, en mode citation et en mode synthèse ; 2 × 1 000 décodages au hasard). Code : `schema.py` (`LEXIQUE_SYNTHESE` : 25 + 5 = 30 jetons), `grammar/lexicon.py`, `grammar/units.py` (algèbre des unités, décimal exact), `grammar/automaton.py` (`Contexte`, `Automate`, `masques`, `accepter`, `decoder_au_hasard`), `anonymize/table.py` (`valeurs` : valeur_id → valeur, pour le masque, hors du modèle), `data/worldgen/cibles.py` (suites de référence de §10 depuis la vérité terrain), `eval/grammaire.py` (mesure). `configs/grammar.yaml` (`GrammarConfig`).
+- **Mesures :**
+  - `uv run python -m ccm.eval.grammaire 100000 runs/grammaire/bilan.json` (126 dossiers d'entraînement générés, mentions de référence) : **10 054 / 10 054 suites de référence acceptées** (5 027 questions, en mode citation et en mode synthèse) ; **100 540 / 100 540 décodages au hasard valides**, aucune impasse, fin par FIN, relus par l'automate ; longueur maximale 96 (citation) et 512 (synthèse), les limites. 457 s.
+  - Premier passage : 4 suites refusées (2 questions ASK_SAME du dossier 50, trois personnes possibles, écrites `ASK_SAME M M M`). Corrigé dans `cibles.py` (grammaire inchangée), dossier 50 ajouté à T4.
+  - Longueur des suites de référence en mode citation : 14 pas au plus sur 6 dossiers.
+  - `make test` : 235 tests passés.
+- **Décisions :**
+  - Pas : `P:k`, `M:t.j`, `N:t.j` (format de `cible`, §4), mot de synthèse `W:mot`. Un mot = `\w+['’]?` ou un signe de ponctuation (« l'heure. » → « l' », « heure », « . »). Les 40 mots d'une phrase ne comptent pas la ponctuation.
+  - Aucune impasse et limite de pas : un pas n'est permis que si la réponse peut encore finir dans la limite (longueur minimale de chaque segment, de la fermeture d'un bloc, de la synthèse).
+  - CALCUL : opérandes distincts (« deux nombres cités », §10) ; une pile n'accepte un opérande ou un opérateur que si elle reste réductible par des opérateurs seuls (unité, précision, valeur non nulle connue pour ÷, durée entière pour DATE ± durée) ; 12 pas entre CALCUL et FIN_CALCUL. Ouverture : deux nombres cités qui se combinent.
+  - Algèbre : un nombre sans unité est un rapport sans unité ; % vaut sa valeur / 100 ; DATE − DATE donne l'unité « jour », et DATE ± durée n'accepte que « jour ». Une date ne se calcule qu'à la précision JOUR ; MIN et MAX de dates de même précision. **DATE + DATE interdit** (la ligne « +, −, MIN, MAX : même unité » le permettrait à la lettre).
+  - CONFLIT : P du bloc sans condition « non citée » ; ils deviennent cités, comme la preuve d'un SAME. DECLARATION : contrainte MEME_UTILISATEUR ou DIFFERENT_UTILISATEUR entre les deux noms ; P suivants : toute proposition hors du bloc, sans maximum. SAME, ASK_SAME : mentions de tous les textes (question, historique, propositions). NOTE_SAME, NOTE_DIFF : mentions de la question.
+  - Synthèse : une seule par réponse ; une source sans marque n'est permise que si une source marquée peut suivre ; dépendances DEPEND_DE en fermeture transitive. Majuscule : forme `Mot` d'un mot de V, au premier élément après DEBUT. La synthèse vient avant FIN.
+  - Suites de référence : NOTE_* d'abord ; étape PREUVE portée par le P du SAME ; bloc CONFLIT seulement si la première ligne a une arête CONFLIT vers les autres (sinon des citations) ; DECLARATION_FAUSSE : NOTE_SAME puis la citation (le corpus ne donne pas de preuve contraire) ; ASK_SAME à plus de deux personnes : un ASK_SAME par paire avec la première, liés par ET.
+  - Liste V absente (phase 5) : les tests prennent comme V les mots des synthèses de référence du dossier ; pas d'arbre de préfixes BPE (pas de tokenizer).
+- **Écarts avec SPEC.md :**
+  - **Limite de pas de la synthèse.** S ≤ 96 (§8) ne tient pas avec la synthèse (8 phrases de 40 mots) : 12 suites de référence sur 2 008 de la validation dépasseraient 96 pas (toutes CALCUL), en mots entiers. T4 garde 96 pour le mode citation ; la synthèse a sa limite, `pas_max_synthese` = 512, provisoire.
+- **Questions pour Raphael :**
+  1. Limite de pas d'une réponse avec synthèse : 512 ? (En jetons BPE, il en faudra plus que des mots.)
+  2. DATE + DATE interdit : d'accord ?
+  3. ASK_SAME à trois personnes possibles : un ASK_SAME par paire avec la première, d'accord ? Ou ajouter une forme à la grammaire ?
+  4. Opérandes distincts dans un CALCUL : d'accord ?
+- **Suite prévue :** retour à la phase 2 : rapport `reports/phase-2.md`, mesure finale sur le test, relecture avant `phase-2-ok`. Puis, en phase 3 : vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
 ## 2026-10-25 — Phase 2 — Mesure finale sur le test, rapport
 - **Travail fait :** retour sur `phase-2` (Raphael : clore la phase 2 avant la suite ; la grammaire attend sur `phase-3`). Mesure finale, une seule fois, sur les 200 dossiers de test : `ccm.eval.noms`, `ccm.eval.conflits`, `ccm.eval.recherche` (un processus chacun, `runs/final/`). Conflits remesurés sur la validation avec le code actuel. `reports/phase-2.md`.
 - **Mesures (test) :** rappel PER 0,9973 ; rappel des justificatives dans le budget 0,9966 ; conflits heure et montant : **précision 0,807** (46 VP, 11 FP), rappel 0,687. Validation, code actuel : précision 0,970, rappel 0,80.
@@ -339,3 +364,631 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Décisions :** la règle des conflits reste celle réglée sur la validation.
 - **Écarts avec SPEC.md :** précision des conflits établis sur le test 0,807 (seuil 0,9), accepté par Raphael.
 - **Suite prévue :** phase 3 sur `phase-3` (grammaire faite, à rebaser sur `main`) : questions de la grammaire en attente (limite de pas de la synthèse, DATE + DATE, ASK_SAME à trois personnes, opérandes distincts), puis vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-25 — Phase 3 — Réponses sur la grammaire
+- **Travail fait :** réponses de Raphael aux questions de la grammaire : (1) `pas_max_synthese` = 512 validé ; (2) DATE + DATE interdit, validé ; (3) ASK_SAME à plus de deux personnes : une paire par personne, validé ; (4) **opérandes distincts refusés** : un CALCUL peut reprendre un même nombre. `automaton.py` : réemploi permis ; l'ouverture d'un CALCUL demande toujours deux nombres cités qui se combinent (§10, « Aucune impasse »). Test `test_calcul` : réemploi permis.
+- **Mesures :** `make test` : 235 tests passés. `ccm.eval.grammaire 100000` : 10 054 / 10 054 suites de référence acceptées, 100 540 / 100 540 décodages valides, aucune impasse (507 s).
+- **Décisions :** voir ci-dessus.
+- **Écarts avec SPEC.md :** aucun de plus.
+- **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-26 — Phase 3 — Suites de référence du corpus et T10
+- **Travail fait :** tâche donnée par Raphael : suites de référence (§10, « Ordre des suites de référence ») pour toutes les questions de la phase 1, et T10. `ccm/data/worldgen/suites.py` : lit le corpus écrit (`verite.json`, `questions.json`), construit stock de référence, exemple et cible de chaque question, en mode citation et en mode synthèse (si la question en a une), contrôle chaque pas dans son masque (`premier_refus`), écrit `cibles.json` dans chaque dossier (pas et jetons, aucune chaîne de nom ; dans `runs/`, hors de git) et le bilan `runs/corpus/niveau0/cibles.json`. `uv run python -m ccm.data.worldgen.suites runs/corpus/niveau0 8`. Test `tests/unit/test_t10_masque_reference.py` (T10) : 10 dossiers générés, chaque pas de chaque suite dans son masque ; couverture des 7 types, des 5 sous-types de dialogue, des deux blocs de conflit, d'ABSTENTION, SAME, NOTE_*, ASK_SAME, DONC CALCUL, SYNTHESE ; un pas hors du masque est refusé.
+- **Mesures :**
+  - Entraînement (2 000 dossiers) : **79 953 / 79 953** suites citation, **71 158 / 71 158** suites synthèse acceptées. Validation (200) : 8 000 / 8 000 et 7 141 / 7 141. Test (200) : 7 982 / 7 982 et 7 123 / 7 123. **0 refus**, 0 erreur de construction. 544 s, 8 processus.
+  - Longueur maximale : 14 pas (citation, limite 96) ; 107 pas (synthèse, limite 512).
+  - Conflits : entraînement 3 610 blocs CONFLIT (établis), 3 364 CONFLIT SANS_PREUVE ; validation 466 / 233 ; test 361 / 371.
+  - `make test` : 247 tests passés.
+- **Décisions :**
+  - **Conflit supposé** : une question CONFLIT (versions contradictoires de la vérité terrain) sans arête CONFLIT dans le contexte s'écrit `CONFLIT SANS_PREUVE P P FIN_CONFLIT` (§10, règle 4 ; §12 : moitié CONFLIT, moitié SANS_PREUVE). Avant, `cibles.py` l'écrivait en citations : aucune suite de référence n'avait de CONFLIT SANS_PREUVE. Corrigé dans `cibles.py` ; grammaire et automate inchangés.
+  - Vocabulaire V provisoire de la synthèse : mots des synthèses de référence du dossier (comme T4), en attendant la liste V de la phase 5.
+  - Les suites du test sont construites (pour l'évaluation) ; aucun réglage fait d'après elles : toutes acceptées au premier passage.
+- **Écarts avec SPEC.md :** aucun de plus. DIALOGUE/DECLARATION_FAUSSE reste NOTE_SAME puis la citation (décision du 2026-10-25) : sans contrainte de l'utilisateur dans l'exemple, CONFLIT DECLARATION est masqué.
+- **Suite prévue :** vérificateur et rendu (§11), modèle oracle, `ccm answer --oracle`.
+
+## 2026-10-27 — Phase 3 — Vérificateur (§11, étapes 1 à 9)
+- **Travail fait :** tâche donnée par Raphael : vérificateur avec la règle d'ancrage et le calcul en décimal exact. `ccm/verify/verifier.py` (étapes 1 à 9, `verifier(con, Entree, suite, …)` → `Reponse` : blocs, citations, erreur, ligne de trace), `ccm/verify/render.py` (gabarits fixes de §11, écriture des nombres ; chaque fragment affiché porte son origine), `ccm/verify/trace.py`, `configs/verify.yaml`. `anonymize/exemple.py` : `zones_message` et `zones_propositions`, appelées par l'anonymiseur et par le vérificateur (une marque ⟦j⟧ = la zone j ; aucune copie). Tests : `tests/unit/test_verificateur.py` (petit stock écrit à la main pour chaque étape ; suites de référence des dossiers 0, 10, 50, résultats des calculs contre la vérité terrain) ; `tests/property/test_t5_rendu_ferme.py` (T5 : décodages au hasard sous masque, mode citation et synthèse, dossiers 0, 1, 2, 10, 50 ; chaque fragment dans son ensemble ; un fragment étranger est refusé).
+- **Mesures :** `make test` : 284 tests passés (247 avant), 171 s. T5 : 0 fragment hors des ensembles, 0 erreur de vérification sur les décodages au hasard et sur les suites de référence.
+- **Décisions :**
+  - Décimal exact : `fractions.Fraction` (aucune perte, même pour 1/3). Un résultat sans écriture décimale finie s'affiche arrondi à `decimales` = 2, précédé de « ≈ ». Dates JJ/MM/AAAA ; heure du jour « 21 h 59 » ; pourcentage × 100 suivi de « % » ; durée « N jours ».
+  - Ancrage : « même nom » = même indice de nom de la table (même norme, même type). Question sans nom : les noms du message le plus récent de l'historique qui en a (comme la recherche, §7). Relations 2 à 11 prises à la lettre (MEME_FAMILLE, INITIALES_DE, PROCHE, INCOMPATIBLE, SIGLE_DE, INCLUS_DANS, ALIAS_DECLARE). Propositions citées : CITE, preuve d'un SAME, propositions des blocs CONFLIT, SANS_PREUVE et DECLARATION.
+  - Conflits (étape 4) : contrôlés pour toutes les propositions citées, y compris celles d'un bloc CONFLIT SANS_PREUVE ; le bloc supposé lui-même n'ajoute rien. « Sa date » : les dates lues dans la phrase (la table `piece` n'a pas de date).
+  - Passages non cités : `seuil_selection` = 0,5, valeur de départ, à régler sur la validation (rappel 0,95) quand le modèle donnera des probabilités (phase 4).
+  - Étape 8 : la relance est une fonction `relancer` fournie par l'appelant (`ccm answer`), appelée une fois ; les notes de la première réponse restent en tête.
+  - Étape 9 : si la recherche a déjà écrit la ligne de trace (`reponse_id`), le vérificateur la complète (`actions`, `modele`) ; sinon il en écrit une.
+  - SAME avec preuve : « Source [n] : » au lieu de « Source : », pour relier les opérandes d'un calcul à cette citation.
+- **Écarts avec SPEC.md :**
+  - T5 : la pièce, la page, le rang et le numéro de citation sont une cinquième origine (« ref », lue dans le stock), hors des quatre ensembles de §11. Les gabarits de §11 les demandent. **Validé par Raphael le 2026-10-27** ; SPEC.md §11 (test de propriété) mis à jour.
+  - Doublons (§5, étape 7), demande de Raphael : sous chaque passage affiché, « Aussi dans : pièce X, page Y ; … », une fois par réponse ; au plus `doublons_max` = 3 endroits (valeur de départ, `configs/verify.yaml`), puis « et N autres endroits », pour ne pas manger le budget d'affichage. `make test` : 285 tests passés.
+- **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
+
+## 2026-10-28 — Phase 3 — T9, T11 et 100 000 décodages sous masque
+- **Travail fait :** tâche donnée par Raphael : rendu et gabarits (§11), T5, T9, T11, test des 100 000 décodages aléatoires sous masque. Rendu, gabarits et T5 faits le 2026-10-27 ; chaque ligne du tableau de §11 a son gabarit dans `verify/render.py` (contrôlé). `tests/unit/test_t9_determinisme.py` (T9) : deux processus neufs, `PYTHONHASHSEED` différents, écrivent le dossier de graine 7 (PDF, `verite.json`, `questions.json`, `cibles.json`) puis décodent chaque question (glouton et au hasard, citation et synthèse) et vérifient ; fichiers égaux octet pour octet, réponses égales. `tests/property/test_t11_synthese.py` (T11) : 100 000 décodages au hasard en mode synthèse ; chacun valide (FIN, `pas_max_synthese`, `accepter`), vérifié sans erreur, rendu contrôlé comme T5 ; chaque phrase : aucun chiffre, aucun mot hors de V, chaque nom et nombre affiché pris dans les sources de la phrase et leur fermeture DEPEND_DE lue dans le stock, chaque pointeur vers l'une d'elles.
+- **Mesures :** T11 : **100 925 / 100 925 décodages valides**, 47 219 avec synthèse, 94 257 phrases contrôlées, 0 erreur (104 dossiers). T5 + T9 + T11 ensemble : 14 passés, 437 s. `make test` : **287 tests passés**, 552 s.
+- **Décisions :**
+  - T9, décodage glouton : le modèle n'existe pas ; le score d'un jeton est une fonction fixe du préfixe et du jeton (crc32). Le modèle oracle puis A0 la remplaceront.
+  - T11 en 4 processus au plus : à 12 processus, `make test` a été arrêté faute de mémoire.
+  - V provisoire : mots des synthèses de référence du dossier (comme T4, T5).
+- **Écarts avec SPEC.md :** aucun de plus. `make test` passe de 171 s à 552 s (T11).
+- **Suite prévue :** modèle oracle, `ccm answer --oracle` de bout en bout (recherche, anonymiseur, oracle, vérificateur, relance après NOTE_*).
+
+## 2026-10-29 — Phase 3 — Modèle oracle, `ccm answer --oracle` de bout en bout
+- **Travail fait :** tâche donnée par Raphael : modèle oracle, `ccm answer --oracle` de bout en bout, tests figés dans `tests/golden/`, aucun nom, nombre ou date affiché hors du contexte, démo filmable.
+  - `ccm/model/oracle.py` : l'oracle lit la vérité terrain du dossier (`verite.json`, `questions.json`) et rejoue la suite de référence (`cible_de_reference`) dans le **vrai** contexte : lignes du stock ingéré (texte exact, copie gardée du groupe de doublons), message lu par les vrais détecteurs, exemple de l'anonymiseur. Si une ligne ou un fait de la référence manque au contexte, ou si l'automate refuse la suite, il s'abstient (ABSTENTION FIN) et dit pourquoi. Relance : la suite reprend après NOTE_SAME / NOTE_DIFF.
+  - `ccm/answer.py` (`repondre`) : lecture du message, recherche (trace), anonymiseur, oracle, vérificateur, une relance après une contrainte notée.
+  - `ccm answer [QUESTION] --stock S --oracle DOSSIER [--id ID] [--synthese] [--conv C] [--suite]`.
+  - `cible_de_reference` : paramètres `lignes` et `msg` (stock de référence par défaut, inchangé) ; un fait absent lève KeyError (StopIteration dans un générateur devenait RuntimeError).
+  - Contrôle du rendu fermé de T5 déplacé dans `ccm/eval/rendu.py` (`fermes`, `controler`), partagé par T5, T11 et les tests figés ; T5 et T11 inchangés sur le fond.
+  - `tests/golden/test_answer_oracle.py` : dossier de validation figé `tests/golden/oracle/syn-1000000` (9 PDF, 404 Ko), ingéré par la vraie chaîne ; 40 questions × 2 modes : pas du modèle, abstentions et texte égaux à `oracle/attendu.json` ; chaque fragment contrôlé comme T5. Plus 3 appels de la commande `ccm answer` (calcul, NOTE_DIFF avec relance, synthèse). Réécriture : `CCM_GOLDEN=ecrire`.
+  - `demo/demo.py` : 9 scènes sur le dossier figé (deux étapes, calcul exact, conflit, identité par ressemblance, dialogue, déclaration et relance, ASK_SAME, abstention, synthèse), avec la question vue par le modèle (marques, aucun nom ni nombre), ses pas, la réponse vérifiée. `--pause` pour filmer.
+- **Mesures :** oracle sur 10 dossiers de validation (`syn-1000001` à `syn-1000010`), citation et synthèse : **740 / 802 réponses rejouées (92,3 %)**, 0 erreur du vérificateur. 62 abstentions de l'oracle : 58 faits non détectés par la vraie détection (surtout en synthèse, qui pointe plus de noms), 2 lignes hors du contexte rendu par la recherche, 2 refus de l'automate (`syn-1000009-q20` : `M:19.2` refusé à l'état M2, pas encore analysé). Dossier figé : 76 / 80. Tests figés : 2 passés, déterministes (deux passes égales). `make test` complet : 288 passés, 1 échec (sonde T5 `fragment_etranger[autre]` : `controler` lève AssertionError et non plus `pytest.fail`) ; sonde corrigée, les 7 sondes repassent. Second `make test` complet arrêté par manque de mémoire ; relancé en deux parties : lint OK, 288 passés hors T11, T11 : 1 passé (100 000 décodages). Tout passe.
+- **Décisions :**
+  - Dossier figé pris dans la validation (jamais dans le test) ; ses sorties attendues sont celles de la chaîne actuelle, relues (pas de vérité réglée pour passer).
+  - Sans `--conv`, `ccm answer` tire un identifiant de conversation neuf (les contraintes notées valent pour cette conversation).
+  - V (mots libres de la synthèse) : provisoire, mots des synthèses de référence du dossier (comme T4, T5, T11).
+  - Seuil interne du test figé : au moins 90 % des réponses rejouées sans abstention de l'oracle (mesure, pas un seuil de SPEC).
+- **Écarts avec SPEC.md :** `ccm/answer.py` et `demo/` ne sont pas dans l'arbre de §3 (orchestration de la chaîne, démo). Observation : « Il ressort de nos constatations… », « Il est établi que… » reçoivent DEPEND_DE vers la phrase précédente (mot « Il » de la liste de SPEC §5, étape 3) ; le vérificateur affiche donc cette phrase en « Contexte : » (§11, étape 2), même quand elle parle d'un autre événement (démo, scènes 1, 5, 6). Conforme à SPEC, et dans les textes permis par T5 (dépendances) : pas une fuite. Question pour Raphael : exclure les « il » impersonnels (« Il ressort », « Il est établi », « Il apparaît ») de la liste ?
+- **Suite prévue :** les trois seuils de phase 3 semblent atteints (suites de référence 100 %, 100 925 décodages valides, rendu fermé contrôlé) : `reports/phase-3.md` et relecture avec Raphael avant `phase-3-ok` et la fusion (ne pas étiqueter sans son accord).
+
+## 2026-10-30 — Phase 3 — `anonymize.encode` (§8)
+- **Travail fait :** tâche donnée par Raphael. `ccm/anonymize/encode.py` : `encode(ex, voc, decouper, ctx=, gcfg=)` → `Encodage` (toutes les tables de §8) ; `Vocabulaire` (jetons spéciaux par variante, identifiants après ceux du tokenizer) ; `masque_pas` (pas permis → vecteur, servira au décodage). `ModelConfig` : `variante`, `t_max`, `p_max`, `s_max`, `rel_max` ; `anonymiseur.unites_max` = 16. Tests écrits avant le code : `tests/unit/test_encode.py` ; T2 étendu à l'encodage entier (B : tables égales sans mise en ordre ; A0 : après mise en ordre), résultat attendu inchangé.
+- **Mesures :** 40 dossiers d'entraînement, 1 596 exemples à 150 propositions, A0, tokenizer de test (un jeton par mot : T n'est qu'un ordre de grandeur) : T 1 017 à 2 301, M 89 à 213, K 47 à 128, S 2 à 14, triplets 27 à 78 (la coupe à 200 n'est jamais atteinte) ; chaque pas de référence est dans son masque. Lint OK. **`make test` complet non terminé** : arrêté par le système, faute de mémoire. Passés seulement : encode, T2, anonymiseur, config, T7. Non relancés : T5, T9, T11, tests figés et le reste.
+- **Décisions :**
+  - Tokenizer passé en paramètre (`decouper`) : ni BPE (phase 5) ni tokenizer de base (phase 4) n'existent encore.
+  - [SORTIE] est en segment 2 ; [REL] en segment 1 ; [BOS] en segment 0.
+  - Héritage : un pointeur copie **tous** les indices de sa position cible (`prop_idx`, `name_idx`, `val_idx`, `num_attr`) : [/P] pour P, le slot pour M et N. Une mention d'une proposition donne donc aussi `prop_idx`.
+  - Pointeurs : trois jetons ⟨PT:P⟩ ⟨PT:N⟩ ⟨PT:M⟩ (« vecteur du genre », §9).
+  - Réservoir des valeurs en A : jetons ⟨NUM_i⟩ et ⟨DATE_i⟩, i = `valeur_id` ; aucune table de plus (512 vecteurs en plus des 1 280).
+  - `num_attr` a 4 colonnes et §6 demande la précision d'une date : elle occupe la colonne unité (cases 18 à 20). Une unité vide ou inconnue va dans « autre » (17) ; 12 unités en config sur 16 cases.
+  - Espace de sortie : L = 30 dès le mode citation (jetons de synthèse masqués), pour garder les mêmes indices en phase 4 bis.
+  - [DEPEND] : sur la proposition qui dépend (a de (a, b)), pas sur b. [CONFLIT] : sur les deux.
+  - [REL] : triplets triés par ordre d'apparition puis identifiant, coupés à `rel_max` ; indépendant du tirage. ⟨R:nom⟩ : 10 jetons (un par relation, le sens est donné par l'ordre a, b).
+  - Limites dépassées : erreur, aucune coupe silencieuse.
+- **Écarts avec SPEC.md :** synthèse hors de `encode` : `Exemple.cible` refuse `W:` et S ≤ 96 ; à reprendre en phase 4 bis. Observation : la cible de l'exemple de §4 (`P:0 SAME …`) n'avait pas de connecteur, l'automate la refusait (§10). **Corrigé avec l'accord de Raphael le 2026-10-30** : `P:0 ET SAME …` dans SPEC.md §4 et `tests/golden/exemple_spec.json` ; aucune règle changée ; `SAME` reste un segment, pas un connecteur.
+- **Phase :** `encode` n'est pas un livrable de la phase 3 (§2), mais du code `anonymize` sans poids ni GPU. Tâche demandée explicitement ; la phase 3 reste non close (`reports/phase-3.md` non écrit) et la phase 4 n'est pas ouverte.
+- **Suite prévue :** `reports/phase-3.md` et relecture avec Raphael, avec `make test-complet` avant la clôture.
+
+## 2026-10-30 — Phase 3 — T11 hors de `make test`
+- **Travail fait :** demande de Raphael, `make test` s'arrêtant faute de mémoire. Marque pytest `couteux` sur T11, exclue par défaut (`addopts`). `make test` : lint et pytest sans T11 ; `make test-t11` : T11 seul ; `make test-complet` : les deux, en deux processus l'un après l'autre. CI : `make test-complet`, car SPEC §10 bis place T11 en CI. T11 lui-même n'est pas modifié (mêmes 100 000 décodages, mêmes contrôles). `CLAUDE.md` et `README.md` mis à jour.
+- **Mesures :** nouveau `make test` : lint OK, **310 passés, 1 désélectionné (T11)**, 179 s (552 s avec T11 le 2026-10-28), sans arrêt mémoire. Sélection de `-m couteux` et `make -n test-complet` contrôlés, sans les exécuter. T11 n'a pas tourné depuis `encode` ; aucun code qu'il lit n'a changé, seulement `configs/ingest.yaml` (`unites_max`, nouvelle clé) ; la CI le lancera.
+- **Décisions :** `make test-complet` obligatoire si le travail touche `grammar`, `verify`, `anonymize` (hors `encode`), `ingest` ou `worldgen`, et avant de clore une phase. Un `pytest` nu exclut aussi T11 ; un chemin explicite vers son fichier le désélectionne : passer par `make test-t11` ou `-m couteux`.
+- **Écarts avec SPEC.md :** aucun : T11 reste en CI.
+- **Suite prévue :** celle de l'entrée précédente.
+
+## 2026-10-31 — Phase 3 — Jeux publics de réglage fin (§12) : téléchargement, licences, conversion arrêtée
+- **Tailles (en-tête `Content-Length`, requêtes HEAD, avant tout téléchargement) :**
+  - HotpotQA, réglage « distracteurs » (Parquet, `hotpotqa/hotpot_qa`, révision `1908d6af`) : `train-00000-of-00002` 165 624 177 ; `train-00001-of-00002` 166 162 479 ; `validation-00000-of-00001` 27 452 575. L'hôte d'origine (`curtis.ml.cmu.edu`, JSON) ne résout plus.
+  - PIAF v1.2 (`piaf-v1.2.json`, data.gouv) : 4 744 747.
+  - SQuAD 2.0 : `train-v2.0.json` 42 123 633 ; `dev-v2.0.json` 4 370 528.
+  - FinQA : `train.json` 78 216 616 ; `dev.json` 10 954 658 ; `test.json` 14 395 143 ; `LICENSE` 1 067.
+  - TAB : `echr_train.json` 47 503 662 ; `echr_dev.json` 12 643 092 ; `echr_test.json` 13 103 290 ; `LICENSE.txt` 1 089.
+  - FQuAD : taille inconnue (HTTP 401 sur `illuin/fquad`, `fquad.illuin.tech` ne résout pas).
+  - **Total : 587 296 756 octets (0,587 Go), PIAF compris**, pour environ 1 Go attendu. Écart surtout dû à HotpotQA en Parquet compressé (0,36 Go) plutôt qu'en JSON.
+- **Travail fait :** demande de Raphael : télécharger et convertir les jeux publics du §12. Sur `phase-3` (non close ; phase 4 non ouverte). `ccm jeux` (`ccm/data/jeux.py`, versions et SHA-256 figés), `ccm convertir` (`ccm/data/publics.py`, `hotpot.py`, `squad_fr.py`, `finqa.py`), `configs/donnees.yaml`, `tests/unit/test_donnees_publiques.py`. Données dans `D:/Nunda-donnees/` (`brut/`, `converti/`, `cache-zones.sqlite`, `conversion.log`). `uv`, `make`, `.venv` (5,1 Go) et `runs/modeles` (1,1 Go) installés : ils manquaient sur cette machine.
+- **ARRÊT : cas 3 (PIAF), licence pas claire.** data.gouv : « License Not Specified » ; Hugging Face : étiquette MIT, section licence vide ; article LREC 2020 : « CC-BY-SA ». PIAF n'est ni téléchargé ni converti.
+- **Mesures :**
+  - **Téléchargés (0,582 Go, tailles égales aux `Content-Length`, SHA-256 figés) :** HotpotQA, SQuAD 2.0, FinQA, TAB.
+  - **FQuAD sauté :** pas d'accès (HTTP 401 sur `illuin/fquad`, `fquad.illuin.tech` ne résout pas). Aucun miroir utilisé. Licence non lue.
+  - **SQuAD converti, mais inutilisable :** 48 712 exemples écrits sur 49 443 questions sans réponse (731 rejetés, titre d'article resté en clair).
+  - **FinQA et HotpotQA non convertis.** Claude Code a arrêté la conversion pour manque de mémoire pendant la détection de FinQA ; pas relancée. Le cache garde 183 237 textes détectés et sert à la reprise. Essai sur 300 questions par partie, avant l'ajout du rejet des titres, supprimé ensuite : HotpotQA 600 gardées sur 600 (29 titres sur 5 941 restés en clair). FinQA à 300 questions : cibles lues et correctes sur 3 exemples, bilan non relu.
+  - **Détection sur l'anglais (cache) :** SQuAD 53,4 % des questions écrites entièrement masquées ; caractères masqués : SQuAD 74,9 % (questions), 40,2 % (phrases) ; HotpotQA 63,2 % et 55,0 %, sur 300 questions. Sans les zones de spaCy seul : 42,8 %, 30,1 %, 55,9 %, 47,7 %. **FinQA (`dev`) : 0 caractère masqué** sur 661 questions et 7 325 phrases : le texte est en minuscules et une zone sans majuscule n'est pas gardée (§6), donc tout nom y resterait en clair.
+  - Débit de la détection : 123 textes/s avec `lot` 32, sur 12 277 textes, chargement compris. `lot_gliner` 128 non mesuré à part.
+  - `make test` : 324 passés, 1 ignoré, 1 désélectionné (T11). `make test-complet` non lancé : aucun module de sa liste touché (`ner/propagate.py` : paramètre `zones` facultatif).
+- **Décisions :**
+  - HotpotQA vient du Parquet de `hotpotqa/hotpot_qa`, l'hôte d'origine ne résolvant plus.
+  - TAB : aucune conversion (§12), fichiers bruts seulement, jamais en entraînement.
+  - Anglais : `nombres_en` dans `data/publics.py`, car `ingest.numbers` lit « 5,829 » comme 5,829. Colonne `valeurs` à côté de `exemple` dans le Parquet (nombres seulement, pour le masque).
+  - Un exemple dont le texte contient encore un titre d'article est rejeté (§15). Cela ne prouve pas l'absence d'autres noms.
+  - `squad` converti laissé sur le disque, avec `A_NE_PAS_UTILISER.txt`.
+- **Écarts avec SPEC.md :** conversion demandée non terminée. PIAF et FQuAD absents : plus aucune source de citation en français (poids 15 %). Total réel 0,587 Go pour environ 1 Go attendu.
+- **Questions pour Raphael :**
+  1. PIAF : quelle licence retenir ? Proposition : traiter comme CC BY-SA (la plus stricte déclarée par les auteurs) après confirmation d'Etalab.
+  2. Détection sur l'anglais : §6 ne la prévoit pas. Proposition : GLiNER et règles seuls pour `en`, sans spaCy français ni D4, mesurés sur TAB avant toute reconversion.
+  3. FinQA en minuscules : garder le jeu (noms en clair, contraire au §15), ou chercher une autre détection ?
+  4. CC BY-SA 4.0 (HotpotQA, SQuAD) : le partage à l'identique est-il compatible avec des poids ouverts sous une autre licence ?
+- **Suite prévue :** selon les réponses ; reprise avec `ccm convertir finqa`, puis `ccm convertir hotpot`, sous surveillance de la mémoire. `reports/phase-3.md` reste à écrire.
+
+## 2026-10-31 — Phase 3 — Jeux publics du §12 : conversion terminée (sauf FQuAD)
+
+- **Travail fait :** suite de l'entrée précédente, dont les questions sont tranchées. PIAF téléchargé et ajouté à `ccm/data/jeux.py`. Chaînes de détection par jeu, cache par chaîne. `ccm/eval/tab.py` (mesure sur TAB `dev`). `detecter_minuscules` pour FinQA. `convertir_partie` par paquets, pour la mémoire. SQuAD, HotpotQA, FinQA et PIAF reconvertis ; `squad` de la première passe remplacé. Sur `phase-3` (non close ; phase 4 non ouverte).
+- **Décisions de Raphael :**
+  - PIAF : CC BY-SA retenue (`DATA_LICENSES.md`).
+  - Anglais : GLiNER, règles, puis D4 ajouté après mesure ; pas de spaCy français.
+  - FinQA : chercher une autre détection, retirer le jeu si ce n'est pas satisfaisant. Résultat : gardé, voir mesures.
+  - CC BY-SA et poids ouverts : Raphael ne sait pas. **Question ouverte, à trancher avant toute publication de poids.**
+- **Mesures, conversion :**
+  - SQuAD : 46 428 gardés sur 49 443 (6,1 % de rejets, tous de titre ; 11 % sans D4).
+  - HotpotQA : 59 733 sur 97 852 (train 55 125, validation 4 608). **Rejets 39,0 %** : 38 096 titres restés en clair, 23 justificatives hors du contexte.
+  - FinQA : 6 086 sur 6 489 (train 4 606, validation 628, test 852, partie `test` jamais pour entraîner). Écartés par la règle du §12 avant conversion : 2 792.
+  - PIAF : 9 224 sur 9 224, 0 rejet.
+  - TAB : aucune conversion (§12). FQuAD : toujours sans accès, licence non lue, aucun miroir.
+  - Débit de la détection anglaise : environ 360 textes/s (1,9 M textes en 87 min, `lot_gliner` 128).
+- **Mesures, TAB `dev`, rappel PERSON / ORG / LOC et caractères masqués :**
+  - 4 détecteurs : 0,969 / 0,920 / 0,985 ; 44,6 %.
+  - GLiNER + règles : 0,919 / 0,826 / 0,940 ; 14,0 %.
+  - **+ D4 (retenu, anglais) : 0,934 / 0,857 / 0,972 ; 16,5 %.**
+  - Minuscules, seuil 0,6 : 0,907 / 0,792 / 0,925 ; 18,2 % (FinQA 8,7 %).
+  - **Minuscules, seuil 0,3 (retenu, FinQA) : 0,943 / 0,902 / 0,949 ; 23,7 % (FinQA 14,6 %).**
+  - Critères fixés avant mesure : PER ≥ 0,87 et masquage réduit (anglais) ; PER et ORG ≥ 0,87 sur TAB en minuscules et moins de 25 % masqués sur FinQA (FinQA gardé). TAB n'est pas financier : le rappel sur FinQA reste indirect.
+- **Contrôle du masquage** (échantillons de 3 000 questions pour la part masquée, 2 000 exemples convertis pour le reste ; script hors dépôt) :
+  - Caractères masqués, questions / phrases : SQuAD 14,3 / 15,6 % ; HotpotQA 25,5 / 24,7 % ; FinQA 11,3 / 14,6 % ; PIAF 13,5 / 15,2 %. **PIAF n'est pas sur-masqué** : son zéro rejet de titre ne vient pas de là.
+  - Mots à majuscule en milieu de phrase restés dans les exemples, pour 1 000 mots : SQuAD 21,0 ; HotpotQA 27,6 ; PIAF 0,5 ; FinQA 0,0 (en minuscules : ne prouve rien). Indice seulement : tous ne sont pas des noms.
+  - **HotpotQA : 10,3 % des exemples gardés contiennent un titre à plusieurs mots d'un autre article** (SQuAD 2,1 %), repéré parmi les titres de 3 000 questions seulement : c'est un minimum. Le rejet ne contrôle que les titres de la question elle-même.
+  - Rejets de titre HotpotQA, sur 3 000 questions : 1 199 rejets, 2 002 titres. 1 953 (97,5 %) ne contiennent que des mots courants (« Wildfire », « Hip hop », « Picture to Burn »), que D4 ne peut pas voir ; 34 ne sont trouvés qu'à l'intérieur d'un autre mot. Beaucoup ne sont pas des noms de personne ; proportion non mesurée.
+- **Décisions :**
+  - Rejet de titre gardé tel quel, malgré 39 % de rejets : l'assouplir laisserait passer plus de noms. Conséquence : perte de questions sur des titres de mots courants.
+  - Chaîne anglaise `[gliner, regle, majuscules]` et seuil FinQA 0,3 dans `configs/donnees.yaml`, propres aux jeux publics. Rien ne change dans la configuration d'ingestion.
+- **Écarts avec SPEC.md :**
+  - **§15 « aucune chaîne de nom dans un fichier d'entraînement » : non tenue strictement sur ces jeux réels.** Sur TAB, environ 6,6 % des personnes et 14 % des organisations restent en clair (anglais), 5,7 % et 10 % en minuscules. Le contrôle ci-dessus le confirme sur HotpotQA. **À trancher par Raphael avant tout entraînement sur ces jeux (phase 4).**
+  - §6 ne prévoit pas de chaîne anglaise distincte (D2 retiré pour `en`) ; `nombres_en` et colonne `valeurs` en plus.
+  - FQuAD absent : PIAF seul pour la citation en français (poids 15 %), 9 224 questions.
+  - HotpotQA ramené à 59 733 questions.
+- **Incidents :** Claude Code a arrêté la conversion de HotpotQA pour manque de mémoire vers 17 h 45, avec 3,4 Go libres. Le processus de conversion avait survécu à cet arrêt (15,4 Go) : tué à la main, cache intact. Relancée à la demande de Raphael, autres applications fermées, sans incident. Origine des 15 Go non cherchée.
+- **Tests :** `make test` : 325 passés, 1 ignoré, 1 désélectionné (T11). `ruff format --check` propre. `make test-complet` non lancé : aucun module de sa liste touché depuis la première passe.
+- **Pistes, à ne pas lancer sans demande (Raphael) :**
+  - Mesurer `urchade/gliner_multi_pii-v1` (Apache 2.0, licence vue sur sa page) sur TAB `dev`, en texte normal et en minuscules, à la place de GLiNER puis en plus.
+  - Mesurer `Jean-Baptiste/camembert-ner` (MIT, vue sur sa page). Français seul : TAB ne convient pas ; référence : corpus synthétique, partie validation, à regénérer (`ccm corpus`). Le rappel PER y est déjà de 0,998 : la mesure dira surtout s'il masque trop.
+  - Seuil proposé sur TAB, à confirmer avant la mesure : au moins la moitié des personnes et organisations restantes en moins, et 25 % de caractères masqués au plus. Aucun modèle n'entre dans la chaîne sans accord de Raphael (§6).
+  - LLM écarté par Raphael.
+  - FinQA : à comparer avec et sans en phase 4 (5 % du poids, le plus exposé aux noms).
+- **Questions pour Raphael :**
+  1. §15 : quel reste de noms accepter sur les jeux publics, avant la phase 4 ?
+  2. CC BY-SA 4.0 et poids ouverts.
+  3. §16 : pré-entraînement bilingue 70/30, ou français seul avec HotpotQA traduit.
+- **Suite prévue :** Raphael prévoit de télécharger le droit français (Légifrance, Judilibre, phases 4 et 5). Avant cela : lire les licences et le cadre de réutilisation des décisions de justice (vraies personnes). `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
+
+## 2026-10-31 — Phase 3 — Décisions de Raphael : noms, langue, poids ; recherche sur les licences
+
+- **Décisions de Raphael :**
+  - **Noms : on n'en veut pas, à réduire au maximum, quitte à décaler le plan.**
+  - **Langue : français.** §16 coché. La traduction de HotpotQA n'est pas décidée (voir ci-dessous).
+  - **Poids : préférence pour des poids fermés**, pour le levier commercial. Cela remplace « code fermé, poids ouverts » (2026-10-18, §3). §16 mis à jour, case laissée ouverte.
+  - Recherche sur les licences confiée à l'agent.
+- **Recherche (synthèse, pas un avis juridique) :**
+  - **Creative Commons** (page « Using CC-licensed works for AI training », lue) : la licence ne s'applique que si une permission est nécessaire ; une exception au droit d'auteur l'écarte. Le partage à l'identique ne joue que si le modèle ou ses sorties sont **partagés publiquement**, et CC conseille alors la même licence.
+  - **Exception de fouille de textes** (directive 2019/790 art. 4, art. L122-5-3 CPI ; extraits lus) : usage commercial possible, sauf opposition du titulaire. Son articulation avec le partage à l'identique reste débattue (Szkalej et Senftleben, JIPITEC, résumé lu seulement).
+  - **Conséquence :** des poids jamais distribués ne déclenchent pas le partage à l'identique selon CC. **Installer les poids chez un client est une distribution**, et le §3 vise un produit hors ligne : c'est là qu'est le risque. Une traduction est une adaptation : HotpotQA traduit reste CC BY-SA.
+  - **Légifrance :** Licence Ouverte 2.0, conditions de PISTE et de l'API (page Open data lue ; ces conditions non lues). Licence ouverte : réutilisation commerciale permise, avec mention de la source.
+  - **Judilibre :** Licence Ouverte 2.0 complétée par des CGU (V8, lues par extraits, pas en entier). **Trois réserves :** interdiction d'altérer les données ; juridiction, formation, siège et date à mentionner pour chaque décision, sans pouvoir les en détacher ; réutilisateur responsable de traitement, tenu de garder ses données à jour. Masquer et découper les décisions pour l'entraînement peut heurter les deux premières : **pas clair, à faire valider avant de s'en servir** (cas d'arrêt 3 si cela reste flou).
+  - **Art. L111-13 COJ (lu) :** interdiction, sous peine pénale, de réutiliser l'identité des magistrats et des greffiers pour évaluer, analyser, comparer ou prédire leurs pratiques. Noms des parties et des tiers occultés à la source, ce qui ne garantit pas qu'il n'en reste aucun.
+- **Recommandation de l'agent, non décidée :** poids fermés et français vont ensemble si le modèle commercial n'utilise aucune donnée CC BY-SA : retirer HotpotQA (traduit ou non), SQuAD, PIAF et Wikipédia. Le plus prudent ; un juriste peut assouplir. Sources restantes : corpus synthétique, Légifrance, Judilibre selon la validation, textes de l'Union européenne (licence à lire), livres du domaine public. Prix : plus de citation humaine annotée sur texte réel ; les chaînes et l'abstention reposeraient sur le synthétique et le modèle enseignant.
+- **Écarts avec SPEC.md :** le §12 (sources, poids) et le §1 C7 ne correspondent plus à la décision de langue ; non modifiés, en attente des arbitrages de Raphael. Les conversions anglaises de ce jour ne serviront sans doute pas à l'entraînement ; TAB reste utile pour la mesure.
+- **Plan pour les noms, à ne pas lancer sans demande :** mesurer `gliner_multi_pii-v1` et `camembert-ner` (entrée précédente) ; trouver une référence française réelle annotée, car 0,998 ne vaut que sur des noms synthétiques ; proposer la liste Wikidata des humains (déjà téléchargée, CC0) comme détecteur supplémentaire, ce qui change le §6 ; élargir le contrôle des exemples au-delà des titres de la question. JORF : nominations et décorations pleines de vrais noms, à surveiller.
+- **Tests :** `make test` non relancé : texte seul, aucun code touché.
+- **Questions pour Raphael :** 1. Retirer les données CC BY-SA du modèle commercial ? 2. Consulter un juriste pour Judilibre et les poids distribués ?
+- **Suite prévue :** selon les réponses. Avant tout téléchargement du droit français : lire en entier les CGU de Judilibre, de PISTE et de l'API Légifrance. `reports/phase-3.md` reste à écrire ; rien à entraîner avant la clôture de la phase 3.
+
+## 2026-11-01 — Phase 3 — Droit français : Légifrance et Judilibre découpés en propositions
+- **Travail fait :** demande de Raphael. `ccm jeux` connaît le stock LEGI (SHA-256 figé). `ccm legi` (`ccm/data/legi.py`) lit l'archive en flux (`tarfile` `r|gz`), sans rien écrire sur le disque. `ccm judilibre` (`ccm/data/judilibre.py`) : `/scan` jour par jour, jeton OAuth, reprise par mois. `ccm/data/droit.py` écrit les textes dans le stock ; `segmenter_paragraphes`, extrait de `segmenter`, donne la même découpe que pour les PDF. `tests/unit/test_droit.py`.
+- **Taille sur le disque, Légifrance :**
+  - Archive `D:/Nunda-donnees/brut/legi/Freemium_legi_global_20250713-140000.tar.gz` : **1 171 027 316 octets** (égale au `Content-Length`). Aucun fichier décompressé : un seul fichier dans le dossier.
+  - Base `D:/Nunda-donnees/droit.sqlite` après Légifrance : 305 360 896 octets.
+- **Mesures, Légifrance :** 5 253 903 membres lus ; sous `code_en_vigueur` : **161 302 articles gardés**, 327 600 écartés (autre état que VIGUEUR), 4 écartés (état VIGUEUR, date du dump hors de leur période). **926 489 propositions** : PHRASE 702 358, EN_TETE 161 338, LIGNE_TABLEAU 50 483, CHAMP 9 632, PARTIE 2 678. 78 codes. Contrôle : `Code civil, article 1240` donne son en-tête et une phrase, le texte attendu. Durée 11 min 38 au dernier passage, 21 min au plus selon la charge de la machine, 6 processus.
+- **Judilibre, téléchargé :** **36 876 décisions** (Cour de cassation 22 349, cours d'appel 14 527), toutes distinctes, toutes datées du mois demandé, aucun texte vide. 186 fichiers mensuels, 101 min, aucune erreur ni 429. Taille sur le disque : `D:/Nunda-donnees/brut/judilibre` **88 174 890 octets**.
+- **Quotas :** en-tête `x-rate-limit` lu : 20 appels environ sur la fenêtre courte, 1 million environ sur la longue. Pause de 0,2 s, soit 5 appels par seconde au plus. L'accès 403 a été levé quand Raphael a rattaché Judilibre (production) à l'application.
+- **Reprise, essai réel :** `ccm judilibre` relancé : aucun mois redemandé, `deja_la` 36 876, 0 ajout, 22 s.
+- **Base finale `D:/Nunda-donnees/droit.sqlite` : 1 030 590 464 octets, 3 193 579 propositions** sur 198 178 pièces. Décisions : **2 267 090 propositions** (PHRASE 1 708 411, PARTIE 481 307, CHAMP 40 471, EN_TETE 36 901), découpe en 9 min 11. Chaque décision commence par son en-tête d'identification ; 25 autres EN_TETE sont des lignes de capitales du texte lui-même. Aucune proposition vide, aucune pièce sans proposition, aucune entité restante.
+- **Taille totale sur le disque : 2 289 792 670 octets** (archive 1 171 027 316, décisions 88 174 890, base 1 030 590 464).
+- **Reste imparfait, non corrigé :** 36 599 propositions de décisions sans lettre (1,6 %), dont 29 178 sans chiffre non plus, et 7 170 dans Légifrance : apostrophe ou « » » fermant une citation, `***`, numéros, 2 880 « . » seuls. 1 305 propositions de décisions dépassaient 2 000 caractères à la première découpe, non recompté. Le texte des décisions montre aussi `?` à la place de `€` : c'est la source, non modifiée.
+- **Première découpe, remplacée :** base de 1 073 455 104 octets, 2 575 106 propositions pour les décisions, dont **210 373 sans lettre** (8 %), 164 544 « . » seuls et 243 002 `&apos;`. Deux défauts corrigés (commit `971eff8`) :
+  - `segment.py` masquait le premier point de « X... » comme une initiale ; la phrase se coupait en « M. X.. », « . », suite. Ce code sert aussi aux PDF : les stocks d'ingestion déjà construits gardent ce défaut là où ils contiennent « X... ». Sur quatre mois de décisions : 759 points seuls avant, 27 après.
+  - `net` ne décodait pas les entités HTML.
+- **Reconstruction :** une première tentative a été arrêtée par le système à 18 h 18, mémoire presque épuisée, à 130 000 articles sur 161 302. Relancée à la demande de Raphael depuis une base vide et les fichiers déjà sur le disque, sans appel réseau : terminée. L'ancienne base est effacée.
+- **Décisions :**
+  - **Une pièce par article ou décision**, avec une proposition EN_TETE d'identification (`Code civil, article 1240` ; juridiction, formation, siège et date pour une décision, art. V des CGU). Type LOI (rang 1) pour les articles, AUTRE pour les décisions.
+  - **Découpe seule** : ni noms, ni nombres, ni doublons, ni conflits, ni index BM25. Ils relèvent de la chaîne du §12. Conséquence : `droit.sqlite` contient le texte brut, dont des noms réels ; c'est une base de travail, pas un fichier d'entraînement.
+  - **Échantillon Judilibre :** Cour de cassation depuis 2016-01, cours d'appel depuis 2022-01, jusqu'à 2026-09 ; part égale par mois (50 000 ÷ 186 fenêtres = 268). Un appel par jour, car l'API trie par date ; un jour vide reporte sur les suivants. Dans un jour : les premières décisions rendues par l'API. Un mois pauvre n'est pas compensé : **36 876 décisions, pas 50 000** (mois de 18 à 268 décisions). Le plafond était « au plus ».
+  - Identifiants dans `D:/Nunda-donnees/piste-identifiants.txt`, hors de git.
+- **Écarts avec SPEC.md :**
+  - **Le droit est figé au 2025-07-13**, date du dernier stock publié par la DILA : « en vigueur » veut dire en vigueur à cette date, soit 16 mois de retard. Les 484 mises à jour quotidiennes (environ 3,1 Go) ne sont pas appliquées.
+  - JORF non téléchargé à part (§12 le cite pour le pré-entraînement) ; pas demandé.
+  - CGU : lues en partie seulement, contrairement à la suite prévue plus haut. Cour de cassation V8 : articles V, VI, VII, IX, XI C à E, XII et XIII. PISTE : pages 3 à 6 sur 8. API Légifrance non lues : cette API n'est pas utilisée.
+- **À signaler seulement si l'échantillon sert à publier ou à vendre :** CGU art. V, obligation de tenir ses données à jour (72 h recommandées) ; un échantillon figé ne la remplit pas.
+- **Incident :** la clé d'API de Raphael s'est affichée dans la session de travail. Elle n'est pas utilisée, n'est pas dans le dépôt, et le fichier qui la portait est supprimé. À régénérer sur PISTE.
+- **Tests :** `make test-complet` sur le code final : 341 passés, 1 ignoré, 1 désélectionné ; T11 passé.
+- **Suite prévue :** la dernière « Suite prévue » de phase 3 reste ouverte : `reports/phase-3.md`, et les arbitrages de langue et de licence demandés à Raphael. La chaîne du §12 (noms, nombres, doublons, conflits, BM25) n'est pas lancée sur `droit.sqlite`.
+
+## 2026-11-02 — Phase 3 (§16, préparation de la phase 4) — Enseignant 7B local : Qwen retenu
+- **Travail fait :** llama.cpp b12048 (CUDA 12.4) installé dans `D:/Nunda-donnees/llama.cpp/b12048/`, empreintes GitHub contrôlées. Qwen2.5-7B-Instruct et Mistral-7B-Instruct-v0.3 téléchargés en Q4_K_M dans `D:/Nunda-donnees/modeles/enseignant/`, SHA-256 identiques à ceux de Hugging Face. `uv run ccm enseignant` (`ccm/data/enseignant.py`) lance les deux modèles sur 10 articles de Légifrance : même prompt, température 0, JSON imposé par schéma, puis second passage du §12. Résultats : `D:/Nunda-donnees/enseignant/comparaison.json`, avec les sorties complètes.
+- **Mesures, 10 articles** (tirés avec la graine 20261102 parmi les 54 012 articles de 3 à 8 phrases et de 400 à 1 800 caractères) :
+
+  | | Qwen2.5-7B Q4_K_M | Mistral-7B v0.3 Q4_K_M |
+  | --- | --- | --- |
+  | Le modèle répond, JSON valide | 10/10 | 10/10 |
+  | Couches sur le GPU | 29/29 | 33/33 |
+  | VRAM au pic, sur 24 576 Mio (contexte 8 192) | 5 050 Mio | 5 530 Mio |
+  | Débit | 103 jetons/s | 109 jetons/s |
+  | Gardées par les règles du §12 | 6/10 | 4/10 |
+  | Rejets : plus de 4 justificatives | 1 | 0 |
+  | Rejets : « réponse possible » sans les justificatives | 2 | 6 |
+  | Rejets : « pas de réponse » avec les justificatives | 1 | 0 |
+  | Lecture de l'agent : question bonne (voir ci-dessous) | 6/10 (n° 1, 2, 3, 8, 9, 10) | 2/10 (n° 4, 5) |
+  | Parmi les gardées : bonnes selon cette lecture | 5/6 | 0/4 |
+  | Fautes de français | 0 | 2 (n° 9 « Quels sont les règles », n° 10 « peut dispensé ») |
+
+  Deuxième exécution : sorties identiques pour les deux modèles. La VRAM est le pic relevé après chaque article, pas un suivi continu.
+- **Décisions :**
+  - **Enseignant retenu : Qwen2.5-7B-Instruct, Q4_K_M, servi par llama.cpp.** Il garde plus d'exemples, et ceux qu'il garde sont meilleurs. Les réponses des deux modèles et la mémoire ne départagent pas : les deux tiennent largement dans 24 Go.
+  - **Confirmé par Raphael le 2026-11-02 : on garde Qwen.**
+  - **Ce choix renverse celui du 2026-10-18** (« Mistral, meilleur en français », et un modèle de 12B ou 24B envisagé). Sur ces 10 articles, Mistral 7B ne fait pas mieux en français. Nemo 12B et Small 24B n'ont pas été testés.
+  - **llama.cpp plutôt que vLLM :** vLLM n'est pas pris en charge sous Windows natif, il aurait fallu WSL ou Docker. Q4_K_M donne bien 4 bits, sans étape de plus.
+  - **Mistral 7B :** pas de GGUF officiel trouvé, quantification communautaire de `bartowski`. Qwen vient du dépôt officiel.
+- **Limites de la comparaison :**
+  - **Échantillon de 10 articles : indice, pas preuve.** Un seul prompt, non réglé. L'écart de 6 contre 4 aux règles du §12 tient à deux articles.
+  - **La « lecture de l'agent » est un jugement d'une seule personne, sans aveugle** : l'agent savait quel modèle avait écrit quoi. Critère : réponse présente dans les justificatives, jeu de justificatives juste, rien d'inventé, français correct. Cas limites comptés bons ou mauvais par ce critère : n° 8 de Mistral compté non bon (justificative 6 superflue, contenu juste), n° 6 de Qwen non bon (3 et 5 superflues, 6 manquante). Le français pèse lourd : sans ce critère, les n° 9 et 10 de Mistral comptent, soit 4/10 pour Mistral contre 6/10.
+  - **Chaque modèle confirme ses propres questions** au second passage : les taux de 6/10 et 4/10 ne mesurent pas seulement la qualité des questions.
+- **Risques pour la phase 4, non corrigés :**
+  - **Le second passage laisse passer des erreurs et rejette de bonnes questions.** Mistral n° 6 demande « Qui sont les deux hôteliers » : le texte ne les nomme pas, et l'exemple passe. Mistral rejette ainsi ses bonnes questions n° 4 et 5.
+  - **Les connecteurs ne sont pas fiables chez les deux modèles :** un connecteur rendu pour une seule justificative, MAIS ou EN_REVANCHE sans opposition dans le texte. À ne pas utiliser tels quels.
+  - Qwen dépasse la limite de 4 justificatives et en donne parfois trop : le code rejette le premier cas, pas le second.
+- **Écarts avec SPEC.md :** aucun. Le travail relève de §16 et prépare la phase 4, mais reste sur `phase-3` : la phase 3 n'est pas close et aucun exemple d'entraînement n'est produit. La décision de §16 est écrite ici, `SPEC.md` n'est pas modifié.
+- **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis (ni `grammar`, ni `verify`, ni `anonymize`, ni `ingest`, ni `worldgen`).
+- **Suite prévue :** inchangée pour la phase 3 : `reports/phase-3.md` et les arbitrages de langue et de licence. En phase 4 : mesurer le second passage sur plus d'articles avant de lancer les 20 000 exemples.
+
+## 2026-11-03 — Phase 3 (§16, préparation de la phase 4) — Enseignant : Qwen plus gros
+- **Travail fait :** demande de Raphael : tester des Qwen plus gros que le 7B avant la génération de la phase 4. Téléchargés en Q4_K_M dans `D:/Nunda-donnees/modeles/enseignant/` : Qwen2.5-14B, Qwen2.5-32B, Qwen3-32B (dépôts officiels), Qwen3.5-27B et Qwen3.5-35B-A3B (`bartowski` : pas de GGUF officiel). SHA-256 contrôlés pour 14B, 3.5-27B et 3-32B. `ccm enseignant` prend maintenant la liste des modèles, `--n` et `--nom` ; le serveur démarre avec `--reasoning off` (Qwen3 et 3.5 réfléchissent sinon). 20 articles (graine 20261102 ; les 10 premiers sont ceux du 2026-11-02). Résultats : `D:/Nunda-donnees/enseignant/q-<modèle>.json`.
+- **Mesures, 20 articles :**
+
+  |  | Qwen2.5-7B | Qwen2.5-14B | Qwen3.5-27B |
+  | --- | --- | --- | --- |
+  | VRAM au pic, sur 24 576 Mio | 5 050 Mio | 10 104 Mio | 17 142 Mio |
+  | Débit | 99 jetons/s | 58 jetons/s | 23 jetons/s |
+  | Durée des 20 articles (3 appels chacun) | 20 s | 36 s | 78 s |
+  | Gardées par les règles du §12 | 16/20 | 18/20 | 18/20 |
+  | Lecture de l'agent : question bonne | 9/20 | 7/20 | 17/20 |
+  | Parmi les gardées : bonnes | 8/16 | 6/18 | 15/18 |
+
+  Qwen2.5-7B : sorties des 10 premiers articles identiques à celles du 2026-11-02 (`--reasoning off` sans effet sur lui). Même critère de lecture que le 2026-11-02 : réponse dans les justificatives, jeu juste (ni manquante ni superflue, titre de l'article ou intertitre « III. » compris), rien d'inventé, français correct.
+  - **Qwen3.5-27B :** non bons n° 4 (4 missions sur 4 citées, la 4e manque : limite de 4 justificatives), 18 (titre superflu ; « est mise fin »), 20 (intertitre « III. » superflu). Rejetées à tort : n° 6 et 19, bonnes questions.
+  - **Qwen2.5-14B :** pire que le 7B à la lecture. Il met souvent le titre de l'article [1] ou des propositions superflues, et fait des fautes d'accord (« Quels sont les étapes », « Quels sont les deux entités »).
+- **Incident :** la première série (5 modèles en arrière-plan) a été arrêtée par Claude Code, mémoire du système basse, au chargement du 27B. Relancé seul au premier plan : la mémoire physique libre (hors cache) est descendue à 152 Mio. À suivre pour les modèles de plus de 18 Go.
+- **Décisions :** aucune. **Recommandation de l'agent, non décidée :** Qwen3.5-27B comme enseignant. Prix : environ 4 fois plus lent que le 7B ; 20 000 exemples gardés à 90 % demandent environ 24 h de calcul contre environ 6 h, sans parallélisme. Le choix reste Qwen2.5-7B tant que Raphael n'a pas tranché.
+- **Limites :** 20 articles ; lecture d'une seule personne, sans aveugle. Chaque modèle confirme ses propres questions au second passage. Qwen3-32B, Qwen2.5-32B et Qwen3.5-35B-A3B non testés (Raphael : « essaye seulement le 3.5 27B »). Le 27B vient d'une quantification communautaire.
+- **Écarts avec SPEC.md :** aucun ; travail de §16, sur `phase-3`, aucun exemple d'entraînement produit.
+- **Tests :** `make test` : 343 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** choix de l'enseignant par Raphael (7B ou 3.5-27B), puis phase 4 comme prévu.
+
+## 2026-11-03 — Phase 4 — Questions de l'enseignant sur Légifrance et Judilibre
+- **Travail fait :** Raphael retient **Qwen3.5-27B** (Q4_K_M, `bartowski`) comme enseignant et demande la génération du §12 « Modèle enseignant ». Branche `phase-4` créée depuis `phase-3`. `uv run ccm questions` (`ccm/data/questions.py`) : un passage par article ou décision, Légifrance et Judilibre en alternance, même prompt et même second passage que la comparaison (« d'une décision de justice française » pour Judilibre). Sortie `D:/Nunda-donnees/enseignant/questions.jsonl`, une ligne par passage (source, pièce, `prop_id` de `droit.sqlite`, sortie de l'enseignant, réponses du second passage, motif de rejet) ; une relance reprend après la dernière ligne. Lancée à 22 h 50 dans un processus détaché (`Start-Process`), hors des commandes de Claude Code.
+- **Passages :** Légifrance : articles de 3 à 8 phrases et de 400 à 1 800 caractères (54 012), comme la comparaison. Judilibre : dans chaque décision, une suite tirée au hasard de 3 à 8 PHRASE consécutives, 400 à 1 800 caractères, sans proposition qui contient maître, « Me », avocat, greffier, président, conseiller, magistrat, rapporteur ou procureur. Décisions sans telle suite : écartées. Ordre tiré avec la graine 20261103.
+- **Réglage du serveur :** `--parallel 4`, contexte 4 096 par requête. Mesuré : 4,2 s par passage à 1 requête, 2,45 s à 4, 2,6 s à 8. Chargement sans mmap (`--load-mode none`) : 2 min 30 et 9,7 Go de RAM gardés ; mmap gardé.
+- **Mesures provisoires, 2026-11-04 à 1 h 06** (3 823 passages) :
+
+  |  | Passages | Gardés | Rejet total | « Réponse possible » sans les justificatives | « Pas de réponse » avec | Numéros invalides |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | Légifrance | 1 912 | 1 703 | 10,9 % | 7,1 % | 3,6 % | 0,3 % |
+  | Judilibre | 1 911 | 1 694 | 11,4 % | 4,6 % | 6,8 % | 0,1 % |
+  | Total | 3 823 | 3 397 | 11,1 % | 5,8 % | 5,2 % | 0,2 % |
+
+  Rythme : environ 1 600 exemples gardés par heure ; fin prévue vers 15 h le 2026-11-04.
+- **Décisions :** moitié Légifrance, moitié Judilibre (10 000 chacun) : le §12 ne fixe pas la part. Exclusion des passages qui citent une personne : le moins de noms possible dans les questions (L111-13 COJ pour les magistrats ; noms d'avocats non occultés dans les décisions).
+- **Écarts avec SPEC.md :** la phase 3 n'est pas close (`reports/phase-3.md` non écrit) : cette génération de phase 4 se fait sur demande de Raphael. `questions.jsonl` contient du texte de décisions et peut contenir des noms : fichier de travail, pas fichier d'entraînement ; la chaîne du §12 (noms, nombres, pointeurs) passera dessus.
+- **Incident :** `tests/unit/test_questions.py` (questions du monde synthétique) écrasé par erreur au premier commit, restauré au suivant ; tests du générateur dans `tests/unit/test_questions_enseignant.py`.
+- **Incident du 2026-11-04 :** à 3 h 15, Windows Update a redémarré le PC (KB5127936) et arrêté la génération. Dernière ligne écrite à 3 h 13 : 7 221 passages, 6 417 gardés, fichier intact. Relance à 4 h 18 : la reprise relisait chaque pièce déjà faite avant de la sauter, et `proposition.piece_id` n'a pas d'index (0,5 s par lecture), soit environ 1 h avant la première question. `passages()` prend maintenant `sauter` et omet ces pièces sans les lire ; ordre des passages inchangé. Relancé à 4 h 43, nouvelles lignes dès 4 h 46. Mises à jour non suspendues (choix de Raphael).
+- **Bilan final, 2026-11-04 à 13 h 57 :** cible atteinte, 22 484 passages, **20 004 gardés**.
+
+ | | Passages | Gardés | Rejet total | « Réponse possible » sans les justificatives | « Pas de réponse » avec | Numéros invalides |
+ | --- | --- | --- | --- | --- | --- | --- |
+ | Légifrance | 11 245 | 10 003 | 11,0 % | 6,9 % | 3,6 % | 0,5 % |
+ | Judilibre | 11 239 | 10 001 | 11,0 % | 4,2 % | 6,6 % | 0,2 % |
+ | Total | 22 484 | 20 004 | 11,0 % | 5,5 % | 5,1 % | 0,4 % |
+
+ Les 4 exemples au-delà de 20 000 viennent des requêtes déjà parties quand le quota est atteint. Rythme après la relance : environ 1 475 gardés par heure.
+- **Tests :** `make test` : 345 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** chaîne du §12 (noms, nombres, pointeurs) sur `questions.jsonl` ; `reports/phase-3.md` toujours à écrire.
+
+## 2026-11-04 — Phase 4 — Chargeur de données du réglage fin (§12, §13)
+- **Travail fait :** demande de Raphael. `ccm/train/chargeur.py` et `ccm/data/negatives.py` (nom de l'arborescence du §3). Chaque exemple est construit à neuf à partir du stock de sa question, avec les fonctions de l'inférence :
+  1. **Mélange pondéré :** `chargeur.poids` de `configs/finetune.yaml` (les parts du §12), renormalisés sur les sources présentes. Une époque est un plan fixé par la graine : parts par plus forts restes, questions de chaque source dans un ordre tiré pour l'époque, places mélangées.
+  2. **Genre tiré :** abstention 12,5 % (justificatives et toutes leurs copies retirées du stock), conflit injecté 10 %, contrefactuel 5 %, sinon normal. Aucun genre pour une question sans réponse.
+  3. **Contexte réel :** `chercher` (§7) sur le stock, avec un index BM25 en mémoire (`Index.en_memoire`). 80 % des exemples : les propositions manquantes que la cible cite sont ajoutées dans leur pièce, à leur place. 20 % : s'il en manque une, la cible devient ABSTENTION (genre `abstention_contexte`).
+  4. **Indices tirés à chaque époque :** nouvelle `TableConversation`, avec une graine tirée de (graine, époque, place).
+  5. **Masques :** `encode` avec le `Contexte` de l'automate. Un pas de référence hors de son masque est une erreur.
+  - Sources : `SourceSynthetique` (stock de référence + `cible_de_reference`, lignes prises dans la copie gardée de leur groupe de doublons) et `SourcePublique` (`publics.stock_de`, factorisé hors de `convertir`, sans changement de comportement). `sources_disponibles` lit les parties d'entraînement avec les lecteurs de `ccm convertir` et les caches de zones.
+  - Test du §13 : `tests/unit/test_chargeur.py`, 10 tests. Chaque pas de référence est dans son masque pour chaque genre et chaque source (synthétique, HotpotQA, PIAF, FinQA, SQuAD). Les tests couvrent aussi le mélange, les indices retirés et la structure gardée, l'abstention avec doublons, le conflit d'un autre rang trouvé par l'ingestion, le contrefactuel, le contexte incomplet et la règle 4.
+- **Mesures :**
+  - 3 dossiers synthétiques, parts relevées : 150 exemples en environ 7 s, aucun sauté.
+  - Vraies sources publiques : 2 000 places, 1 985 exemples gardés, tous les pas dans leur masque. Durée 600 s, en un processus : environ 0,3 s par exemple. Une époque de 200 000 demande donc environ 17 h en un processus, ou environ 3 h sur 6 processus.
+  - Replis : conflit 187 sur 187 ; contrefactuel 50 sur 93 ; 15 exemples sautés (Rejet).
+  - Chargement des sources : 39 s.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - **Les transformations se font sur le stock, pas sur l'exemple JSON.** Après chaque ajout, `dedoublonner` et `detecter_conflits` repassent sur le stock : l'arête CONFLIT d'un conflit injecté vient de l'ingestion. Si le conflit n'est pas trouvé (§5 : il faut une date au jour près, un nom commun et une heure ou des montants qui se recouvrent), l'exemple redevient normal et il est compté comme repli.
+  - **Valeur changée :** seulement un nombre NUM. Mêmes positions et même nombre de chiffres ; le nombre doit être relu par l'extraction comme le même genre, à la même unité. Aucune date n'est changée : une date différente veut dire un autre fait (§5). « Inverser une règle » n'est pas fait.
+  - **Contrefactuel :** la forme d'origine va dans une pièce `AUTRE`, de rang 0. Elle est retirée si l'ingestion la trouve en conflit avec la justificative, sinon la règle 4 imposerait un bloc CONFLIT.
+  - **Règle 4 du §10 :** elle s'applique à toutes les sources. Un CITE en début de segment, dont la proposition a un conflit établi dans le contexte, devient un bloc CONFLIT avec ses partenaires non cités ailleurs.
+  - **Parts et réglages :** conflit injecté 10 % (le §12 ne fixe pas la part ; c'est celle des conflits du corpus synthétique). 200 000 exemples par époque. Le stock synthétique passe aussi par `dedoublonner`.
+  - **Mode citation seulement :** `encode` calcule les masques sans synthèse.
+- **Écarts avec SPEC.md :** aucun sur les règles.
+  - **Le conflit injecté ne prend pas sur les jeux publics** (0 sur 187). Il ne vient que du corpus synthétique, environ 1 sur 3 des essais sur 3 dossiers. À revoir avec Raphael : garder la règle du §5, ou viser d'autres phrases.
+  - Le conflit supposé et le faux conflit (§12) ne sont pas faits : ils ne font pas partie de la tâche.
+  - Il n'y a pas encore de source Légifrance et Judilibre : `questions.jsonl` n'est pas converti, et les 15 % sont répartis sur les autres sources.
+  - L'abstention retire les justificatives et leurs doublons, comme le §12. Une autre ligne qui dit le même fait autrement peut rester, et la cible ABSTENTION serait alors fausse. C'est un risque.
+- **Tests :** `make test` : 355 passés, 1 ignoré, 1 désélectionné. `make test-complet` non requis : `search`, `data` et `train` seulement ; ni `grammar`, ni `anonymize`, ni `ingest`, ni `worldgen` modifiés.
+- **Suite prévue :** source Légifrance et Judilibre (chaîne du §12 sur `questions.jsonl`) ; parallélisme du chargeur ; `reports/phase-3.md` toujours à écrire.
+
+## 2026-11-04 — Phase 4 — Chargeur : conflit injecté et abstention, choix de Raphael
+- **Décisions de Raphael :**
+  - **Conflit injecté :** la règle du §5 est gardée. L'arête CONFLIT vient toujours de l'ingestion, donc les conflits injectés viennent du corpus synthétique seulement.
+  - **Abstention, option B :** pour le corpus synthétique, l'abstention se fonde sur la vérité terrain (« si ça aide l'entraînement à s'abstenir, c'est bien »).
+- **Travail fait :** `Cas.temoins` (`ccm/train/chargeur.py`) = toutes les lignes des événements des justificatives (`Ligne.evenement` de `verite.json`). Cela couvre un autre témoin, une autre forme du nom et l'autre version d'un conflit.
+  - **Abstention :** les justificatives, leurs témoins et leurs doublons sortent du stock. Si un témoin a été cité au tour précédent, le fait reste dans le contexte : l'exemple redevient normal (repli).
+  - **Contexte incomplet (20 %) :** si une justificative manque mais qu'un témoin est dans le contexte, la réponse y est. Les manquantes sont alors ajoutées, au lieu de mettre ABSTENTION.
+  - Jeux publics inchangés : ils n'ont pas de vérité terrain, et les justificatives et leurs doublons sont retirés comme avant.
+  - Test ajouté : `test_abstention_synthetique_retire_tout_l_evenement`. Sur 10 questions, aucune justificative ni aucun témoin ne reste dans le contexte, et chaque pas est dans son masque.
+- **Mesures :** sur 20 dossiers synthétiques, 418 des 713 questions avec réponse (59 %) ont au moins une autre ligne du même événement hors des lignes équivalentes de la question. Avec l'ancienne règle, leur ABSTENTION pouvait être fausse. 5 questions ont un témoin déjà cité.
+- **Limite :** retirer tout l'événement retire aussi des lignes qui ne portent pas l'attribut demandé. Les abstentions sont donc un peu plus faciles, mais leur cible est sûre. 5 lignes d'étape sur 1 437 n'ont pas d'événement : pour elles, seules les lignes équivalentes sortent.
+- **Écarts avec SPEC.md :** le §12 dit « retire les justificatives et leurs doublons ». Pour le synthétique, le code retire plus, sur décision de Raphael. `SPEC.md` n'est pas modifié.
+- **Tests :** `make test` : 356 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** inchangée (source Légifrance et Judilibre, parallélisme du chargeur, `reports/phase-3.md`).
+
+## 2026-11-04 — Phase 4 — Choix du modèle de base et du GPU ; durée estimée de A0 et A1
+- **Décisions de Raphael (§16) :** modèle de base de A : **SmolLM**. GPU : **une RTX 3090 (24 Go)**, rien d'autre. L'entraînement se fait par nuits de 8 h.
+- **Mesure :** longueur des séquences A0 avec le tokenizer de SmolLM2-360M (`HuggingFaceTB/SmolLM2-360M`, tokenizer seul) sur 597 exemples du chargeur, toutes sources présentes (sans Légifrance ni Judilibre). T moyen 1 499, médiane 1 466, q90 2 503, max 3 546. Par source : synthétique 2 159, HotpotQA 1 314, FinQA 892, PIAF 601, SQuAD 175.
+- **Estimation, à remplacer par la mesure de 20 minutes du §13 :**
+  - SmolLM2-360M : 32 couches, dimension 960.
+  - Environ 2,2 GFLOP par jeton à l'entraînement avec LoRA : environ 0,72 GFLOP en avant, multiplié par 3.
+  - RTX 3090 : 71 TFLOPS en bf16 ; 15 à 35 % d'utilisation, soit environ 5 000 à 11 000 jetons/s.
+  - Une époque = 200 000 × 1 500 = 3·10⁸ jetons, soit **7,5 à 17 h, environ 9 h**.
+  - A0, 3 époques : 23 à 50 h, environ 28 h, soit **4 nuits (3 à 7)**.
+  - A1, 2 époques depuis A0 : biais dense sans attention rapide, contexte de 2 500 jetons ; environ 1,5 fois plus lent. Environ 28 h, soit **4 nuits (3 à 6)**.
+  - Chargeur : 0,3 s par exemple, soit 17 h de CPU par époque. Il faut 3 ou 4 processus de chargement pendant l'entraînement pour suivre le GPU.
+- **Points ouverts :**
+  - SmolLM2 n'a pas de taille entre 0,4 et 0,6 milliard (§9). Les tailles voisines sont 360 M, puis 1,7 milliard à la place de 1,5.
+  - SmolLM2 est entraîné surtout sur de l'anglais, et nos données sont surtout en français.
+  - SmolLM2-1.7B coûterait environ 5 fois plus : environ 140 h pour 3 époques. C'est au-delà des 5 jours du §15, cas 4.
+  - Les résultats finaux demandent 3 graines (§13), ce qui triple les nuits des entraînements finaux.
+- **Suite prévue :** inchangée ; mesure du débit réel au premier essai à blanc.
+
+## 2026-11-04 — Phase 4 — Taille du modèle de base
+- **Décision de Raphael :** A0 et A1 utilisent **SmolLM2-360M** seulement. Pas d'étape à 1,5 ou 1,7 milliard (« je n'ai pas 18 jours pour un réglage fin »).
+- **Durée estimée :** environ 4 nuits de 8 h pour A0 et environ 4 nuits pour A1, à remplacer par la mesure du §13.
+- **Écart avec SPEC.md :**
+  - Le §9 prévoit 0,4 à 0,6 milliard, puis 1,5 milliard. 360 M est la taille de SmolLM2 la plus proche, et l'étape à 1,5 milliard est abandonnée.
+  - Pour réduire la durée sans changer de modèle : baisser `exemples_par_epoque` (200 000 aujourd'hui), ou ne pas faire A1. Raphael n'a choisi ni l'un ni l'autre.
+
+## 2026-11-05 — Phase 4 — Code de A0 (§9) et perte du §13
+- **Travail fait :** demande de Raphael. `ccm/model/a0.py`, `ccm/train/a0.py`, `tests/unit/test_a0.py` ; dépendance `peft` ajoutée (§3).
+  - **Tronc :** SmolLM2-360M (`AutoModel`, sans tête), LoRA rang 16, alpha 32, abandon 0,05 sur `q/k/v/o_proj` et `gate/up/down_proj` ; poids de base gelés.
+  - **Jetons nouveaux :** table propre (`Vocabulaire` de A0, avec l'en-tête [REL] déjà écrit par `encode`) ; l'entrée passe par `inputs_embeds`. `num_attr` : 4 tables ajoutées au vecteur du slot.
+  - **Deux passes :** l'entrée jusqu'avant [SORTIE] (cache gardé), puis la sortie. Vecteurs pointés : [/P] → linéaire → RMSNorm ; nombre et mention : état du slot. Après un pointeur : ⟨PT:X⟩ + `W_in` × vecteur pointé de la référence, gradient passant.
+  - **Têtes :** `W_lex` sur les 25 + synthèse de `LEXIQUE_COMPLET` ; pointeurs P, N, M à 256 dimensions avec τ et b par famille ; sélection sigmoïde sur `r_p`. Masque de l'automate appliqué aux logits.
+  - **Perte (§13) :** L_actions (pas de mention : −log de la somme des mentions autorisées du nom) + 0,5 · BCE de sélection, poids des positives = négatives / positives borné à 10.
+  - Optimiseur : AdamW (0,9 ; 0,999), 2e-4 LoRA, 1e-3 modules nouveaux, décroissance 0,01, norme bornée à 1,0, bf16 (autocast) sur GPU.
+- **Mesures :** surapprentissage voulu, 8 exemples synthétiques (dossier 0, chargeur, T 2 160 à 2 530), 200 pas d'un lot de 8 : perte 3,59 au pas 0, 1,20 au pas 10, 0,068 au pas 50, 1e-5 au pas 199. RTX 3090 : 705 s, environ 3,5 s par pas de 8 exemples, soit environ 5 400 jetons/s (bas de l'estimation du 2026-11-04 ; à remplacer par la mesure de 20 minutes).
+- **Décisions (SPEC.md muet, option la plus simple) :** un contexte par passe avant (accumulation pour le lot) ; tronc en float32 avec autocast bf16 ; pas d'échauffement dans l'essai de surapprentissage ; ni décodage glouton ni sauvegarde de point de contrôle (pas dans la tâche).
+- **Écarts avec SPEC.md :** aucun.
+- **Tests :** `make test` : 359 passés, 1 ignoré, 1 désélectionné. 3 tests nouveaux sur un petit LLaMA tiré au hasard (CPU) : formes et gradients, pointeur de nom, surapprentissage.
+- **Suite prévue :** décodage glouton sous masque, points de contrôle, essai à blanc du §13 (200 pas sur 1 000 exemples) et mesure du débit de 20 minutes.
+
+## 2026-11-06 — Phase 4 — A0 : essai à blanc et mesure du débit (§13)
+- **Travail fait :** `ccm/train/a0.py` : échauffement linéaire (500 pas), lot de 16 contextes par accumulation, points de contrôle (`sauver`, `recharger` : poids entraînés seulement, optimiseur, ordonnanceur, pas ; reprise au même exemple). `python -m ccm.train.a0 essai` : essai à blanc, rechargement dans un modèle neuf, puis 20 minutes de débit. Dossier `runs/2026-11-06-a0-essai/` : configs, commit, paquets, `metrics.jsonl`, `bilan.json`, `pas-200.pt`. Tests ajoutés : `test_point_de_controle` (reprise = même chemin, mêmes pertes), `test_perte_sans_proposition`.
+- **Correction :** au premier essai, 9 pas sur 200 avaient une perte NaN. Ils contenaient un exemple d'abstention à contexte vide (P = 0), où la BCE de sélection est la moyenne d'un tenseur vide. Sans proposition, la perte de sélection vaut maintenant 0. Les poids n'étaient pas touchés, car aucun gradient n'était NaN. Ce premier essai est gardé dans `metrics-essai1-nan.jsonl`.
+- **Mesures (RTX 3090, SmolLM2-360M + LoRA, bf16) :**
+  - **Données :** 1 000 exemples réels de l'époque 0 (synthétique sur 20 dossiers rédigés en mémoire, HotpotQA, PIAF, FinQA, SQuAD). T moyen 1 504 jetons. Chargement 283 s, soit 0,28 s par exemple en un processus.
+  - **Essai à blanc :** 200 pas × 16 contextes, 1 244 s. Perte moyenne 3,19 sur les 20 premiers pas, 1,67 sur les 20 derniers, aucun NaN. **La perte baisse.**
+  - **Point de contrôle :** rechargé dans un modèle neuf. Écart des pertes sur 8 exemples : 0,0. Pas relu : 200.
+  - **Débit (20 min, 193 pas) :** 2,57 contextes/s, 3 858 jetons/s, mémoire max 9,2 Go.
+  - T1 : en A, l'écart est une mesure et non un test (§14). Il n'est pas mesuré ce soir.
+- **Durée prévue de A0 :** 3 époques × 200 000 contextes ÷ 2,57/s = **65 h, soit 2,7 jours**. C'est sous les 3 jours visés et sous les 5 jours du §15. Cela fait environ 8 nuits de 8 h.
+  - La mesure est plus lente que l'estimation du 2026-11-04 (28 h) : 3 858 jetons/s au lieu de 5 000 à 11 000.
+  - Le chargeur demande 0,28 s de CPU par exemple, et le GPU en consomme un toutes les 0,39 s. Il faut au moins 1 processus de chargement en parallèle de l'entraînement, 2 pour avoir de la marge.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - Après l'échauffement, le pas d'apprentissage reste constant : le §13 ne fixe pas de décroissance pour la phase 4.
+  - La mesure du débit réutilise les 1 000 exemples de l'essai, pris en boucle, avec la même répartition des longueurs.
+- **Écarts avec SPEC.md :** aucun.
+- **Tests :** `make test` : 361 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** chargeur en processus parallèles, rotation des points de contrôle tous les 2 000 pas (garder les 3 derniers et le meilleur), puis lancement de A0.
+
+## 2026-11-06 — Phase 4 — A0 : débit doublé, préchargement des 3 époques, source de droit, lancement par nuits
+- **Demande de Raphael :** les 65 h prévues sont trop longues. Il veut tout charger aujourd'hui, puis entraîner la nuit, **en 3 nuits**, avec du droit et des tableaux de suivi. Une époque de 9 h au lieu de 8 lui convient.
+- **Débit du GPU :**
+  - **Diagnostic :** à un contexte par passe, le GPU attendait 45 % du temps, à cause des lancements de noyaux (0,23 s de calcul pour 0,41 s par contexte). Mettre le tronc en bf16 seul ne change rien : 2,56 contre 2,52 contextes/s.
+  - **Correctif :** `ModeleA0.lot` passe plusieurs contextes à la fois, complétés à droite, avec un masque d'attention et les positions propres à chacun. Un test vérifie que le lot donne les mêmes logits que les contextes un par un. Les contextes de chaque pas sont groupés par longueur, en paquets de 8 000 jetons au plus (`JETONS_LOT`). Les poids gelés du tronc sont en bf16 ; LoRA et les modules nouveaux restent en float32.
+  - **Mesures (RTX 3090) :** 6 000 jetons par paquet : 4,74 ctx/s ; **8 000 : 5,09 ctx/s, 17 Go** ; 10 000 : 0,82 ctx/s, car la mémoire déborde dans la RAM partagée de Windows.
+- **Durée :** décision de Raphael, **145 000 exemples par époque** au lieu de 200 000 (`configs/finetune.yaml`, valeur de départ). Une époque fait 9 062 pas de 16 contextes, soit **environ 8 h à 5,1 ctx/s**. 3 époques font **3 nuits, environ 24 h**. `lancer` fait une époque entière par nuit, sans limite d'heure.
+- **Préchargement (`ccm/train/precharger.py`) :**
+  - Les 3 époques du chargeur sont écrites d'avance dans `D:/Nunda-donnees/tirages/a0/epoque-E/<source>-NNNN.pkl`, par paquets de 1 000 places : **441 paquets, 67 Go**, fini à 12 h 51.
+  - Il y a un groupe de processus par source, qui ne charge que sa source : avec toutes les sources dans chaque processus, 8 processus épuisaient les 32 Go de RAM.
+  - La place et le tirage d'un exemple ne dépendent que de la graine et de la taille de sa source. Le plan est donc le même qu'avec le chargeur en ligne : les places de chaque époque sont tirées de nouveau (§12). `lire(e)` fusionne les sources dans l'ordre des places, et refuse une époque incomplète.
+  - **Exemples gardés / places :** synthétique 174 000 / 174 000 ; hotpot 86 983 / 87 000 ; PIAF 65 250 / 65 250 ; droit 65 250 / 65 250 ; SQuAD 21 750 / 21 750 ; FinQA, environ 5 % sautés (703 sur les 13 000 places relevées).
+  - **Deux pannes corrigées :**
+    - Un `Rejet` levé dans `Source.cas` faisait tomber le chargeur ; la question est maintenant sautée.
+    - D: est un **disque dur** : les lectures au hasard du cache de détection, depuis plusieurs processus, bloquaient hotpot (11 % de CPU, aucun paquet en 45 min). `ZonesCache` copie maintenant le cache en mémoire.
+- **Source Légifrance et Judilibre (`ccm/data/droit_questions.py`) :**
+  - 20 004 questions gardées par l'enseignant : Légifrance 10 003, Judilibre 10 001. Les passages sont lus dans `droit.sqlite`.
+  - Chaque question a son passage, plus 3 passages d'autres questions de la même source, tirés par la graine, comme distracteurs.
+  - Les justificatives sont dans l'ordre de l'enseignant.
+  - Ses connecteurs (ET 17 888, MAIS 1 528, PAR_AILLEURS 460, EN_REVANCHE 79) sont gardés s'il y en a un de moins que de justificatives, sinon ET partout. 4 110 questions sont dans ce second cas. Champ `Brut.connecteurs`, test `test_connecteurs_de_l_enseignant`.
+  - Détection des noms : chaîne française, 108 849 textes, cache `cache-zones-droit.sqlite`.
+- **Lancement (`make nuit`) :**
+  - `python -m ccm.train.a0 lancer` lit les exemples préchargés, fait une époque entière, puis s'arrête.
+  - Point de contrôle tous les 2 000 pas et à la fin. Il garde les 3 derniers et `meilleur.pt`, choisi sur la perte d'entraînement moyenne des 2 000 derniers pas (il n'y a pas encore de jeu de validation).
+  - Après une panne, `make nuit` reprend au dernier point de contrôle, au même exemple. Pas de mise en veille pendant l'entraînement.
+  - La perte de chaque contexte est écrite par source et par genre.
+  - Raphael lance lui-même chaque soir : pas de tâche programmée.
+- **Tableaux (`make tableau`, `ccm/train/tableau.py`) :** `runs/<date>-a0/tableau.md`, refait à la fin de chaque nuit. Il donne :
+  - les nuits : horaires, pas, contextes/s, jetons/s, perte ;
+  - l'avancement, avec une prévision ;
+  - la perte par tranche de 1 000 pas, au total et pour chacune des 6 sources ;
+  - les points de contrôle.
+- **Essai de 3 minutes sur les vraies données :** les 6 sources sont présentes. Perte de la fenêtre : 3,17 au pas 20, puis 2,48 au pas 40. Reprise après panne vérifiée (pas 44 → 51). Vitesse 4,37 ctx/s, mais pendant le préchargement, qui occupait le CPU. Le GPU dépend du CPU pour lancer ses noyaux. La vraie vitesse sera lue dans le tableau de la nuit 1.
+- **Décisions (SPEC.md muet, option la plus simple) :** distracteurs du droit tirés dans la même source ; toutes les questions du droit vont à l'entraînement (pas de validation de droit) ; meilleur point de contrôle choisi sur la perte d'entraînement.
+- **Écarts avec SPEC.md :**
+  - 145 000 exemples par époque au lieu de 200 000, sur décision de Raphael.
+  - Le conflit supposé et le faux conflit du droit (§12) ne sont pas faits.
+  - Il n'y a pas de jeu de validation pour choisir le meilleur point de contrôle.
+- **Tests :** `make test` : 363 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** nuit 1 de A0 (`make nuit`), puis lecture du tableau (vitesse réelle, perte par source) ; nuits 2 et 3.
+
+## 2026-11-06 — Phase 4 — A0 : nuit 1 lancée, mesures de validation (§2, §14)
+- **Demande de Raphael :** lancer la première époque, puis les mesures ; il filme demain.
+- **Nuit 1 :** `make nuit` lancé à 20 h 14 (`runs/2026-11-06-a0/`). Un `ccm ingest` lancé en parallèle a pris le GPU (24,2 Go) et ralenti l'entraînement de 0,27 à 0,11 pas/s ; arrêté au bout de 10 min. Même chose avec `make test` (un processus de test sur le GPU malgré `CUDA_VISIBLE_DEVICES` vide), arrêté aussi. **Rien d'autre ne doit tourner sur le GPU pendant une nuit.**
+- **Travail fait :**
+  - `ccm/model/decodeur.py` : `DecodeurA0`, décodage glouton sous le masque de l'automate, par lots groupés par longueur. Chaque pas réencode l'exemple avec le préfixe décodé (pas de cache : même calcul que l'entraînement). Même interface que `Oracle.decoder`.
+  - `ccm answer --modele POINT.pt` : A0 à la place de l'oracle, de bout en bout (recherche, anonymiseur, vérificateur). `--oracle DOSSIER` reste requis pour les questions et la vérité terrain.
+  - `ccm/eval/a0.py`, `make eval` : mesures sur 1 000 exemples synthétiques de validation (niveau 0) et 1 000 HotpotQA validation (distracteurs), tirés par le chargeur de l'entraînement (mêmes parts d'abstention, de conflit, de contrefactuel). Écrit `eval-<point>/rapport.md`, `resultats.json`, `suites.jsonl` à côté du point de contrôle.
+  - Partie de validation du corpus niveau 0 écrite dans `runs/corpus/niveau0-val/` (200 dossiers, 8 000 questions), pour ne pas écraser `controle.json` de `niveau0`.
+  - `runs/apres-nuit.ps1` (hors git) : attend la ligne « arret » de la nuit, lance `make eval`, puis ingère `syn-1000000` dans `runs/demo/` pour la démonstration, puis `make test` (`runs/test-apres-nuit.log`).
+  - Test `test_decodeur_glouton` : suites acceptées par l'automate, identiques à chaque appel, premier pas = argmax permis de la passe d'entraînement.
+- **Essai de la chaîne :** sur `runs/2026-11-06-a0-essai/pas-200.pt`, en CPU, 4 + 4 exemples : 14 s, rapport écrit. Le modèle de 200 pas s'abstient sur le synthétique et cite P:0 sur HotpotQA : attendu à ce stade.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - F1 de citation : moyenne par question sur les questions qui ont une réponse (convention de HotpotQA). Abstention : part des ABSTENTION sur les questions sans réponse de référence.
+  - Mesures sur la validation, jamais sur le test. La mesure finale de la phase se fera une seule fois sur le test.
+- **Écarts avec SPEC.md :** pas de `eval/report.py` commun ; le rapport de A0 est écrit par `ccm/eval/a0.py`.
+- **Tests :** `ruff` propre ; `tests/unit/test_a0.py` : 7 passés. **`make test` complet pas encore passé** : lancé automatiquement après la nuit, pour ne pas toucher au GPU.
+- **Suite prévue :** vérifier `runs/test-apres-nuit.log` ; lire `runs/2026-11-06-a0/eval-pas-*/rapport.md` et `tableau.md` après la nuit 1 ; nuits 2 et 3.
+
+## 2026-11-07 — Phase 4 — A0 : bilan de la nuit 1 (§2, §14)
+- **Nuit 1 :** 20 h 14 → 05 h 24, pas 0 → 9 062 (époque 0 sur 3), 9,2 h. Perte de la tranche 9 000 : 0,384 (synthétique 0,136, hotpot 0,611).
+- **Mesures (`make eval`, validation, `pas-009062.pt`, 1 000 + 1 000 exemples, 900 s) :**
+  - Synthétique niveau 0 : F1 de citation **0,843** (seuil 0,90, non atteint) ; abstention **0,968** (seuil 0,85, atteint) ; abstention à tort 0,003 ; suites exactes 0,765. Point faible : conflits injectés, F1 0,661 (précision 0,528).
+  - HotpotQA distracteurs : F1 des faits justificatifs **0,696** (seuil 0,75, non atteint) ; abstention 0,746 ; abstention à tort 0,093.
+  - Ce n'est pas un essai documenté au sens du §15 : il reste 2 époques sur 3.
+- **Démonstration :** `ccm answer --modele runs/2026-11-06-a0/pas-009062.pt` fonctionne sur `runs/demo/syn-1000000.sqlite` (question q00 : conflit d'heure établi, P03/P07 contre P06), 24 s.
+- **Tests :** `make test` : 364 passés, 1 ignoré, 1 désélectionné.
+- **Suite prévue :** nuits 2 et 3 (`make nuit`), puis `make eval`.
+
+## 2026-11-08 — Phase 4 — A0 : bilan de la nuit 2 (§2, §14)
+- **Nuit 2 :** 21 h 38 → 06 h 28, pas 9 062 → 18 124 (époque 1 sur 3), 4,54 contextes/s. Perte de la tranche 18 000 : 0,292 (synthétique 0,133, hotpot 0,520) ; tranche 9 000 : 0,363. Reste 9 086 pas (~8,9 h, nuit 3).
+- **Incident :** `make nuit` a échoué après l'entraînement, à `ccm.train.tableau` : `UnicodeEncodeError` (console cp1252, caractère `→`). Relancé avec `PYTHONUTF8=1` : `make tableau` puis `make eval` passent. Code non modifié.
+- **Mesures (`make eval`, validation, `pas-018124.pt`, 1 000 + 1 000 exemples, 886 s) :**
+  - Synthétique niveau 0 : F1 **0,842** (seuil 0,90, non atteint ; nuit 1 : 0,843) ; abstention **0,981** (seuil 0,85, atteint) ; abstention à tort 0,000 ; suites exactes 0,781. Conflits : F1 0,694 (précision 0,555).
+  - HotpotQA distracteurs : F1 **0,675** (seuil 0,75, non atteint ; nuit 1 : 0,696) ; abstention 0,851 (nuit 1 : 0,746) ; abstention à tort 0,147 (nuit 1 : 0,093). La perte baisse mais le modèle s'abstient plus souvent à tort sur HotpotQA.
+  - Pas encore un essai documenté au sens du §15 : il reste 1 époque.
+- **Tests :** `make test` non lancé (demande de Raphael).
+- **Suite prévue :** corriger l'encodage de la sortie de `ccm.train.tableau` (ou `PYTHONUTF8=1` dans le `Makefile`) ; nuit 3 (`make nuit`), puis `make eval`.
+
+## 2026-11-08 — Phase 4 — A0 : analyse des erreurs après la nuit 2, entraînement arrêté
+- **Travail fait :** analyse de `eval-pas-018124/suites.jsonl` (et comparaison avec `eval-pas-009062`), script hors dépôt.
+- **Mesures :**
+  - HotpotQA (879 questions avec réponse) : 129 abstentions à tort ; F1 hors abstentions 0,791. Ces 129 questions sont dures (F1 0,31 à la nuit 1) : sans aucune abstention, F1 estimé ~0,72, sous le seuil 0,75. F1 selon le nombre de faits de référence : 2 → 0,86 ; 3 → 0,70 ; 4 → 0,56. Erreurs surtout faits manquants ou mélangés (353 sur 750).
+  - Synthétique (784 avec réponse) : aucune abstention à tort. Sur 215 suites non exactes : 150 mauvais choix de proposition (60 sans aucun P commun, 90 mixtes), 59 bons P mais structure différente, 21 `SAME` attendu et `P` produit. F1 stable (~0,85) pour 1 ou 2 propositions : le défaut est le choix de la proposition, pas la longueur.
+  - Mesures de la nuit 2 inchangées sur le synthétique par rapport à la nuit 1 (0,842 contre 0,843).
+- **Décisions (Raphael) :** **arrêt de l'entraînement de A0 après la nuit 2** (pas 18 124 sur 27 186) ; la nuit 3 n'est pas lancée. Les seuils de la phase 4 ne sont pas atteints (synthétique F1 0,842 / 0,90 ; HotpotQA F1 0,675 / 0,75) et la tendance ne laisse pas espérer qu'une troisième époque les atteigne.
+- **Écarts avec SPEC.md :** essai arrêté avant la fin des 3 époques prévues. Noté comme essai 1 de A0 au sens du §15 (seuils non atteints).
+- **Suite prévue :** attendre les nouvelles consignes de Raphael (pistes : capacité du modèle, données à plusieurs faits, choix de la proposition, sélection du point de contrôle par F1 de validation plutôt que par perte).
+
+## 2026-11-08 — Phase 4 — A1 : attention relationnelle dense, essai à blanc (§9, §13)
+- **Demande de Raphael :** code de A1 : envelopper l'attention de SmolLM, δ à zéro, version de référence dense, contexte limité à 2 500 jetons ; départ du point de contrôle A0, sans [REL] ; essai à blanc.
+- **Travail fait :**
+  - `ccm/model/attention.py` : `biais_dense` (biais B × têtes × Tq × Tk lu dans `NN`, `PP`, `val_idx`, selon la formule du §9) ; `envelopper` : un crochet avant chaque `self_attn` du tronc remplace son masque par masque causal + biais de sa couche. Les noms des paramètres ne changent pas : le point A0 se recharge tel quel.
+  - `ccm/model/a1.py` : `ModeleA1` (hérite de `ModeleA0`, δ = couches × têtes × 24 = 32 × 15 × 24, à zéro) ; `sans_rel` (retire [REL] … [/REL] d'un encodage A0, recule les positions) ; `depuis_a0` ; `optimiseur` (δ à 1e-3, sans décroissance de poids) ; `T_MAX = 2500`.
+  - `ccm/model/a0.py` : `ModeleA0.regler`, appelé avant chaque passe du tronc (rien en A0).
+  - `ccm/train/a1.py` : `python -m ccm.train.a1 essai`.
+  - `tests/unit/test_a1.py` (7 tests) : biais contre la somme naïve Σ_r δ R_r ; biais inchangé quand on renumérote les noms et les valeurs ; `sans_rel` ; δ = 0 donne exactement A0 (sdpa et eager) ; lot complété = un par un ; δ reçoit un gradient depuis zéro ; rechargement depuis A0.
+- **Problème corrigé :** première version du biais par indexation `BN[nq, nk]` : 150 s par pas. Le gradient de cette lecture accumule sur des indices très répétés (presque tout est 0). Le biais est maintenant lu par produits avec des matrices une-chaude (Oq · BN · Okᵀ), même résultat : 8 s par pas.
+- **Essai à blanc (`runs/2026-11-08-a1-essai/`, départ `runs/2026-11-06-a0/pas-018124.pt`) :** 910 exemples sur les 1 000 de l'essai de A0 (en-tête retiré ; 90 au-dessus de 2 500 jetons écartés ; T moyen 1 283).
+  - Départ : δ = 0 rend la perte de A0 à l'identique (écart 0,0 sur 8 témoins).
+  - 200 pas (lot de 16) : perte des 20 premiers pas 0,397 → 20 derniers 0,168. |δ| max 0,023 au pas 200.
+  - Point de contrôle sauvé puis rechargé dans un modèle neuf : écart 0,0.
+  - T1 (mesure en A) : écart des logits 0,0 après renumérotation des noms et des valeurs.
+  - 8,0 s par pas, 18,2 Go au maximum (paquets de 4 000 jetons). Pour comparer : A0 met environ 3,7 s par pas.
+- **Décisions (SPEC.md muet, option la plus simple) :**
+  - A1 garde la table de jetons nouveaux de A0 (mêmes identifiants). Il encode comme A0, puis retire l'en-tête. Les vecteurs [REL], [/REL], ⟨R:…⟩ restent dans la table mais ne servent plus. Les tirages préchargés de A0 resservent donc pour A1.
+  - Limite des 2 500 jetons : on écarte les exemples trop longs, sans les couper (9 % ici). `t_max` de `model_a1.yaml` reste 8 192 (limite de l'encodeur, §8, contrôlée par un test).
+  - Départ du dernier point de A0 (`pas-018124.pt`, celui qui a été mesuré), pas de `meilleur.pt`.
+  - T1 mesure la renumérotation des noms et des valeurs, pas encore celle de l'ordre des mentions.
+- **Écarts avec SPEC.md :** pas de version `flex` ni de test T6. Le biais est passé à l'attention comme masque additif (sdpa), sans changer son code.
+- **Tests :** `make test` ne passe pas l'étape `uv sync --locked` : GitHub répond 504 sur la roue `fr_core_news_lg`. Mêmes commandes avec `uv run --no-sync` : `ruff` propre ; `pytest` : 374 passés, 1 ignoré, code 0.
+- **Suite prévue :** attendre les consignes de Raphael (mesure du débit sur 20 min, préchargement A1 depuis les tirages A0, puis 2 époques).
+
+## 2026-11-08 — Phase 4 — A1 : données préparées, mesure du débit (§13)
+- **Demande de Raphael :** mesurer le débit et préparer les données. Les époques seront lancées plus tard.
+- **Travail fait :** `python -m ccm.train.a1 preparer` et `python -m ccm.train.a1 debit` (`ccm/train/a1.py`).
+- **Données (`D:\Nunda-donnees\tirages\a1\`, 36 Go) :** époques 0 et 1 préchargées pour A0, converties pour A1 : en-tête [REL] retiré ; les exemples de plus de 2 500 jetons sont écartés, leur place reste vide. Conversion en 15 min (4 processus). `precharger.lire(e, racine)` les lit comme ceux de A0. Bilan dans `bilan.jsonl`.
+  - Époque 0 : 134 105 exemples gardés, 10 491 écartés. Époque 1 : 134 062 gardés, 10 547 écartés.
+  - Exemples écartés : synthétique 18,1 % (10 477 et 10 527) ; HotpotQA 14 et 20 ; aucun pour les autres sources.
+- **Débit (`runs/2026-11-08-a1-debit/`, 20 min sur l'époque 0, départ `pas-018124.pt`) :** 1,60 contexte/s ; 10,0 s par pas de 16 ; 1 938 jetons/s ; T moyen 1 208 ; 18,1 Go au maximum. Pour comparer, A0 : 4,54 contextes/s.
+  - **Durée prévue :** 8 381 pas par époque, 23,2 h par époque, **46,5 h pour les 2 époques**, soit environ 5 nuits de 9 h. C'est sous la limite de 5 jours du §15.
+- **Décisions (SPEC.md muet, option la plus simple) :** les 2 époques de A1 sont les époques 0 et 1 du préchargement de A0 (mêmes exemples que ceux vus par A0, en-tête retiré).
+- **Risque :** la limite de 2 500 jetons retire 18 % des exemples synthétiques, ceux qui ont les contextes les plus longs. Or les seuils de la phase portent sur le synthétique. Autre option : un budget de recherche plus petit pour A1 (`jetons_a`, 6 000 aujourd'hui), qui couperait des propositions au lieu d'écarter des exemples. Cela demande de relancer le préchargement. À décider par Raphael.
+- **Tests :** `ruff` propre ; `pytest` (`uv run --no-sync`, comme à la séance précédente) : 374 passés, 1 ignoré.
+- **Suite prévue :** lancement des 2 époques de A1 quand Raphael le demandera (`lancer` de A1 à écrire, sur le modèle de `ccm.train.a0.lancer`).
+
+## 2026-11-08 — Phase 4 — A1 : commande d'entraînement et mesures de fin (§13, §14)
+- **Demande de Raphael :** écrire le `lancer` de A1, avec des mesures à la fin. La limite de 2 500 jetons reste telle quelle.
+- **Travail fait :**
+  - `ccm.train.a0.lancer` est maintenant commun aux deux variantes. Les réglages de A0 n'ont pas changé. Nouveaux paramètres : `construire` (modèle et optimiseur), `donnees` (racine des exemples préchargés), `par_epoque`, `heures` (arrêt au premier pas après cette durée), `par_nuit`, `jetons_lot`, `configs`. La fonction écrit une ligne `plan` (total, pas par nuit) que `tableau` et `courbe` lisent ; sans elle, ils gardent les valeurs de A0. Une nuit est maintenant comptée comme une reprise, et non plus comme une époque.
+  - `python -m ccm.train.a1 lancer [heures]` : une nuit de 9 h par défaut. Premier départ du point A0 (`pas-018124.pt`), δ = 0, optimiseur neuf. Les nuits suivantes reprennent au dernier point de contrôle, au même exemple. 2 époques de 8 378 pas, soit 16 756 pas.
+  - `python -m ccm.train.a1 evaluer` : mesure le dernier point de contrôle, une seule fois, quand les 2 époques sont finies. Sinon, rien.
+  - `ccm.eval.a0.evaluer(..., variante="a1")` et `DecodeurA0(apres=...)` : mêmes exemples de validation que A0, en-tête retiré. Un exemple dont l'entrée plus 96 pas de sortie dépasse 2 500 jetons n'est pas décodé. Il compte comme faux dans la ligne « total » ; la ligne « dans_limite » donne les mesures sans lui.
+  - `Makefile` : `make nuit-a1` (une nuit, puis `tableau a1`, `courbe a1`, puis `evaluer`, qui ne mesure qu'à la fin), `make tableau-a1`, `make eval-a1`. `export PYTHONUTF8 = 1` en tête : corrige l'erreur d'encodage de `tableau` vue à la nuit 2 de A0.
+  - `tableau` : la colonne d'arrêt dit « fini » ou « arrêt prévu » ; la durée affichée est celle d'une nuit.
+- **Essais (dossier jetable `runs/2026-11-08-a1-test/`, effacé) :** nuit de 0,03 h : pas 0 → 16, point de contrôle sauvé. Relance : reprise au pas 16, mêmes exemples, jusqu'au pas 31. `tableau a1-test` est correct. Mesure A1 sur 20 + 20 exemples : rapport écrit ; 5 exemples sur 40 hors limite.
+- **Risque :** à la mesure, la limite doit laisser la place aux 96 pas de sortie. Elle est donc plus stricte qu'à l'entraînement : 5 exemples sur 40 hors limite dans l'essai, surtout synthétiques. Comptés faux, ils pèsent sur le F1 « total » de A1 face à A0.
+- **Environnement :** `uv run --locked` échoue tant que GitHub répond 504 sur la roue `fr_core_news_lg` (déjà installée). `make nuit-a1` échouera aussi tant que la panne dure. En attendant : `uv run --no-sync python -m ccm.train.a1 lancer`.
+- **Tests :** `ruff` propre ; `pytest` (`--no-sync`) : 374 passés, 1 ignoré.
+- **Suite prévue :** `make nuit-a1`, environ 5 nuits ; les mesures se lancent seules après la dernière.
+
+## 2026-11-09 — Phase 4 — A1 : bilan de la nuit 1 (§13, §14)
+- **Demande de Raphael :** lancer l'entraînement de A1 (première nuit), lire `metrics.jsonl`, écrire le journal, mesures.
+- **Nuit 1 (`make nuit-a1`, `runs/2026-11-08-a1/`) :** 2026-11-08 20 h 50 → 2026-11-09 05 h 50, pas 0 → 3 726 sur 16 756 (22,2 %, époque 0), 9,0 h. Départ `pas-018124.pt` de A0, δ = 0. 1,84 contexte/s, 2 207 jetons/s (mesure de débit : 1,60 contexte/s). Aucune erreur ; `uv sync --locked` passe à nouveau (fin de la panne GitHub sur `fr_core_news_lg`).
+- **Perte (`tableau.md`) :** 100 premiers pas 0,387 → 100 derniers 0,288 (pas 0 : 0,638).
+  - Par tranche de 1 000 pas, toutes / synthétique / hotpot : 0–999 : 0,340 / 0,220 / 0,618 ; 1 000–1 999 : 0,302 / 0,141 / 0,603 ; 2 000–2 999 : 0,297 / 0,126 / 0,591 ; 3 000–3 725 : 0,297 / 0,132 / 0,604.
+  - Pour comparer, A0 tranche 18 000 : 0,292 / 0,133 / 0,520. Le synthétique revient au niveau de A0 dès le pas 2 000 ; HotpotQA reste au-dessus (~0,60), et la perte totale est à plat depuis le pas 2 000.
+  - Points de contrôle : `pas-002000.pt` (perte des 2 000 pas 0,321, `meilleur.pt`), `pas-003726.pt`.
+- **Mesures intermédiaires (demande de Raphael ; `python -m ccm.train.a1 evaluer runs/2026-11-08-a1/pas-003726.pt`, validation, 1 000 + 1 000, 1 607 s) :** `make nuit-a1` ne mesure qu'à la fin des 2 époques, cette mesure est donc lancée à la main. Elle ne compte pas comme essai au sens du §15 (22 % de l'entraînement).
+  - Synthétique, total : F1 **0,681** (seuil 0,90) ; abstention **0,778** (seuil 0,85). 226 exemples sur 1 000 sont hors limite (entrée + 96 pas > 2 500 jetons ; 189 normaux, 22 abstentions, 8 contrefactuels, 7 conflits), comptés faux.
+  - Synthétique, dans la limite (774) : F1 0,886, abstention 0,977. A0 (`pas-018124.pt`) sur les mêmes 774 : F1 0,874, abstention 0,977, suites exactes 0,761 pour les deux. A1 fait un peu mieux que A0 à exemples égaux ; l'écart sur le total vient de la limite de 2 500 jetons.
+  - HotpotQA : F1 **0,616** (seuil 0,75 ; A0 0,676 sur les mêmes 999) ; abstention 0,950 ; abstention à tort **0,224** (A0 0,146). Le défaut de A0 sur HotpotQA (abstentions à tort) s'aggrave.
+  - Conflits synthétiques : F1 0,578 (précision 0,463).
+- **δ (`pas-002000.pt` → `pas-003726.pt`) :** |δ| max 0,71 → 1,12, encore en hausse. Plus forts |δ| moyens : MEME_FAMILLE 0,187, ALIAS_DECLARE 0,153, INCLUS_DANS (inverse) 0,111 et INCLUS_DANS 0,102, surtout dans les couches 12 à 20. 7 relations restent exactement à 0 (jamais présentes dans les données, donc sans gradient) : MEME_UTILISATEUR, DIFFERENT_UTILISATEUR, MEME_HYPOTHESE, DEPEND_DE et son inverse, DOUBLON_DE, MEME_SECTION.
+- **Courbes :** `runs/2026-11-08-a1/a1-nuit1.html` (perte par source contre A0, carte de δ relation × couche, tableau de δ).
+- **Avancement :** reste 13 030 pas, 31,5 h à cette vitesse, soit 4 nuits de 9 h (la dernière courte) au lieu des 5 prévues.
+- **Tests :** non lancés (aucun code modifié).
+- **Risque :** la limite de 2 500 jetons coûte 0,2 de F1 sur le synthétique total, et la mesure finale la comptera de même. À décider par Raphael.
+- **Suite prévue :** nuit 2 de A1 (`make nuit-a1`, reprise au pas 3 726).
+
+## 2026-11-09 — Phase 4 — A1 : limite des 2 500 jetons à la mesure (§9, §14)
+- **Demande de Raphael :** corriger le « bug des 2 500 jetons ».
+- **Cause :** à la mesure, un exemple n'était pas décodé si son entrée plus 96 pas de sortie (`s_max`, le maximum possible) dépassait 2 500 jetons. Les suites réelles sont bien plus courtes : on écartait des exemples qui tenaient dans la limite.
+- **Correction :** `DecodeurA0(t_max=...)` : le décodage d'une suite s'arrête (`["HORS_LIMITE"]`, comptée fausse) seulement quand son entrée réelle (contexte et suite déjà produite) dépasse `t_max`. `ccm.eval.a0` en A1 passe `T_MAX` au décodeur et n'écarte plus rien d'avance. Test `test_decodeur_t_max`.
+- **Mesure refaite (`pas-003726.pt`, même validation ; ancienne dans `eval-pas-003726-avant/`) :**
+  - Hors limite : 227 → **174** (synthétique 226 → 173, HotpotQA 1).
+  - Synthétique, total : F1 0,681 → **0,726** ; abstention 0,778 → **0,819**. Dans la limite (827) : F1 0,881, abstention 0,978.
+  - HotpotQA : inchangé (F1 0,616).
+- **Ce qui reste :** les 173 exemples synthétiques restants (17 %) ont un contexte qui dépasse à lui seul 2 500 jetons ; c'est la même part que celle écartée à l'entraînement (18,1 %). Ce n'est plus un défaut de la mesure, c'est la limite du §9 elle-même. Pour les garder il faut des contextes plus courts pour A1 (budget de recherche `jetons_a` plus petit, qui coupe des propositions), donc refaire le préchargement et reprendre l'entraînement de A1 depuis A0. À décider par Raphael.
+- **Tests :** `ruff` propre ; `pytest` (`--no-sync`, GitHub ne répond pas) : code 0.
+- **Décision (Raphael) :** la limite de 2 500 jetons et le budget de recherche de A1 restent tels quels ; les exemples synthétiques trop longs restent écartés à l'entraînement et comptés faux à la mesure.
+- **Suite prévue :** nuit 2 de A1 (`make nuit-a1`), quand Raphael la demandera.
+
+## 2026-11-10 — Phase 4 — A1 : bilan de la nuit 2 et mesure (§13, §14)
+- **Demande de Raphael :** lancer la suite de l'entraînement, puis faire la mesure.
+- **Nuit 2 (`make nuit-a1`) :** 2026-11-09 20 h 51 → 2026-11-10 05 h 51, pas 3 726 → 6 712 sur 16 756 (40,1 %, toujours époque 0). 1,48 contexte/s (nuit 1 : 1,84) : 2 986 pas au lieu de ~3 700. Cause non trouvée. Reste 10 044 pas, ~30 h à cette vitesse (4 nuits de plus, au lieu de 3).
+- **Perte par tranche de 1 000 pas, toutes / synthétique / hotpot :** 3 000 : 0,293 / 0,132 / 0,590 ; 4 000 : 0,283 / 0,126 / 0,565 ; 5 000 : 0,274 / 0,120 / 0,533 ; 6 000–6 711 : 0,278 / 0,123 / 0,539. HotpotQA, à plat à la nuit 1, baisse et rejoint A0 (0,520).
+- **Mesures (`python -m ccm.train.a1 evaluer runs/2026-11-08-a1/pas-006712.pt`, validation, 1 000 + 1 000, 1 807 s ; comparaison avec la mesure corrigée du pas 3 726) :**
+  - Synthétique, total : F1 **0,718** (pas 3 726 : 0,726 ; seuil 0,90) ; abstention **0,819** (0,819 ; seuil 0,85). Dans la limite (827) : F1 0,871 (0,881). 173 exemples hors limite, comptés faux.
+  - HotpotQA : F1 **0,741** (0,616 ; seuil 0,75 ; A0 0,675) ; abstention à tort **0,053** (0,224 ; A0 0,146) ; abstention 0,777 (0,950).
+  - Lecture : grand progrès sur HotpotQA, qui frôle le seuil ; le modèle s'abstient beaucoup moins souvent à tort. Le synthétique recule un peu (−0,01 de F1 dans la limite), à suivre à la prochaine mesure.
+- **δ :** |δ| max 1,18 (pas 4 000) → 1,54 (6 000) → 1,65 (6 712). Mêmes relations en tête : MEME_FAMILLE 0,241, ALIAS_DECLARE 0,228, INCLUS_DANS (inverse) 0,155, INCLUS_DANS 0,153. Toujours 7 relations à 0.
+- **Surapprentissage :** les deux époques de A1 sont les époques 0 et 1 de A0, déjà vues par A0 ; l'époque 2 préchargée n'a jamais servi. Proposé à Raphael : la prendre comme deuxième époque de A1, et mesurer la validation après chaque nuit. Pas encore décidé ; la nuit 3 restera dans l'époque 0 (bascule au pas 8 378).
+- **Tests :** non lancés (aucun code modifié).
+- **Suite prévue :** décision sur l'époque 2 avant la nuit 4 ; nuit 3 de A1 quand Raphael la demandera.
+
+## 2026-11-10 (soir) — Phase 4 — A1 : lancement de la nuit 3 (§13, §15)
+- **Demande de Raphael :** suite de l'entraînement A1 ; chaque matin, une ligne au journal sur `metrics.jsonl` ; à la fin, page HTML (perte et mesure contre A0).
+- **Nuit 3 (`make nuit-a1`) :** lancée 2026-11-10 20 h 35, reprise au pas 6 712 sur 16 756, époque 0 (bascule au pas 8 378, l'époque 2 préchargée n'étant pas retenue faute de décision : option la plus simple).
+- **Durée (§15, cas 4) :** calcul mesuré 18,0 h (nuits 1 et 2) ; reste 10 044 pas, ~30 h à 1,48 contexte/s ; total prévu ~48 h, sous les 5 jours. Je compte le temps de calcul mesuré, pas le calendrier (5 nuits prévues dès le plan).
+- **Matin du 2026-11-11 (`metrics.jsonl`) :** nuit 3 arrêtée à 02 h 07 au pas 8 378 sur 16 756 (fin de l'époque 0, arrêt prévu par la boucle), 5,5 h ; perte 6 712–6 999 / 7 000–7 999 / 8 000–8 377, toutes / synthétique / hotpot : 0,263 / 0,117 / 0,517 ; 0,269 / 0,122 / 0,526 ; 0,269 / 0,121 / 0,520. **Reste 8 378 pas (époque 1), ~27,8 h** à 0,084 pas/s ; calcul fait 23,5 h, total prévu ~51 h (2,1 jours, sous les 5 jours du §15). Nuit 4 non lancée : elle ouvre l'époque 1, qui attend la décision de Raphael sur l'époque 2. Mesure de validation de `pas-008378.pt` lancée (`runs/eval-a1-pas-008378.log`).
+- **Mesure `pas-008378.pt` (validation, 1 000 + 1 000, 1 785 s ; entre parenthèses pas 6 712) :** synthétique total F1 **0,719** (0,718), abstention **0,829** (0,819), dans la limite F1 0,872 (0,871) ; HotpotQA F1 **0,747** (0,741 ; seuil 0,75 ; A0 0,675), abstention 0,818 (0,777), abstention à tort 0,043 (0,053). 174 hors limite. Pas de signe de surapprentissage sur la validation ; progrès faible.
+- **Suite prévue :** décision de Raphael sur l'époque 2, puis nuit 4 (`make nuit-a1`).
+- **Décision faute de réponse (option la plus simple, CLAUDE.md) :** la demande de Raphael est la suite de l'entraînement ; je garde le plan en place (époque 1 de A1 = époque 1 de A0). Copie de sauvegarde `fin-epoque0-pas-008378.pt` pour pouvoir refaire l'époque 2 depuis la fin de l'époque 0 si Raphael le préfère. Nuit 4 lancée 2026-11-11.
+- **Erreur de ma part :** Raphael ne voulait pas la nuit 4. Arrêtée à la main (`taskkill`) après 4,8 h, au pas 9 929 (époque 1). Aucun point de contrôle écrit après `pas-008378.pt` (`etat.json` : pas 8 378) ; la reprise repartira donc de la fin de l'époque 0. `metrics.jsonl` garde les lignes des pas 8 378 à 9 929 de cet essai, sans ligne `arret` : à retirer ou à marquer avant la prochaine nuit, selon le choix de Raphael.
+- **Suite prévue :** décision de Raphael sur l'époque 2 ; rien ne sera lancé avant.
+
+## 2026-11-11 — Phase 4 — Mesure sur corpus corrigé, A0 contre A1 (§14)
+- **Décision (Raphael) :** les exemples trop longs pour A1 (entrée sans [REL] > 2 500 jetons, les mêmes que ceux écartés à l'entraînement) sont retirés de la mesure, pour A0 comme pour A1, afin de comparer les deux modèles sur les mêmes exemples. **Écart avec SPEC.md :** le seuil de la phase 4 est désormais mesuré sur ce corpus corrigé.
+- **Code :** `ccm.eval.a0.evaluer(..., corrige=True)` (CLI : argument `corrige`) filtre les tirages avant décodage ; sortie `eval-<point>-corrige/`.
+- **Mesures (validation corrigée : synthétique 827, HotpotQA 999 ; A0 `pas-018124.pt`, 783 s / A1 `pas-008378.pt`, 1 995 s) :**
+  - Synthétique : F1 A0 **0,864** / A1 **0,872** (seuil 0,90, non) ; abstention 0,978 / **0,989** (seuil 0,85, oui) ; suites exactes 0,803 / 0,819 ; conflits F1 0,696 / 0,681 ; contrefactuels F1 0,877 / 0,988.
+  - HotpotQA : F1 A0 **0,676** / A1 **0,748** (seuil 0,75, non, à 0,002) ; abstention à tort 0,146 / 0,043 ; abstention 0,851 / 0,818.
+  - Lecture : à corpus égal, A1 fait mieux que A0 partout sauf les conflits (−0,015) et l'abstention HotpotQA (−0,03). Aucun seuil de F1 n'est encore atteint ; il reste la moitié de l'entraînement de A1.
+- **Tests :** `ruff` propre ; `make test` : 374 passés.
+- **Suite prévue :** décision de Raphael sur l'époque 2 et sur les lignes des pas 8 378–9 929 de `metrics.jsonl`, puis nuit 4.
+
+## 2026-11-11 — Phase 4 — Clôture
+- **Décision (Raphael) :** clôture de la phase 4 avec les seuils de F1 manqués de peu (synthétique 0,872 / 0,90 ; HotpotQA 0,748 / 0,75 ; corpus corrigé). La méthode fonctionne (A1 meilleur que A0 à exemples égaux) et le temps manque. Fin des modèles A : A1 arrêté au pas 8 378, l'époque 2 n'est pas faite.
+- **Travail fait :** `reports/phase-4.md`. `make test-complet` : 374 passés et T11 passé. Nuit 4 marquée dans `metrics.jsonl` (ligne `arret` avec `interrompu: true`).
+- **Écarts avec SPEC.md :** voir `reports/phase-4.md`.
+- **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
+- **Clôture administrative (accord de Raphael) :** `reports/phase-3.md` écrit (seuils de la phase 3 atteints, d'après les mesures du journal et `make test-complet`). Étiquettes `phase-3-ok` (sur `phase-3`) et `phase-4-ok` (seuils de F1 manqués, écart accepté, comme `phase-2-ok`). `phase-4`, qui contient `phase-3`, est fusionnée dans `main`.

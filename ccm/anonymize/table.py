@@ -42,3 +42,7 @@ class TableConversation:
 
     def valeur(self, unite: str, cle: str) -> int:
         return self._tirer("valeurs", ("VAL", unite, cle))
+
+    def valeurs(self) -> dict[int, str]:
+        """valeur_id → valeur (clé de `cle_valeur`) : pour le masque, hors du modèle (§10)."""
+        return {i: c[2] for c, i in self._indices.items() if c[0] == "VAL"}

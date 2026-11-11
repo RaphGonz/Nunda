@@ -1,0 +1,56 @@
+<title>Perte de A0</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout : une colonne, deux graphiques empilés, le total d'abord. */
+:root{--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--grid:#e6e5e1;--raw:#b7d3f6;
+--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;
+--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--grid:#2e2e2c;--raw:#184f95;
+--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1a1a19;--fg:#f0efec;--muted:#c3c2b7;--grid:#2e2e2c;--raw:#184f95;
+--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans)}
+main{max-width:980px;margin:0 auto;padding-block:28px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+h1{font-size:1.5rem;font-weight:600;margin:0 0 6px;text-wrap:balance}
+h2{font-size:1.05rem;font-weight:600;margin:0 0 4px}
+p{margin:0;color:var(--muted);line-height:1.5;max-width:65ch}
+.chiffres{display:flex;flex-wrap:wrap;gap:28px;margin-top:14px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.chiffres b{display:block;font-size:1.4rem;font-weight:400;color:var(--fg)}
+.chiffres span{font-size:.75rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.boite{position:relative;height:360px;max-width:100%}
+section{display:grid;gap:10px;min-width:0}
+</style>
+<main>
+<header>
+<h1>Perte d'entraînement de A0</h1>
+<p>SmolLM2-360M avec LoRA, réglé sur la tâche de citation. 3 époques de 9 062 pas de 16 contextes, une par nuit. Chaque point est la moyenne de 50 pas ; les traits verticaux marquent le début de chaque nuit.</p>
+<div class="chiffres"><div><span>Perte au départ</span><b>__DEBUT__</b></div><div><span>Dernière perte</span><b>__FIN__</b></div><div><span>Pas</span><b>__PAS__ / __TOTAL__</b></div><div><span>Nuits</span><b>__NUITS__</b></div></div>
+</header>
+<section><h2>Perte totale</h2><p>L = L<sub>actions</sub> + 0,5 · L<sub>sélection</sub> (SPEC §13).</p><div class="boite"><canvas id="total" aria-label="Perte totale par pas"></canvas></div></section>
+<section><h2>Perte par source de données</h2><p>Le synthétique et SQuAD sont presque appris ; HotpotQA, le droit et FinQA restent les plus durs.</p><div class="boite"><canvas id="sources" aria-label="Perte par source"></canvas></div></section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D=__DATA__;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fr=x=>x==null?"–":x.toLocaleString("fr-FR",{maximumFractionDigits:3});
+const noms={synthetique:"Synthétique niveau 0",hotpot:"HotpotQA",fquad_piaf:"PIAF",droit:"Droit (Légifrance, Judilibre)",finqa:"FinQA",squad:"SQuAD (sans réponse)"};
+function opts(legend){return{responsive:true,maintainAspectRatio:false,animation:false,
+ interaction:{mode:"index",intersect:false},
+ plugins:{legend:{display:legend,position:"top",align:"start",labels:{color:css("--fg"),boxWidth:14,boxHeight:3,font:{family:"IBM Plex Sans"}}},
+  tooltip:{callbacks:{title:i=>"pas "+i[0].label.toLocaleString("fr-FR"),label:c=>" "+c.dataset.label+" : "+fr(c.parsed.y)}}},
+ scales:{x:{type:"linear",min:0,max:D.total_pas,title:{display:true,text:"pas",color:css("--muted")},ticks:{color:css("--muted"),callback:v=>v.toLocaleString("fr-FR")},grid:{color:css("--grid")}},
+  y:{min:0,title:{display:true,text:"perte",color:css("--muted")},ticks:{color:css("--muted"),callback:v=>fr(v)},grid:{color:css("--grid")}}}}}
+const pts=k=>D.pas.map((p,i)=>({x:p,y:D[k][i]}));
+const nuits={id:"nuits",afterDraw(c){const x=c.scales.x,y=c.scales.y,g=c.ctx;g.save();g.strokeStyle=css("--muted");g.setLineDash([4,4]);g.fillStyle=css("--muted");g.font="12px IBM Plex Sans";
+ D.nuits.forEach((p,i)=>{const px=x.getPixelForValue(p);g.beginPath();g.moveTo(px,y.top);g.lineTo(px,y.bottom);g.stroke();g.fillText("nuit "+(i+1),px+4,y.top+12)});g.restore()}};
+Chart.register(nuits);
+let charts=[];
+function dessiner(){charts.forEach(c=>c.destroy());
+ charts=[new Chart(total,{type:"line",data:{datasets:[{label:"Perte totale",data:pts("total"),borderColor:css("--s1"),borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2}]},options:opts(false)}),
+ new Chart(sources,{type:"line",data:{datasets:Object.keys(noms).map((k,i)=>({label:noms[k],data:pts(k),borderColor:css("--s"+(i+1)),backgroundColor:css("--s"+(i+1)),borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2}))},options:opts(true)})];}
+dessiner();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",dessiner);
+new MutationObserver(dessiner).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>

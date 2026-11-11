@@ -160,7 +160,7 @@ L'anonymiseur produit cette structure à l'inférence. Les fichiers d'entraînem
   ],
   "relations_noms": [[3, 5, "INITIALES_DE"], [3, 5, "ALIAS_DECLARE"]],
   "relations_props": [],
-  "cible": ["P:0", "SAME", "M:q.0", "M:0.0", "P:0", "FIN"],
+  "cible": ["P:0", "ET", "SAME", "M:q.0", "M:0.0", "P:0", "FIN"],
   "justificatives": [0]
 }
 ```
@@ -606,7 +606,7 @@ Les gabarits sont des chaînes fixes dans `verify/render.py`. Les noms entre gui
 
 Pour un type autre que PER, « la même personne » devient « la même organisation », « le même lieu » ou « la même chose ».
 
-**Test de propriété.** Pour toute suite tirée au hasard sous masque, chaque caractère affiché vient de l'un de ces quatre ensembles : texte original d'une proposition du contexte ou de ses dépendances et conflits, gabarit fixe, nom d'une mention du contexte ou de la question, résultat d'un calcul sur des nombres cités.
+**Test de propriété.** Pour toute suite tirée au hasard sous masque, chaque caractère affiché vient de l'un de ces quatre ensembles : texte original d'une proposition du contexte ou de ses dépendances et conflits, gabarit fixe, nom d'une mention du contexte ou de la question, résultat d'un calcul sur des nombres cités. S'y ajoutent les références lues dans le stock : pièce, page, rang et numéro de citation (décision de Raphael, 2026-10-27).
 
 ## 12. Données d'entraînement
 
@@ -834,7 +834,7 @@ Ces 9 points ne bloquent pas les phases 0 à 3. Les trois premiers bloquent la p
 - [ ] **Modèle enseignant.** Quel LLM pour les questions sur Légifrance (phase 4) et pour la rédaction des pièces (phase 7) ; local ou par API.
 - [ ] **Homonymes exacts.** En v1, deux personnes qui portent exactement la même chaîne (un père et un fils, par exemple) sont un seul nom. Option : limiter un nom à sa pièce et laisser le modèle relier les pièces par SAME. C'est plus sûr en pénal, mais chaque réponse affiche plus d'hypothèses.
 - [x] **Conflits reformulés.** Tranché le 2026-10-21 : action « conflit supposé » du modèle (`CONFLIT SANS_PREUVE`), affichée comme hypothèse ; le code ne crée que les conflits établis (section 5).
-- [ ] **Langues.** Pré-entraînement bilingue 70/30, ou français seul avec HotpotQA traduit.
+- [x] **Langues.** Tranché le 2026-10-31 : français (Raphael). Les sources et poids du §12 restent à refaire (`JOURNAL.md`, 2026-10-31).
 - [ ] **Licences.** Accepter des jeux à licence non commerciale pour la recherche.
 - [ ] **Types de pièces.** Faire valider la table des types et des motifs d'en-tête par un praticien.
-- [ ] **Publication.** Licence du code et des poids, puisque le plan est de publier un modèle ouvert.
+- [ ] **Publication.** Licence du code et des poids. Le 2026-10-31, Raphael préfère garder les poids fermés (levier commercial), à la place de « code fermé, poids ouverts » (2026-10-18, §3). Licences des données : voir `JOURNAL.md`, 2026-10-31.

@@ -2,10 +2,13 @@
 des détecteurs, renommer par une bijection qui garde les relations, puis encoder. Les
 tables doivent être égales après mise en ordre des indices par première apparition."""
 
+import zlib
+from dataclasses import fields
+
 import numpy as np
 import pytest
 
-from ccm.anonymize.encode import tables_relations
+from ccm.anonymize.encode import Vocabulaire, encode, tables_relations
 from ccm.anonymize.exemple import anonymiser
 from ccm.anonymize.table import TableConversation
 from ccm.config import load_config
@@ -20,10 +23,25 @@ from ccm.eval.equivariance import (
     renommer_tour,
     stock_de_reference,
 )
+from ccm.schema import Exemple
 
 CFG = load_config("ingest")
 WCFG = load_config("worldgen")
 K = CFG.anonymiseur.reservoir
+
+
+VOC_A0 = Vocabulaire(load_config("model_a0"), CFG, 32000)
+VOC_B = Vocabulaire(load_config("model_b_s"), CFG, 32000)
+
+
+def _mots(texte):
+    return [zlib.crc32(m.encode()) % 32000 for m in texte.split()]
+
+
+def _memes_tables(a, b, id_):
+    for champ in fields(a):
+        va, vb = getattr(a, champ.name), getattr(b, champ.name)
+        assert np.array_equal(va, vb) if isinstance(va, np.ndarray) else va == vb, (id_, champ.name)
 
 
 def _contexte(d, con):
@@ -79,6 +97,11 @@ def test_t2_anonymiseur(i):
         assert canonique(a) == canonique(b), q.id
         for ta, tb in zip(tables_relations(a), tables_relations(b), strict=True):
             assert np.array_equal(ta, tb), q.id
+        # Encodage entier : en B, égal sans mise en ordre ; en A, après mise en ordre.
+        ea, eb = encode(a, VOC_B, _mots), encode(b, VOC_B, _mots)
+        _memes_tables(ea, eb, q.id)
+        ca, cb = (Exemple.model_validate(canonique(x)) for x in (a, b))
+        _memes_tables(encode(ca, VOC_A0, _mots), encode(cb, VOC_A0, _mots), q.id)
 
 
 def test_t2_detecte_une_fuite(monkeypatch):

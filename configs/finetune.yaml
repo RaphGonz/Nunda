@@ -1,3 +1,21 @@
 # Champs ajoutés avec la phase qui les utilise.
 version: 1
 description: "Réglage fin (SPEC.md §13)."
+
+# Chargeur de données (ccm/train/chargeur.py). Exemples par époque : valeur de départ,
+# 80 000 exemples synthétiques (§12) pour une part de 40 %.
+chargeur:
+  graine: 0
+  exemples_par_epoque: 145000  # 3 nuits de 8 h à 5,1 contextes/s (Raphael, 2026-11-06)
+  poids:  # SPEC.md §12, « Données de réglage fin » ; TAB : évaluation seulement
+    synthetique: 0.40
+    hotpot: 0.20
+    fquad_piaf: 0.15
+    droit: 0.15
+    finqa: 0.05
+    squad: 0.05
+  contexte_complet: 0.8
+  abstention: 0.125
+  conflit_injecte: 0.10  # le §12 ne fixe pas la part ; celle des conflits du corpus synthétique
+  contrefactuel: 0.05
+  essais_valeur: 8

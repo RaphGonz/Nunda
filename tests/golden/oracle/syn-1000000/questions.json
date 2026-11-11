@@ -1,0 +1,6188 @@
+[
+ {
+  "id": "syn-1000000-q00",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle heure a eu lieu le contrôle du 13 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 40,
+     "fin": 52,
+     "surface": "13 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/3",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Il existe des versions contradictoires : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Il existe des versions contradictoires : 8h02 et 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q01",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le lieu du contrôle de la SARL Delcoron du 13/03/2025 ?",
+   "faits": [
+    {
+     "debut": 35,
+     "fin": 48,
+     "surface": "SARL Delcoron",
+     "genre": "ORG",
+     "entite": 4,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 52,
+     "fin": 62,
+     "surface": "13/03/2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/0",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a participé au contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a participé au contrôle de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/0",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a participé au contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a participé au contrôle de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/0",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoins se contredisent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " contre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoins se contredisent : 8h02 contre 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q02",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle est l'heure du contrôle auquel LANARD Nathalie a pris part ?",
+   "faits": [
+    {
+     "debut": 38,
+     "fin": 53,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/4",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La vérification visant la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " associe ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La vérification visant la société SARL Delcoron associe LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/4",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoignages diffèrent entre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoignages diffèrent entre 8h02 et 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q03",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le lieu du contrôle auquel LANARD Nathalie a pris part du 13 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 36,
+     "fin": 51,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 67,
+     "fin": 79,
+     "surface": "13 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/4",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoignages diffèrent entre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoignages diffèrent entre 8h02 et 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q04",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle est l'heure du contrôle auquel LANARD Nathalie a pris part le 13 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 38,
+     "fin": 53,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 69,
+     "fin": 81,
+     "surface": "13 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P03:9",
+     "P07:4"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P03:9"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/1",
+    "sources": [
+     "P03:9",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les sources divergent, avec ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:9:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " face à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les sources divergent, avec 8 h 02 face à 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q05",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quel moment de la journée a eu lieu le contrôle de la SARL Delcoron le 13 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 56,
+     "fin": 69,
+     "surface": "SARL Delcoron",
+     "genre": "ORG",
+     "entite": 4,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 73,
+     "fin": 85,
+     "surface": "13 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/4",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La vérification visant la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " associe ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La vérification visant la société SARL Delcoron associe LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/2",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les versions s'opposent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ou ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les versions s'opposent : 8h02 ou 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q06",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_SOCIETE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle est la société en cause dans le contrôle du 13 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 51,
+     "fin": 63,
+     "surface": "13 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-13",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/4",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La vérification visant la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " associe ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La vérification visant la société SARL Delcoron associe LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/0",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoins se contredisent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " contre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoins se contredisent : 8h02 contre 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q07",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quel moment de la journée a eu lieu le contrôle mené avec LANARD Nathalie ?",
+   "faits": [
+    {
+     "debut": 60,
+     "fin": 75,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P03:9",
+     "P07:4"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P03:9"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/3",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a pris part à l'inspection de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, LANARD Nathalie a pris part à l'inspection de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/4",
+    "sources": [
+     "P03:9",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoignages diffèrent entre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:9:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoignages diffèrent entre 8 h 02 et 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q08",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Où a eu lieu le contrôle mené avec LANARD Nathalie ?",
+   "faits": [
+    {
+     "debut": 35,
+     "fin": 50,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P03:9",
+     "P07:4"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P03:9"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/4",
+    "sources": [
+     "P03:9",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoignages diffèrent entre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:9:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoignages diffèrent entre 8 h 02 et 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q09",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_HEURE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle heure a eu lieu le contrôle mené avec LANARD Nathalie ?",
+   "faits": [
+    {
+     "debut": 47,
+     "fin": 62,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P03:9",
+     "P07:4"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P03:9"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/0",
+    "sources": [
+     "P03:9",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoins se contredisent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:9:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " contre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoins se contredisent : 8 h 02 contre 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q10",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_DATE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quand a eu lieu le contrôle auquel LANARD Nathalie a pris part ?",
+   "faits": [
+    {
+     "debut": 35,
+     "fin": 50,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P03:9",
+     "P07:4"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/3",
+    "sources": [
+     "P03:9"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a pris part à l'inspection de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:9:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, LANARD Nathalie a pris part à l'inspection de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/0",
+    "sources": [
+     "P03:9",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoins se contredisent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:9:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " contre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoins se contredisent : 8 h 02 contre 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q11",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quel endroit a eu lieu le contrôle mené avec LANARD Nathalie ?",
+   "faits": [
+    {
+     "debut": 47,
+     "fin": 62,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/0",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a participé au contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a participé au contrôle de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/4",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La vérification visant la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " associe ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La vérification visant la société SARL Delcoron associe LANARD Nathalie."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/0",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les témoins se contredisent : ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " contre ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les témoins se contredisent : 8h02 contre 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q12",
+  "type": "CONFLIT",
+  "sous_type": "HEURE_SOCIETE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle entreprise est liée au contrôle mené avec LANARD Nathalie ?",
+   "faits": [
+    {
+     "debut": 49,
+     "fin": 64,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P07:4",
+     "P03:9"
+    ]
+   },
+   {
+    "role": "CONFLIT",
+    "lignes": [
+     "P06:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/1",
+    "sources": [
+     "P07:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrôle de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a été mené par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrôle de la société SARL Delcoron a été mené par LANARD Nathalie."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P06:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LANARD Nathalie a vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CONFLIT",
+    "gabarit": "synthese/CONFLIT/1",
+    "sources": [
+     "P07:4",
+     "P06:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les sources divergent, avec ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " face à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P06:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les sources divergent, avec 8h02 face à 3h34."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q13",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "DATE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quand a eu lieu l'interpellation de Locan Salaud ?",
+   "faits": [
+    {
+     "debut": 36,
+     "fin": 48,
+     "surface": "Locan Salaud",
+     "genre": "PER",
+     "entite": 8,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/0",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'interpellation concerne ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'interpellation concerne ROLLAND Tel, Locan Salaud et Borvan Picard."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et situé au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 25 mai 2025 et situé au 77 rue de la Fontaine, Gallobourg."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q14",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "DATE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer le vol commis par LERMORON Patricia ?",
+   "faits": [
+    {
+     "debut": 39,
+     "fin": 56,
+     "surface": "LERMORON Patricia",
+     "genre": "PER",
+     "entite": 1,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:4"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/1",
+    "sources": [
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le vol de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " est le fait de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le vol de 12 678,59 euros est le fait de LERMORON Patricia, Sarah Lanlard et Lerie Lanard."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/1",
+    "sources": [
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cela s'est produit à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:4:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cela s'est produit à Lopa-les-Bains le 9 août 2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q15",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "DATE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer le vol reproché à SALMON Corborin ?",
+   "faits": [
+    {
+     "debut": 39,
+     "fin": 54,
+     "surface": "SALMON Corborin",
+     "genre": "PER",
+     "entite": 18,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/3",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a pris part au vol portant sur ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, SALMON Corborin a pris part au vol portant sur 26 536,10 euros."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/4",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", les faits se sont déroulés à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le 15 juillet 2025, les faits se sont déroulés à Lopa-les-Bains."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q16",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "DATE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer la rencontre avec Sa Joly ?",
+   "faits": [
+    {
+     "debut": 39,
+     "fin": 46,
+     "surface": "Sa Joly",
+     "genre": "PER",
+     "entite": 17,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P09:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RENCONTRE",
+    "gabarit": "synthese/RENCONTRE/3",
+    "sources": [
+     "P09:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P09:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P09:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P09:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont assisté au rendez-vous.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, Talmo Morin, NICOLAS Sophie et Sa Joly ont assisté au rendez-vous."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/0",
+    "sources": [
+     "P09:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les faits ont eu lieu le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P09:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " vers ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P09:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les faits ont eu lieu le 16/07/2025 vers 13:36."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q17",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le lieu de l'audition de Calanie Payet du 5 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 34,
+     "fin": 47,
+     "surface": "Calanie Payet",
+     "genre": "PER",
+     "entite": 12,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 51,
+     "fin": 62,
+     "surface": "5 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-05",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:8"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "AUDITION",
+    "gabarit": "synthese/AUDITION/0",
+    "sources": [
+     "P05:8"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les enquêteurs ont entendu ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:8:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les enquêteurs ont entendu Calanie Payet."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/2",
+    "sources": [
+     "P05:8"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La date retenue est le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:8:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", vers ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:8:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:8:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La date retenue est le 5 mars 2025, vers 3 h 52, au 47 boulevard de la Liberté, Labory."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q18",
+  "type": "FAIT_SIMPLE",
+  "sous_type": "SOCIETE",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle société était concernée par le contrat signé par M. Salaud ?",
+   "faits": [
+    {
+     "debut": 59,
+     "fin": 65,
+     "surface": "Salaud",
+     "genre": "PER",
+     "entite": 8,
+     "forme": "TITRE_NOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:7"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/3",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont paraphé le contrat avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " pour ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, HENRY Rachida, Géraldine Dufour et Salaud ont paraphé le contrat avec la société SAS Tier Import-Export pour 28 642,42 € et 24 940,56 euros."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/1",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cela s'est produit au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:7",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:6",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cela s'est produit au 77 rue de la Fontaine, Gallobourg le 28/12/2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q19",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le montant du contrat signé par la personne qui a rencontré Talmo Morin du 29 août 2024 le 31 décembre 2024 ?",
+   "faits": [
+    {
+     "debut": 69,
+     "fin": 80,
+     "surface": "Talmo Morin",
+     "genre": "PER",
+     "entite": 2,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 84,
+     "fin": 96,
+     "surface": "29 août 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-08-29",
+     "unite": null
+    },
+    {
+     "debut": 100,
+     "fin": 116,
+     "surface": "31 décembre 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-31",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:4"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P04:4"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RENCONTRE",
+    "gabarit": "synthese/RENCONTRE/3",
+    "sources": [
+     "P05:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont assisté au rendez-vous.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, FET Chloé et Talmo Morin ont assisté au rendez-vous."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/4",
+    "sources": [
+     "P04:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La signature du contrat de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P04:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " implique ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P04:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P04:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La signature du contrat de 24 241,90 € implique FET Chloé et la société SARL Delcoron."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/2",
+    "sources": [
+     "P04:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La date retenue est le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P04:4:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La date retenue est le 31 décembre 2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q20",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Qui d'autre était impliqué dans le contrat signé par la personne qui a fait un virement avec LANARD Nathalie le 28/12/2024 ?",
+   "faits": [
+    {
+     "debut": 93,
+     "fin": 108,
+     "surface": "LANARD Nathalie",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 112,
+     "fin": 122,
+     "surface": "28/12/2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-28",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:6"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:7"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VIREMENT",
+    "gabarit": "synthese/VIREMENT/0",
+    "sources": [
+     "P05:6"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont viré ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " à la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Géraldine Dufour et LANARD Nathalie ont viré 32 729,53 € à la société Bernard."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/0",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont signé le contrat de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "HENRY Rachida, Géraldine Dufour et Salaud ont signé le contrat de 28 642,42 € et 24 940,56 euros avec la société SAS Tier Import-Export."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/1",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cela s'est produit au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:7",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:6",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cela s'est produit au 77 rue de la Fontaine, Gallobourg le 28/12/2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q21",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "De quand date l'arrestation de la personne qui a fait des constatations avec ROLLAND Tel ?",
+   "faits": [
+    {
+     "debut": 77,
+     "fin": 88,
+     "surface": "ROLLAND Tel",
+     "genre": "PER",
+     "entite": 6,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:8"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONSTATATION",
+    "gabarit": "synthese/CONSTATATION/2",
+    "sources": [
+     "P03:8"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont relevé des dommages.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "ROLLAND Tel et Locan Salaud ont relevé des dommages."
+   },
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/3",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, l'arrestation vise ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, l'arrestation vise ROLLAND Tel, Locan Salaud et Borvan Picard."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et situé au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 25 mai 2025 et situé au 77 rue de la Fontaine, Gallobourg."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q22",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le lieu de la signature du contrat par la personne qui a fait un virement avec Nathalie Lanard ?",
+   "faits": [
+    {
+     "debut": 88,
+     "fin": 103,
+     "surface": "Nathalie Lanard",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P01:5"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:7"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VIREMENT",
+    "gabarit": "synthese/VIREMENT/2",
+    "sources": [
+     "P01:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P01:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P01:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont ordonné le virement de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P01:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " vers la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P01:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Géraldine Dufour et Nathalie Lanard ont ordonné le virement de 32729,53 euros vers la société SA Bernard."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/4",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La signature du contrat de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " implique ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La signature du contrat de 28 642,42 € et 24 940,56 euros implique HENRY Rachida, Géraldine Dufour et Salaud et la société SAS Tier Import-Export."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/1",
+    "sources": [
+     "P03:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cela s'est produit au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:7:7",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:7:6",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cela s'est produit au 77 rue de la Fontaine, Gallobourg le 28/12/2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q23",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelles autres personnes ont pris part à la signature du contrat par la personne qui a rencontré Talmo Morin du 29 août 2024 du 6 décembre 2024 ?",
+   "faits": [
+    {
+     "debut": 97,
+     "fin": 108,
+     "surface": "Talmo Morin",
+     "genre": "PER",
+     "entite": 2,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 112,
+     "fin": 124,
+     "surface": "29 août 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-08-29",
+     "unite": null
+    },
+    {
+     "debut": 128,
+     "fin": 143,
+     "surface": "6 décembre 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-06",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:4"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RENCONTRE",
+    "gabarit": "synthese/RENCONTRE/1",
+    "sources": [
+     "P05:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La rencontre réunit ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:4:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La rencontre réunit FET Chloé et Talmo Morin."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/2",
+    "sources": [
+     "P05:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont conclu l'accord de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:5:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "FET Chloé, Patricia Lermoron et Borvan Picard ont conclu l'accord de 3532,19 euros et 31 742,77 euros avec la société SA Bernard."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/0",
+    "sources": [
+     "P05:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les faits ont eu lieu le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:5:6",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " vers ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:5:7",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:5:8",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les faits ont eu lieu le 6 décembre 2024 vers 7h51 au 47 boulevard de la Liberté, Labory."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q24",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Où a eu lieu l'interpellation de la personne qui a fait des constatations avec Locan Salaud du 29/12/2024 ?",
+   "faits": [
+    {
+     "debut": 79,
+     "fin": 91,
+     "surface": "Locan Salaud",
+     "genre": "PER",
+     "entite": 8,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 95,
+     "fin": 105,
+     "surface": "29/12/2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-29",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:8"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONSTATATION",
+    "gabarit": "synthese/CONSTATATION/0",
+    "sources": [
+     "P03:8"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont constaté les dégradations.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "ROLLAND Tel et Locan Salaud ont constaté les dégradations."
+   },
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/4",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La police a arrêté ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La police a arrêté ROLLAND Tel, Locan Salaud et Borvan Picard."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/0",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les faits ont eu lieu le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les faits ont eu lieu le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q25",
+  "type": "PLUSIEURS_ETAPES",
+  "sous_type": "2_ETAPES",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Où a eu lieu l'arrestation de la personne qui a fait des constatations avec Locan Salaud le 29/12/2024 du 25/05/2025 ?",
+   "faits": [
+    {
+     "debut": 76,
+     "fin": 88,
+     "surface": "Locan Salaud",
+     "genre": "PER",
+     "entite": 8,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 92,
+     "fin": 102,
+     "surface": "29/12/2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-29",
+     "unite": null
+    },
+    {
+     "debut": 106,
+     "fin": 116,
+     "surface": "25/05/2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-05-25",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:8"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "CONSTATATION",
+    "gabarit": "synthese/CONSTATATION/2",
+    "sources": [
+     "P03:8"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:8:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont relevé des dommages.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "ROLLAND Tel et Locan Salaud ont relevé des dommages."
+   },
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/2",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont fait l'objet de l'interpellation.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "ROLLAND Tel, Locan Salaud et Borvan Picard ont fait l'objet de l'interpellation."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/1",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cela s'est produit au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cela s'est produit au 77 rue de la Fontaine, Gallobourg le 25 mai 2025."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q26",
+  "type": "IDENTITE",
+  "sous_type": "RESSEMBLANCE_NOM_PRENOM",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quand a eu lieu le vol reproché à Corborin Salmon ?",
+   "faits": [
+    {
+     "debut": 34,
+     "fin": 49,
+     "surface": "Corborin Salmon",
+     "genre": "PER",
+     "entite": 18,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:5"
+    ]
+   }
+  ],
+  "identites": [
+   {
+    "question": 0,
+    "fait": "P08:5:1",
+    "preuve": null
+   }
+  ],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RESSEMBLANCE",
+    "gabarit": "synthese/RESSEMBLANCE/1",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Cette personne apparaît sous la forme ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Cette personne apparaît sous la forme SALMON Corborin."
+   },
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/0",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a commis le vol de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "SALMON Corborin a commis le vol de 26 536,10 euros."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/2",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La date retenue est le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La date retenue est le 15 juillet 2025, à Lopa-les-Bains."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q27",
+  "type": "IDENTITE",
+  "sous_type": "RESSEMBLANCE_TITRE_NOM",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quel endroit a eu lieu l'arrestation de Chloé Fet ?",
+   "faits": [
+    {
+     "debut": 42,
+     "fin": 51,
+     "surface": "Chloé Fet",
+     "genre": "PER",
+     "entite": 0,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:7"
+    ]
+   }
+  ],
+  "identites": [
+   {
+    "question": 0,
+    "fait": "P05:7:1",
+    "preuve": null
+   }
+  ],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RESSEMBLANCE",
+    "gabarit": "synthese/RESSEMBLANCE/2",
+    "sources": [
+     "P05:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le nom écrit dans la pièce est ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:7:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le nom écrit dans la pièce est Fet."
+   },
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/1",
+    "sources": [
+     "P05:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les policiers ont interpellé ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:7:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les policiers ont interpellé Fet."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P05:7"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:7:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et situé au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:7:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 02/03/2025 et situé au 102 boulevard de la Liberté, Na-sur-Loire."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q28",
+  "type": "IDENTITE",
+  "sous_type": "RESSEMBLANCE_COMPLET",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer le constat fait par PAYET Calanie ?",
+   "faits": [
+    {
+     "debut": 41,
+     "fin": 54,
+     "surface": "PAYET Calanie",
+     "genre": "PER",
+     "entite": 12,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P03:6"
+    ]
+   }
+  ],
+  "identites": [
+   {
+    "question": 0,
+    "fait": "P03:6:1",
+    "preuve": null
+   }
+  ],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RESSEMBLANCE",
+    "gabarit": "synthese/RESSEMBLANCE/4",
+    "sources": [
+     "P03:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La personne de la question correspond probablement à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La personne de la question correspond probablement à Calanie Payet."
+   },
+   {
+    "relation": "CONSTATATION",
+    "gabarit": "synthese/CONSTATATION/0",
+    "sources": [
+     "P03:6"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P03:6:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont constaté les dégradations.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Calanie Payet, Nathalie Lanard et TALON Ingrid ont constaté les dégradations."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P03:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P03:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 31 octobre 2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q29",
+  "type": "IDENTITE",
+  "sous_type": "RESSEMBLANCE_COMPLET",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle heure a eu lieu la signature du contrat par BAMIER Elodie ?",
+   "faits": [
+    {
+     "debut": 53,
+     "fin": 66,
+     "surface": "BAMIER Elodie",
+     "genre": "PER",
+     "entite": 7,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P02:6"
+    ]
+   }
+  ],
+  "identites": [
+   {
+    "question": 0,
+    "fait": "P02:6:0",
+    "preuve": null
+   }
+  ],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RESSEMBLANCE",
+    "gabarit": "synthese/RESSEMBLANCE/0",
+    "sources": [
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La pièce nomme cette personne ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La pièce nomme cette personne Elodie Bamier."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/0",
+    "sources": [
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a signé le contrat de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P02:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Elodie Bamier a signé le contrat de 35027,14 euros avec la société SARL Delcoron."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P02:6:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P02:6:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 27 mars 2025, à 21h59."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q30",
+  "type": "IDENTITE",
+  "sous_type": "RESSEMBLANCE_COMPLET",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quand a eu lieu le contrôle auquel FET Chloé a pris part ?",
+   "faits": [
+    {
+     "debut": 35,
+     "fin": 44,
+     "surface": "FET Chloé",
+     "genre": "PER",
+     "entite": 0,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:6"
+    ]
+   }
+  ],
+  "identites": [
+   {
+    "question": 0,
+    "fait": "P07:6:4",
+    "preuve": null
+   }
+  ],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "RESSEMBLANCE",
+    "gabarit": "synthese/RESSEMBLANCE/3",
+    "sources": [
+     "P07:6"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:6:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " semble désigner la personne visée.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Chloé Fet semble désigner la personne visée."
+   },
+   {
+    "relation": "CONTROLE",
+    "gabarit": "synthese/CONTROLE/2",
+    "sources": [
+     "P07:6"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:6:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:6:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont vérifié les comptes de la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:6:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Chloé Fet et BAMIER Elodie ont vérifié les comptes de la société SARL Delcoron."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/3",
+    "sources": [
+     "P07:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "L'événement est daté du ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et situé au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "L'événement est daté du 23 juin 2025 et situé au 77 rue de la Fontaine, Gallobourg, à 6h22."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q31",
+  "type": "FAIT_ABSENT",
+  "sous_type": "ATTRIBUT_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le lieu du virement fait par Nathalie Lanard ?",
+   "faits": [
+    {
+     "debut": 38,
+     "fin": 53,
+     "surface": "Nathalie Lanard",
+     "genre": "PER",
+     "entite": 15,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": true,
+  "synthese": []
+ },
+ {
+  "id": "syn-1000000-q32",
+  "type": "FAIT_ABSENT",
+  "sous_type": "ATTRIBUT_LIEU",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Où a eu lieu la constatation faite par Locan Salaud du 1er octobre 2024 ?",
+   "faits": [
+    {
+     "debut": 39,
+     "fin": 51,
+     "surface": "Locan Salaud",
+     "genre": "PER",
+     "entite": 8,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 55,
+     "fin": 71,
+     "surface": "1er octobre 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-10-01",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": true,
+  "synthese": []
+ },
+ {
+  "id": "syn-1000000-q33",
+  "type": "FAIT_ABSENT",
+  "sous_type": "EVENEMENT",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer le contrôle mené avec HENRY Rachida ?",
+   "faits": [
+    {
+     "debut": 43,
+     "fin": 56,
+     "surface": "HENRY Rachida",
+     "genre": "PER",
+     "entite": 3,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": true,
+  "synthese": []
+ },
+ {
+  "id": "syn-1000000-q34",
+  "type": "CALCUL",
+  "sous_type": "ECART",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel écart sépare le montant du vol commis par Sarah Lanlard et celui du contrat signé par Elodie Bamier ?",
+   "faits": [
+    {
+     "debut": 47,
+     "fin": 60,
+     "surface": "Sarah Lanlard",
+     "genre": "PER",
+     "entite": 11,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 91,
+     "fin": 104,
+     "surface": "Elodie Bamier",
+     "genre": "PER",
+     "entite": 7,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:4"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P02:6"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": {
+   "operation": "ECART",
+   "postfixe": [
+    "P02:6:1",
+    "P08:4:2",
+    "−"
+   ],
+   "resultat": "22348.55",
+   "unite": "€"
+  },
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/3",
+    "sources": [
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont pris part au vol portant sur ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, LERMORON Patricia, Sarah Lanlard et Lerie Lanard ont pris part au vol portant sur 12 678,59 euros."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/3",
+    "sources": [
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " a paraphé le contrat avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " pour ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P02:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, Elodie Bamier a paraphé le contrat avec la société SARL Delcoron pour 35027,14 euros."
+   },
+   {
+    "relation": "ECART",
+    "gabarit": "synthese/ECART/2",
+    "sources": [
+     "P08:4",
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Ces sommes diffèrent de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "CALCUL",
+      "mots": "",
+      "fait": "",
+      "calcul": [
+       "P02:6:1",
+       "P08:4:2",
+       "−"
+      ]
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Ces sommes diffèrent de 22 348,55 €."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q35",
+  "type": "CALCUL",
+  "sous_type": "MIN",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quel est le plus petit montant parmi le vol commis par SALMON Corborin le 15 juillet 2025 et le vol reproché à LERMORON Patricia ?",
+   "faits": [
+    {
+     "debut": 55,
+     "fin": 70,
+     "surface": "SALMON Corborin",
+     "genre": "PER",
+     "entite": 18,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 74,
+     "fin": 89,
+     "surface": "15 juillet 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-07-15",
+     "unite": null
+    },
+    {
+     "debut": 111,
+     "fin": 128,
+     "surface": "LERMORON Patricia",
+     "genre": "PER",
+     "entite": 1,
+     "forme": "NOM_PRENOM",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:5"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:4"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": {
+   "operation": "MIN",
+   "postfixe": [
+    "P08:5:0",
+    "P08:4:2",
+    "MIN"
+   ],
+   "resultat": "12678.59",
+   "unite": "€"
+  },
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/1",
+    "sources": [
+     "P08:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le vol de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " est le fait de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le vol de 26 536,10 euros est le fait de SALMON Corborin."
+   },
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/3",
+    "sources": [
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "D'après la pièce, ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont pris part au vol portant sur ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "D'après la pièce, LERMORON Patricia, Sarah Lanlard et Lerie Lanard ont pris part au vol portant sur 12 678,59 euros."
+   },
+   {
+    "relation": "MIN",
+    "gabarit": "synthese/MIN/4",
+    "sources": [
+     "P08:5",
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le montant le moins élevé est ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "CALCUL",
+      "mots": "",
+      "fait": "",
+      "calcul": [
+       "P08:5:0",
+       "P08:4:2",
+       "MIN"
+      ]
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le montant le moins élevé est 12 678,59 €."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q36",
+  "type": "CALCUL",
+  "sous_type": "ECART",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Quelle est la différence entre le montant du vol reproché à Lerie Lanard et celui de la signature du contrat par Elodie Bamier le 27 mars 2025 ?",
+   "faits": [
+    {
+     "debut": 60,
+     "fin": 72,
+     "surface": "Lerie Lanard",
+     "genre": "PER",
+     "entite": 16,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 113,
+     "fin": 126,
+     "surface": "Elodie Bamier",
+     "genre": "PER",
+     "entite": 7,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 130,
+     "fin": 142,
+     "surface": "27 mars 2025",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2025-03-27",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P08:4"
+    ]
+   },
+   {
+    "role": "CITE",
+    "lignes": [
+     "P02:6"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": {
+   "operation": "ECART",
+   "postfixe": [
+    "P02:6:1",
+    "P08:4:2",
+    "−"
+   ],
+   "resultat": "22348.55",
+   "unite": "€"
+  },
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VOL",
+    "gabarit": "synthese/VOL/2",
+    "sources": [
+     "P08:4"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P08:4:5",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont dérobé la somme de ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P08:4:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "LERMORON Patricia, Sarah Lanlard et Lerie Lanard ont dérobé la somme de 12 678,59 euros."
+   },
+   {
+    "relation": "SIGNATURE",
+    "gabarit": "synthese/SIGNATURE/1",
+    "sources": [
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Le contrat conclu avec la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " engage ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P02:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " pour ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P02:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Le contrat conclu avec la société SARL Delcoron engage Elodie Bamier pour 35027,14 euros."
+   },
+   {
+    "relation": "ECART",
+    "gabarit": "synthese/ECART/1",
+    "sources": [
+     "P08:4",
+     "P02:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "La différence s'élève à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "CALCUL",
+      "mots": "",
+      "fait": "",
+      "calcul": [
+       "P02:6:1",
+       "P08:4:2",
+       "−"
+      ]
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "La différence s'élève à 22 348,55 €."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q37",
+  "type": "DIALOGUE",
+  "sous_type": "ASK_SAME",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "À quelle date situer le constat fait par Lanard ?",
+   "faits": [
+    {
+     "debut": 41,
+     "fin": 47,
+     "surface": "Lanard",
+     "genre": "PER",
+     "entite": null,
+     "forme": "NOM_SEUL",
+     "valeur": null,
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [
+   "P03:6:2",
+   "P04:6:1"
+  ],
+  "abstention": false,
+  "synthese": []
+ },
+ {
+  "id": "syn-1000000-q38",
+  "type": "DIALOGUE",
+  "sous_type": "NOTE_DIFF",
+  "historique": [],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Géraldine Dufour et Talmo Morin sont deux personnes différentes. Quelle entreprise est liée au virement fait par Géraldine Dufour le 7 décembre 2024 ?",
+   "faits": [
+    {
+     "debut": 0,
+     "fin": 16,
+     "surface": "Géraldine Dufour",
+     "genre": "PER",
+     "entite": 5,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 20,
+     "fin": 31,
+     "surface": "Talmo Morin",
+     "genre": "PER",
+     "entite": 2,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 113,
+     "fin": 129,
+     "surface": "Géraldine Dufour",
+     "genre": "PER",
+     "entite": 5,
+     "forme": "COMPLET",
+     "valeur": null,
+     "unite": null
+    },
+    {
+     "debut": 133,
+     "fin": 148,
+     "surface": "7 décembre 2024",
+     "genre": "DATE",
+     "entite": null,
+     "forme": null,
+     "valeur": "2024-12-07",
+     "unite": null
+    }
+   ],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P05:6",
+     "P01:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": {
+   "genre": "DIFFERENT",
+   "juste": true,
+   "faits": [
+    0,
+    1
+   ]
+  },
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "VIREMENT",
+    "gabarit": "synthese/VIREMENT/4",
+    "sources": [
+     "P05:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les fonds envoyés par ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " à la société ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P05:6:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " s'élèvent à ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:6:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les fonds envoyés par Géraldine Dufour et LANARD Nathalie à la société Bernard s'élèvent à 32 729,53 €."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/0",
+    "sources": [
+     "P05:6"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les faits ont eu lieu le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P05:6:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les faits ont eu lieu le 07/12/2024."
+   }
+  ]
+ },
+ {
+  "id": "syn-1000000-q39",
+  "type": "DIALOGUE",
+  "sous_type": "SUITE",
+  "historique": [
+   {
+    "role": "UTILISATEUR",
+    "texte": "De quand date l'interpellation de ROLLAND Tel ?",
+    "faits": [
+     {
+      "debut": 34,
+      "fin": 45,
+      "surface": "ROLLAND Tel",
+      "genre": "PER",
+      "entite": 6,
+      "forme": "NOM_PRENOM",
+      "valeur": null,
+      "unite": null
+     }
+    ],
+    "lignes": []
+   },
+   {
+    "role": "MODELE",
+    "texte": "",
+    "faits": [],
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "message": {
+   "role": "UTILISATEUR",
+   "texte": "Et où se trouvait-il alors ?",
+   "faits": [],
+   "lignes": []
+  },
+  "etapes": [
+   {
+    "role": "CITE",
+    "lignes": [
+     "P07:5"
+    ]
+   }
+  ],
+  "identites": [],
+  "calcul": null,
+  "declaration": null,
+  "ambigus": [],
+  "abstention": false,
+  "synthese": [
+   {
+    "relation": "INTERPELLATION",
+    "gabarit": "synthese/INTERPELLATION/2",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:0",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ", ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:1",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " et ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:2",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " ont fait l'objet de l'interpellation.",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "ROLLAND Tel, Locan Salaud et Borvan Picard ont fait l'objet de l'interpellation."
+   },
+   {
+    "relation": "CIRCONSTANCES",
+    "gabarit": "synthese/CIRCONSTANCES/0",
+    "sources": [
+     "P07:5"
+    ],
+    "elements": [
+     {
+      "genre": "MOTS",
+      "mots": "Les faits ont eu lieu le ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "N",
+      "mots": "",
+      "fait": "P07:5:3",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": " au ",
+      "fait": "",
+      "calcul": []
+     },
+     {
+      "genre": "M",
+      "mots": "",
+      "fait": "P07:5:4",
+      "calcul": []
+     },
+     {
+      "genre": "MOTS",
+      "mots": ".",
+      "fait": "",
+      "calcul": []
+     }
+    ],
+    "texte": "Les faits ont eu lieu le 25 mai 2025 au 77 rue de la Fontaine, Gallobourg."
+   }
+  ]
+ }
+]

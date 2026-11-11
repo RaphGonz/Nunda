@@ -9,7 +9,9 @@ dependencies = [
     "datasketch>=2.0.0",
     "fr-core-news-lg",
     "gliner>=0.2.29",
+    "peft>=0.13",
     "protobuf>=7.36.2",
+    "pyarrow>=17",
     "pydantic>=2.9",
     "pypdfium2>=4.30",
     "pysbd>=0.3.4",
@@ -52,7 +54,8 @@ select = ["E", "F", "W", "I", "B", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not couteux'"
+markers = ["couteux: test long et gourmand en mémoire, hors de `make test` (make test-t11)"]
 
 [tool.uv]
 default-groups = ["dev", "interne"]
