@@ -11,6 +11,11 @@ import hashlib
 import urllib.request
 from pathlib import Path
 
+# Wikimedia refuse (403) l'en-tête par défaut de urllib : un nom de client générique.
+_OUVREUR = urllib.request.build_opener()
+_OUVREUR.addheaders = [("User-Agent", "ccm-corpus/0.1 (recherche)")]
+urllib.request.install_opener(_OUVREUR)
+
 _HOTPOT = "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor"
 _PIAF = "https://static.data.gouv.fr/resources/piaf-le-dataset-francophone-de-questions-reponses/20210323-174441"
 _SQUAD = "https://rajpurkar.github.io/SQuAD-explorer/dataset"

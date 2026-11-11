@@ -36,11 +36,18 @@ DILA = {"dila_cass": "CASS", "dila_inca": "INCA", "dila_jade": "JADE", "dila_cap
 HF = {
     "livres_fr": ("PleIAs/French-PD-Books", A_FIGER, r".*\.parquet", 40),
     "gutenberg_en": ("manu/project_gutenberg", A_FIGER, r"data/en-.*\.parquet", 40),
-    "eurlex": ("nlpaueb/multi_eurlex", A_FIGER, r".*\.(jsonl|jsonl\.gz|parquet)", 20),
-    "cedh_en": ("ecthr_cases", A_FIGER, r".*\.parquet", 10),
 }  # fmt: skip
 # Fichiers à URL fixe.
-FIXES = {"europarl": ("fr-en.tgz", "https://www.statmt.org/europarl/v7/fr-en.tgz")}
+# MultiEURLEX et ECtHR : les dépôts HF n'ont qu'un script de chargement ; leurs données sont
+# sur Zenodo et archive.org (URL lues dans `multi_eurlex.py` et `ecthr_cases.py`).
+FIXES = {
+    "europarl": ("fr-en.tgz", "https://www.statmt.org/europarl/v7/fr-en.tgz"),
+    "eurlex": (
+        "multi_eurlex.tar.gz",
+        "https://zenodo.org/record/5363165/files/multi_eurlex.tar.gz",
+    ),
+    "cedh_en": ("dataset.zip", "https://archive.org/download/ECtHR-NAACL2021/dataset.zip"),
+}
 
 
 def _lire(url: str) -> bytes:
@@ -50,7 +57,7 @@ def _lire(url: str) -> bytes:
 
 def _wiki(projet: str) -> tuple[str, str]:
     rss = _lire(f"{_WIKI}/{projet}/latest/{projet}-latest-pages-articles.xml.bz2-rss.xml")
-    date = re.search(rf"{_WIKI}/{projet}/(\d{{8}})".encode(), rss)
+    date = re.search(rf"/{projet}/(\d{{8}})".encode(), rss)  # hôte download. ou dumps.
     if date is None:
         raise ValueError(f"date du dump {projet} introuvable")
     d = date[1].decode()

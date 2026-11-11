@@ -57,4 +57,4 @@ corpus:
     gutenberg_en: {langue: en, lecteur: hf_parquet, quota: 200000000, gutenberg: true}
     eurlex_en: {langue: en, lecteur: eurlex, quota: 100000000, dossier: eurlex}
     europarl_en: {langue: en, lecteur: europarl, quota: 50000000, dossier: europarl}
-    cedh_en: {langue: en, lecteur: hf_parquet, quota: 50000000, colonne: facts}
+    cedh_en: {langue: en, lecteur: cedh, quota: 50000000}

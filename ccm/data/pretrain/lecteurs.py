@@ -10,6 +10,7 @@ import json
 import re
 import tarfile
 import xml.etree.ElementTree as ET
+import zipfile
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -156,9 +157,32 @@ def europarl(archive: Path, source: str, s: SourcePretrain) -> Iterator[Document
                    "texte": "\n".join(lignes)}  # fmt: skip
 
 
+def _jsonl_tar(chemin: Path) -> Iterator[tuple[str, dict]]:
+    """(nom du membre, ligne JSON) des fichiers `.jsonl` d'une archive tar.gz."""
+    with tarfile.open(chemin, "r|gz") as t:
+        for m in t:
+            f = t.extractfile(m) if m.isfile() and m.name.endswith(".jsonl") else None
+            if f is not None:
+                for x in f:
+                    yield m.name, json.loads(x)
+
+
 def eurlex(chemins: list[Path], source: str, s: SourcePretrain) -> Iterator[Document]:
-    """MultiEURLEX : lignes JSON (`celex_id`, `text` : chaîne ou {langue: texte}) ou Parquet."""
+    """MultiEURLEX : lignes JSON (`celex_id`, `text` : chaîne ou {langue: texte}), seules, en
+    Parquet ou dans l'archive tar.gz de Zenodo (un membre par langue : les autres sont sautés)."""
     for chemin in chemins:
+        if chemin.name.endswith(".tar.gz"):
+            for k, (nom, r) in enumerate(_jsonl_tar(chemin)):
+                texte = r.get(s.colonne)
+                if isinstance(texte, dict):
+                    texte = texte.get(s.langue)
+                elif any(p in {"en", "fr", "de", "it", "es", "nl"} and p != s.langue
+                         for p in re.split(r"[/._-]", nom)):  # fmt: skip
+                    continue
+                if texte:
+                    yield {"id": f"{source}-{r.get('celex_id') or k}", "source": source,
+                           "langue": s.langue, "texte": texte}  # fmt: skip
+            continue
         if chemin.suffix == ".parquet":
             lignes = (r for lot in pq.ParquetFile(chemin).iter_batches(batch_size=256)
                       for r in lot.to_pylist())  # fmt: skip
@@ -173,6 +197,20 @@ def eurlex(chemins: list[Path], source: str, s: SourcePretrain) -> Iterator[Docu
                 id_ = r.get("celex_id") or f"{chemin.stem}-{k}"
                 yield {"id": f"{source}-{id_}", "source": source, "langue": s.langue,
                        "texte": texte}  # fmt: skip
+
+
+def cedh(archive: Path, source: str, s: SourcePretrain) -> Iterator[Document]:
+    """ECtHR (archive.org, `dataset.zip`) : lignes JSON, `facts` = liste de paragraphes."""
+    with zipfile.ZipFile(archive) as z:
+        for nom in sorted(n for n in z.namelist() if n.endswith(".jsonl")):
+            with z.open(nom) as f:
+                for k, x in enumerate(f):
+                    r = json.loads(x)
+                    faits = r.get("facts") or []
+                    if faits:
+                        yield {"id": f"{source}-{Path(nom).stem}-{r.get('case_id', k)}",
+                               "source": source, "langue": s.langue,
+                               "texte": "\n\n".join(faits)}  # fmt: skip
 
 
 def documents(source: str, s: SourcePretrain, cfg: CorpusConfig, dcfg: DonneesConfig
@@ -202,3 +240,6 @@ def documents(source: str, s: SourcePretrain, cfg: CorpusConfig, dcfg: DonneesCo
             yield from europarl(f, source, s)
     elif s.lecteur == "eurlex":
         yield from eurlex(fichiers, source, s)
+    elif s.lecteur == "cedh":
+        for f in fichiers:
+            yield from cedh(f, source, s)

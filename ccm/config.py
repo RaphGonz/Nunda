@@ -252,7 +252,9 @@ class SourcePretrain(_Bloc):
     `racine/brut/<dossier>/` (nom de la source par défaut)."""
 
     langue: Literal["fr", "en"]
-    lecteur: Literal["wiki", "hf_parquet", "dila", "europarl", "eurlex", "legi", "judilibre"]
+    lecteur: Literal[
+        "wiki", "hf_parquet", "dila", "europarl", "eurlex", "cedh", "legi", "judilibre"
+    ]
     quota: int  # jetons (tokenizer de comptage) ; la lecture s'arrête au quota
     dossier: str | None = None
     colonne: str = "text"  # hf_parquet, eurlex
