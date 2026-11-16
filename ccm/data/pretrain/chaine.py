@@ -277,7 +277,8 @@ def passe_a(ch: Chemins, cfg: CorpusConfig, icfg: IngestConfig,
                     if sha in shas or vus.execute("SELECT 1 FROM vu WHERE sha = ?",
                                                   (sha,)).fetchone():  # fmt: skip
                         raison = "doublon"
-                    shas.add(sha)
+                    else:
+                        shas.add(sha)
                 if raison:
                     rejets[raison] += 1
                     continue

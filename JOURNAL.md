@@ -1034,3 +1034,28 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   3. `make pretrain-debit` : 10 M jetons (7 M fr, 3 M en), chaque détecteur seul, GPU sans entraînement en même temps ; ~1 à 2 h d'après les débits ci-dessus. Écrit `debit.json`.
   4. Décision GLiNER au journal (`tout` si ≤ 40 h, sinon `10pct`), et contrôle de la durée totale contre les 5 jours du §15.
   5. `make pretrain-chaine` (reprend après un arrêt), puis `bilan.json` : durée = détection (estimée ci-dessus) plus les passes sur CPU, à mesurer sur les premiers paquets.
+
+## 2026-11-11 (nuit) — Phase 5 — Lancement du téléchargement et de la chaîne (§12, §14, §15)
+- **Demande de Raphael :** lancer le téléchargement et tout ce qui suit cette nuit.
+- **Lancé à 21 h 30 (`runs/pretrain-nuit.log`) :** `ccm pretrain telecharger --figer` → `brut --essai 1000` → `brut` → `canaris` → `debit`, l'un après l'autre, arrêt au premier échec. Ensuite : décision GLiNER selon `debit.json` et contrôle des 5 jours du §15 avant `make pretrain-chaine`.
+- **Licences :** lancées sans lecture en ligne préalable (licences remises à plus tard par Raphael, à revoir avant publication ou vente).
+
+## 2026-11-14 — Phase 5 — Reprise de la chaîne du corpus après une coupure
+- **Incident :** une mise à jour Windows a redémarré la machine pendant `brut` (nuit du 2026-11-11), après le paquet 20 (02 h 13, 21 paquets écrits, `etat.json` non complet). `telecharger --figer` et `brut --essai 1000` étaient finis.
+- **Relance (demande de Raphael) :** `runs/pretrain-reprise.ps1` : `brut` (relit les sources et saute les paquets déjà finis) → `canaris` → `debit`, dans `runs/pretrain-nuit.log`. Arrêt avant `pretrain-chaine` : décision GLiNER et contrôle des 5 jours d'abord.
+- **Windows Update (demande de Raphael) :** mises à jour en pause jusqu'au 2026-12-19 (maximum de 35 jours, à renouveler) ; règle `NoAutoRebootWithLoggedOnUsers` = 1 (pas toujours appliquée sur Windows Home).
+- **`brut` fini (2026-11-15 00 h 24) :** 116 paquets, 1 151 153 documents. LEGI : 161 302 documents (≈ 26 M jetons d'après la moyenne de l'essai, loin des 100 M) ; jetons exacts par source à lire au bilan.
+- **`canaris` fini (00 h 40) :** 600 canaris, 116 paquets. **`debit` arrêté vers 00 h 55** : Claude Code a tué la tâche de fond parce que la mémoire du système était presque pleine (32 Go). Pas de `debit.json`. À relancer avec l'accord de Raphael, en surveillant la mémoire.
+- **`debit` relancé (03 h 42 → 06 h 18, processus détaché de Claude Code) :** 10 M jetons (7,2 M fr, 2,8 M en). `debit.json` :
+  - GLiNER : fr 897 jetons/s (542 h pour 1,75 G), en 5 450 jetons/s (38 h pour 0,75 G) ; total **580 h**, au-delà des 40 h → **`10pct`** (règle de Raphael) : ≈ 58 h.
+  - spaCy (fr, CPU) : 12 768 jetons/s → **38 h**. Majuscules 4,9 h, nombres 0,6 h, règles 0,5 h (fr + en).
+  - Durée de la détection avec `10pct` : ≈ 102 h (4,3 jours) si les détecteurs passent l'un après l'autre, plus les passes sur CPU (non mesurées) : **proche des 5 jours du §15**.
+  - GLiNER fr 6 fois plus lent que GLiNER en : la mémoire du GPU était pleine (23,5 / 24 Go, 4 alertes OOM du cache CUDA) ; la mesure fr est peut-être faussée. La RAM libre est aussi descendue à 4 Go pendant la mesure.
+- **Suite prévue :** accord de Raphael avant `make pretrain-chaine` (durée proche de la limite du §15).
+- **`make pretrain-chaine` lancé (accord de Raphael), 2026-11-15 09 h 31 :** mode `10pct` (lu dans `debit.json`), processus détaché (`runs/pretrain-chaine-lancer.ps1`), journal dans `runs/pretrain-chaine.log`. Reprend après un arrêt.
+- **Mémoire pendant la chaîne :** pics à 18 Go pour le processus principal pendant la détection du premier paquet (1 Go libre sur 31), retour à 7 Go ensuite ; alertes OOM du cache CUDA, sans arrêt. Les surveillances de Claude Code sont coupées par la mémoire basse ; la chaîne, détachée, continue. Point prévu le soir du 2026-11-15.
+- **Arrêt de la chaîne (Raphael), 2026-11-15 vers 16 h 50 :** toujours au paquet 0 sur 116 (11 % du corpus en octets, les livres). Fait : GLiNER sur 10 % des documents en fr (265 594 phrases, 28 min) ; fr sans GLiNER à 4,0 M phrases sur 4,26 M (≈ 6 h 40, ≈ 170 phrases/s, plus lent que la mesure de `debit`). Le cache de détection est enregistré par lot (`travail/cache/<chaîne>/paquet-00000.sqlite`) : la relance ne refait que les phrases manquantes.
+- **Relance :** `powershell -File runs\pretrain-chaine-lancer.ps1` (détaché).
+- **Relancée (demande de Raphael), 2026-11-15 21 h 14 :** `runs/pretrain-chaine-lancer.ps1`, détachée ; reprend au paquet 0 avec le cache de détection.
+- **Échec (2026-11-16, vers 04 h 50) :** paquet 0 fini (`detecte/etat.json`), arrêt au paquet 1 : `IntegrityError: UNIQUE constraint failed: vu.sha` (`passe_a`). Un document du paquet 1, copie d'un document du paquet 0, était bien rejeté comme doublon, mais son SHA-1 restait dans l'ensemble inséré dans `vus.sqlite`. Corrigé (SHA ajouté seulement aux documents gardés) ; test `test_doublon_entre_paquets` (un document par paquet, graine 3 : échoue sans la correction). `make test` : 397 passés.
+- **Relancée 2026-11-16 :** reprend au paquet 1.

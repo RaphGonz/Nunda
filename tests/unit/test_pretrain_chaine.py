@@ -233,3 +233,12 @@ def test_liste_des_canaris_hors_du_corpus(corpus):
     for c in liste:
         if c["genre"] == "naturel":
             assert all(brut[i].count(c["phrase"]) == 1 for i in c["documents"])
+
+
+def test_doublon_entre_paquets(tmp_path):
+    """Un paquet par document : la copie fr-11 de fr-09 tombe dans un autre paquet.
+
+    Graine 3 : ni fr-09 ni fr-11 ne reçoit de canari naturel (sinon pas de doublon).
+    """
+    ch = construire(tmp_path, config(documents_par_paquet=1, graine=3))
+    assert bilan(ch)["rejets"] == {"trop court": 1, "doublon": 1}
