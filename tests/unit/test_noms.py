@@ -191,3 +191,10 @@ def test_detecter_en_tete_tableau_sans_nom():
 
 def test_modeles_lus_sur_le_disque():
     assert not Path(CFG.detection.gliner.modele).is_absolute()
+
+
+def test_d4_mot_a_nombreux_tirets():
+    """Chaîne d'acides aminés : spylls essayait toutes les coupes aux tirets (bloqué 9 h)."""
+    mot = "Ser-" + "-".join("tyr ser met glu his phe arg try gly lys".split() * 4)
+    t = f"La séquence {mot} est connue."
+    assert surfaces(t, d4_majuscules(t, CFG.detection)) == [(mot, "AUTRE")]
