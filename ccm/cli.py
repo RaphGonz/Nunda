@@ -545,6 +545,47 @@ def pretrain_bpe() -> None:
     typer.echo(json.dumps(entrainer(paquets, Path(b.dossier), b.vocabulaire, b.part, b.graine)))
 
 
+@pretrain.command("essai-b")
+def pretrain_essai_b(dossier: Path) -> None:
+    """Essai à blanc du pré-entraînement de B (§13). Avec l'accord de Raphael seulement."""
+    from ccm.train.b import lancer
+
+    typer.echo(lancer(dossier, essai=True))
+
+
+@pretrain.command("entrainer-b")
+def pretrain_entrainer_b(dossier: Path) -> None:
+    """Pré-entraînement de B-S (§13), reprend au dernier point de contrôle. Avec l'accord
+    de Raphael seulement."""
+    from ccm.train.b import lancer
+
+    typer.echo(lancer(dossier))
+
+
+@pretrain.command("canaris-b")
+def pretrain_canaris_b(point: Path, sortie: Path) -> None:
+    """Mesure des canaris (§14) sur un point de contrôle de B."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data import canaries
+    from ccm.data.pretrain import bpe
+    from ccm.data.pretrain.exemples import Jetons
+    from ccm.eval.canaris_b import mesurer
+    from ccm.model.b import ModeleB, attributs_b
+    from ccm.train.b import recharger
+
+    dcfg, cfg, _ = _pretrain()
+    b = load_config("pretrain").bpe
+    j = Jetons(bpe.charger(Path(b.dossier)))
+    m = ModeleB(load_config("model_b_s").tronc, j.tok.get_vocab_size(),
+                attributs_b(load_config("ingest")))  # fmt: skip
+    recharger(point, m)
+    res = mesurer(m.cuda().eval(), j, canaries.lire(dcfg.racine / cfg.canaris))
+    sortie.write_text(json.dumps(res, indent=1), encoding="utf-8")
+    typer.echo(json.dumps(res["par_groupe"], indent=1))
+
+
 @pretrain.command("chaine")
 def pretrain_chaine(
     gliner: Annotated[
