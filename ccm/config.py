@@ -239,12 +239,24 @@ class VerifyConfig(ConfigBase):
     decimales: int  # arrondi affiché d'un résultat sans écriture décimale finie
 
 
+class TroncConfig(_Bloc):
+    """Tronc de B, de zéro (SPEC.md §9, « Tailles de B »)."""
+
+    couches: int
+    dimension: int
+    tetes: int
+    mlp: int
+    projection: int  # têtes de pointeur (§9 : 256)
+    rope_base: float
+
+
 class ModelConfig(ConfigBase):
     variante: Literal["A0", "A1", "B"]
     t_max: int  # limites de la séquence (SPEC.md §8)
     p_max: int
     s_max: int
     rel_max: int  # triplets de l'en-tête [REL], A0 seulement
+    tronc: TroncConfig | None = None  # B seulement
 
 
 class SourcePretrain(_Bloc):
@@ -328,9 +340,36 @@ class BpeConfig(_Bloc):
     dossier: str  # sous la racine du dépôt (hors de git)
 
 
+class EntrainementBConfig(_Bloc):
+    """Pré-entraînement de B-S (SPEC.md §13). Rien n'est lancé sans l'accord de Raphael."""
+
+    graine: int
+    t_max: int  # fenêtre coupée au-delà (BPE de B)
+    part_validation: float  # fenêtres de validation, tirées par graine sur l'id
+    validation_max: int  # fenêtres lues à chaque mesure de la perte de validation
+    sequences_par_pas: int  # lot de §13 (avec accumulation)
+    micro_lot: int
+    passages: int
+    pic: float
+    plancher: float
+    echauffement: int
+    decroissance: float
+    clip: float
+    part_masque: float  # mode préfixe : jetons du préfixe remplacés par [MASK]
+    coupe: tuple[float, float]  # mode préfixe : fin de phrase entre 25 % et 75 %
+    poids_pointeur: float
+    poids_attributs: float
+    point_tous: int  # pas entre deux points de contrôle
+    garder: int  # derniers points de contrôle gardés (plus le meilleur)
+    validation_tous: int
+    essai_pas: int  # essai à blanc (§13) : 200 pas sur 1 000 exemples
+    essai_exemples: int
+
+
 class PretrainConfig(ConfigBase):
     corpus: CorpusConfig
     bpe: BpeConfig
+    entrainement: EntrainementBConfig
 
 
 class ChargeurConfig(_Bloc):

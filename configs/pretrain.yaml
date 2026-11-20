@@ -64,3 +64,26 @@ bpe:  # SPEC.md §8
   part: 0.25  # valeur de départ : ≈ 580 M jetons
   graine: 0
   dossier: runs/modeles/bpe-b
+
+entrainement:  # SPEC.md §13 ; rien n'est lancé sans l'accord de Raphael
+  graine: 0
+  t_max: 2048  # §9 : version dense de l'attention (pas de FlexAttention sous Windows)
+  part_validation: 0.001
+  validation_max: 1000
+  sequences_par_pas: 64
+  micro_lot: 4  # valeur de départ, à régler à la mesure du débit
+  passages: 2
+  pic: 6.0e-4
+  plancher: 6.0e-5
+  echauffement: 2000
+  decroissance: 0.1
+  clip: 1.0
+  part_masque: 0.15
+  coupe: [0.25, 0.75]
+  poids_pointeur: 1.0
+  poids_attributs: 0.5
+  point_tous: 2000
+  garder: 3
+  validation_tous: 1000
+  essai_pas: 200
+  essai_exemples: 1000
