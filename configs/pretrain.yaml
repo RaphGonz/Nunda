@@ -58,3 +58,9 @@ corpus:
     eurlex_en: {langue: en, lecteur: eurlex, quota: 100000000, dossier: eurlex}
     europarl_en: {langue: en, lecteur: europarl, quota: 50000000, dossier: europarl}
     cedh_en: {langue: en, lecteur: cedh, quota: 50000000}
+
+bpe:  # SPEC.md §8
+  vocabulaire: 32000  # jetons spéciaux compris
+  part: 0.25  # valeur de départ : ≈ 580 M jetons
+  graine: 0
+  dossier: runs/modeles/bpe-b

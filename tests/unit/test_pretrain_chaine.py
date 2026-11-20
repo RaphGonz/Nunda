@@ -242,3 +242,24 @@ def test_doublon_entre_paquets(tmp_path):
     """
     ch = construire(tmp_path, config(documents_par_paquet=1, graine=3))
     assert bilan(ch)["rejets"] == {"trop court": 1, "doublon": 1}
+
+
+def test_bpe_sur_le_final(tmp_path, corpus):
+    """BPE de B (§8) : spéciaux en tête et d'un seul jeton, aucun marqueur ⟦k⟧ ni surface
+    détectée dans son vocabulaire (hors canaris forcés), aller-retour exact."""
+    from ccm.data.pretrain import bpe
+
+    paquets = [Etape(corpus.final).chemin_paquet(n) for n in Etape(corpus.final).paquets()]
+    b = bpe.entrainer(paquets, tmp_path, 400, 1.0, 0)
+    tok = bpe.charger(tmp_path)
+    assert b["fenetres"] == len(finales(corpus)) and b["vocabulaire"] <= 400
+    assert [tok.token_to_id(s) for s in bpe.SPECIAUX] == list(range(len(bpe.SPECIAUX)))
+    x = finales(corpus)[0]
+    t = bpe.texte_bpe(x["texte"], json.loads(x["marques"]))
+    assert "⟦" not in t and tok.decode(tok.encode(t).ids, skip_special_tokens=False) == t
+    ids = tok.encode("[P] ⟨PER⟩ a vu ⟨LIEU⟩ le ⟨DATE⟩ [/P]").ids
+    assert all(tok.token_to_id(s) in ids for s in ("[P]", "⟨PER⟩", "⟨LIEU⟩", "⟨DATE⟩", "[/P]"))
+    vocab = {tok.decoder.decode([v]) for v in tok.get_vocab()}
+    assert not any("⟦" in v for v in vocab)
+    # tirage partiel : même graine, mêmes fenêtres
+    assert list(bpe.textes(paquets, 0.5, 0)) == list(bpe.textes(paquets, 0.5, 0))

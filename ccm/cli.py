@@ -530,6 +530,21 @@ def pretrain_debit() -> None:
     typer.echo(json.dumps({"heures_gliner": res["heures_gliner"], "gliner": res["gliner"]}))
 
 
+@pretrain.command("bpe")
+def pretrain_bpe() -> None:
+    """Entraîne le BPE de B (§8) sur le corpus anonymisé (`final/`)."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain.bpe import entrainer
+    from ccm.data.pretrain.chaine import _paquets
+
+    _, _, ch = _pretrain()
+    b = load_config("pretrain").bpe
+    paquets = [p for _, p in _paquets(ch.final)]
+    typer.echo(json.dumps(entrainer(paquets, Path(b.dossier), b.vocabulaire, b.part, b.graine)))
+
+
 @pretrain.command("chaine")
 def pretrain_chaine(
     gliner: Annotated[

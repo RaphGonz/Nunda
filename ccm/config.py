@@ -319,8 +319,18 @@ class CorpusConfig(_Bloc):
     sources: dict[str, SourcePretrain]
 
 
+class BpeConfig(_Bloc):
+    """Tokenizer de B (SPEC.md §8), entraîné sur `final/`."""
+
+    vocabulaire: int
+    part: float  # fenêtres tirées par graine sur l'id (mémoire de l'entraînement)
+    graine: int
+    dossier: str  # sous la racine du dépôt (hors de git)
+
+
 class PretrainConfig(ConfigBase):
     corpus: CorpusConfig
+    bpe: BpeConfig
 
 
 class ChargeurConfig(_Bloc):
