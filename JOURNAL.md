@@ -1068,3 +1068,30 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Relancée (Raphael), 2026-11-17 23 h 23 :** reprend au paquet 19.
 - **Chaîne finie, 2026-11-19 05 h 52 :** passe A finie le 18 à 23 h 44 (≈ 24 h depuis la relance au paquet 19), passes B, C et bilan ≈ 6 h. `final/` : 116 paquets, 1 878 978 fenêtres, **2,33 G jetons** (fr 72,1 %, en 27,9 %). Canaris forcés et documents naturels : 11 100 / 11 100. Rejets : trop court 37 993, doublon 1 576, peu de lettres 285, OCR 73. Liste globale : 2 790 520 chaînes (sur 3 234 830 candidates).
   - **Zones ratées sans GLiNER** (sur les 10 % de contrôle) : PER 14,8 %, ORG 22,6 %, LIEU 8,1 %, AUTRE 5,0 %. À examiner avec Raphael : 90 % du corpus est passé sans GLiNER.
+
+## 2026-11-20 — Phase 5 — BPE de B, code du modèle B et de son pré-entraînement (§8, §9, §13, §14)
+- **Demande de Raphael :** insérer les 300 canaris forcés après l'anonymisation, entraîner le BPE de 32 000 jetons sur le corpus anonymisé, tout faire pour clore la phase 5 ; puis, en cours de séance : **« ne lance pas le pré-entraînement »** (le code de B, oui).
+- **Canaris forcés :** déjà insérés par la passe C (après l'anonymisation, en clair) pendant la chaîne : `bilan.json` 11 100 / 11 100 occurrences, aucun manquant. Rien à refaire.
+- **Travail fait :**
+  - `ccm/data/pretrain/bpe.py`, `ccm pretrain bpe` : BPE par octets (`tokenizers`), 32 000 jetons, casse gardée, 19 jetons spéciaux en tête (structure et slots de B, ids 0 à 18). Chaque marqueur ⟦k⟧ devient le jeton de son slot (⟨PER⟩ … ⟨DATE⟩) : aucun nom détecté n'entre dans le BPE.
+  - `ccm/model/b.py` : B de zéro (§9) : RMSNorm en pré-norme, RoPE, SwiGLU, sans biais, entrée liée à la tête de langage, δ (couches × têtes × 24) à zéro, masque prefix-LM ; slot = vecteur de son type, plus les attributs d'un nombre ; pointeurs (nom, valeur) vers une mention ou [NOUVEAU] ; têtes d'unité et d'ordre de grandeur. Configs `tronc` de B-S et B-M.
+  - `ccm/data/pretrain/exemples.py` : fenêtre de `final/` → entrée de B (BPE, `name_idx`, `val_idx`, `num_attr`, `prop_idx`, NN, PP) ; modes causal et préfixe à parts égales (coupe à une fin de phrase entre 25 et 75 %, 15 % de [MASK] dans le préfixe, slot masqué sans indices ni attributs).
+  - `ccm/train/b.py` : L_pré = L_mots + 1,0 · L_pointeur + 0,5 · L_attributs, AdamW (0,9 ; 0,95), pic 6e-4, cosinus jusqu'à 6e-5, 2 000 pas d'échauffement, décroissance 0,1 (sauf δ, normes, vecteurs d'entrée), 64 séquences par pas, bf16, norme bornée à 1, points de contrôle tous les 2 000 pas (3 derniers et le meilleur), validation, reprise. `ccm/eval/canaris_b.py` : rang de la vraie fin parmi les 1 000.
+  - Commandes `ccm pretrain essai-b`, `entrainer-b`, `canaris-b` : **écrites, non lancées.** Bloc `entrainement` de `configs/pretrain.yaml`.
+  - Tests `tests/unit/test_model_b.py` (petit modèle, CPU) : T1 exact (logits et pertes de pointeur à 1e-5 en float32, δ non nul), masque prefix-LM et remplissage, tirage des modes, [NOUVEAU], perte qui baisse, reprise (mêmes états), mesure des canaris ; test du BPE sur le mini-corpus.
+- **Mesures :**
+  - BPE : 3 min, 469 747 fenêtres (25 %), 1,77 G caractères. Sur 3 000 fenêtres : 0,72 jeton BPE par jeton SmolLM2 (corpus ≈ 1,68 G jetons BPE au lieu de 2,33 G) ; 1,6 % des fenêtres dépassent 2 048 jetons (max 2 546) et sont coupées.
+  - Encodage de 2 000 vraies fenêtres : slots = marques partout ; ≈ 300 000 jetons/s sur un cœur, assez pour le GPU.
+  - `make test` : 407 passés, 1 ignoré (déjà ignoré avant).
+- **Décisions (option la plus simple) :**
+  - BPE sur 25 % des fenêtres (tirage par graine) : la mémoire de l'entraînement croît avec les mots distincts. Canaris forcés gardés dans le texte du BPE : un nom non détecté y entrerait aussi.
+  - Attention dense (§9, version de référence), T ≤ 2 048 : FlexAttention demande triton, absent sous Windows (échec de `torch.compile`). Pas de `torch.compile` non plus (même cause).
+  - Pointeurs : en suite, mentions d'avant le slot ; slot masqué du préfixe, mentions non masquées du préfixe. Un slot est prédit par la position d'avant (suite) ou par la sienne (masqué). Le dernier jeton du préfixe n'est jamais masqué (il prédit le premier jeton de la suite).
+  - L_attributs = unité + ordre de grandeur (le « type » d'un nombre est un jeton du vocabulaire, compté dans L_mots).
+  - Canaris mesurés avec le nom en clair dans le préfixe (ce que les poids ont retenu du nom).
+  - Validation : 0,1 % des fenêtres (tirage par graine sur l'id), 1 000 lues par mesure.
+- **Écarts avec SPEC.md :** pas de FlexAttention ni de `torch.compile` (§9, §13), voir plus haut. Le BPE met une espace à part devant chaque slot (« Ġ », « ⟨PER⟩ ») : quelques % de jetons en plus, sans effet sur les garanties.
+- **Phase 5 non close :** le seuil (§2) demande un point de contrôle pré-entraîné (T1, perte de validation stable, taux des canaris naturels). Pré-entraînement non lancé (Raphael).
+- **Ordre de grandeur, à remplacer par la mesure du débit :** 2 passages × 1,68 G = 3,4 G jetons ; à 20 000 à 40 000 jetons/s (110 M paramètres, biais dense), 1 à 2 jours de GPU.
+- **Suite prévue (chaque étape avec l'accord de Raphael) :** `ccm pretrain essai-b runs/<date>-b-essai` (200 pas, quelques minutes) ; mesure du débit (20 min) et durée au journal ; `ccm pretrain entrainer-b runs/<date>-b` ; `ccm pretrain canaris-b` ; rapport `reports/phase-5.md`.
+- **Questions pour Raphael (non bloquantes) :** zones ratées sans GLiNER (PER 14,8 %, ORG 22,6 % sur les 10 % de contrôle) ; sonde en livre fermé et modèle témoin (§14, 2 × 500 M jetons) : hors du seuil de la phase 5, à lancer ou non.
