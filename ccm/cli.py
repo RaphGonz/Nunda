@@ -553,13 +553,30 @@ def pretrain_essai_b(dossier: Path) -> None:
     typer.echo(lancer(dossier, essai=True))
 
 
+@pretrain.command("debit-b")
+def pretrain_debit_b(
+    dossier: Path, minutes: Annotated[float, typer.Option(help="Durée de la mesure.")] = 20.0
+) -> None:
+    """Mesure du débit du pré-entraînement de B à pleine taille (§13) : `debit.json`."""
+    import json
+
+    from ccm.train.b import lancer
+
+    typer.echo(json.dumps(lancer(dossier, debit_s=minutes * 60), indent=1))
+
+
 @pretrain.command("entrainer-b")
-def pretrain_entrainer_b(dossier: Path) -> None:
+def pretrain_entrainer_b(
+    dossier: Path,
+    heures: Annotated[
+        float | None, typer.Option(help="Arrêt (avec point de contrôle) après ce temps.")
+    ] = None,
+) -> None:
     """Pré-entraînement de B-S (§13), reprend au dernier point de contrôle. Avec l'accord
     de Raphael seulement."""
     from ccm.train.b import lancer
 
-    typer.echo(lancer(dossier))
+    typer.echo(lancer(dossier, heures=heures))
 
 
 @pretrain.command("canaris-b")

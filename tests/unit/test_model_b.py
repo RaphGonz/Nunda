@@ -207,6 +207,17 @@ def test_entrainer_reprise_et_canaris(jetons, tmp_path):
     assert set(res["par_groupe"]) == {"naturel-1", "force-1"}
 
 
+def test_arret_ecrit_un_point_et_reprend(jetons, tmp_path):
+    """Arrêt en cours (nuit finie) : point de contrôle au pas d'arrêt, reprise au même pas."""
+    m = modele(jetons, delta=False)
+    w = encoder(FENETRE, jetons, VOC, 2048)
+    flux = (tirer(w, jetons, g % 2 == 0, 0.15, (0.25, 0.75), random.Random(g)) for g in
+            iter(int, 1))  # fmt: skip
+    r = tb.entrainer(m, flux, CFG, jetons.nouveau, 30, tmp_path, [], arret=lambda p: p == 7)
+    assert r["pas"] == 7 and tb.dernier_point(tmp_path).name == "pas-000007.pt"
+    assert tb.recharger(tb.dernier_point(tmp_path), modele(jetons, graine=1))["pas"] == 7
+
+
 def test_taux_et_groupes(jetons):
     pas_total = 100
     lr = [tb.taux(p, pas_total, CFG) for p in range(pas_total)]

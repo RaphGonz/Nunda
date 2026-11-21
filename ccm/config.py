@@ -349,7 +349,7 @@ class EntrainementBConfig(_Bloc):
     validation_max: int  # fenêtres lues à chaque mesure de la perte de validation
     sequences_par_pas: int  # lot de §13 (avec accumulation)
     micro_lot: int
-    passages: int
+    passages: float  # fraction permise : budget de calcul (§13)
     pic: float
     plancher: float
     echauffement: int

@@ -227,6 +227,7 @@ def entrainer(modele: ModeleB, flux: Iterator[ExempleB], cfg, nouveau_id: int, p
             for k, v in p.items():
                 cumul[k] = cumul.get(k, 0.0) + float(v.detach()) / accum
             lues += len(b)
+            cumul["jetons"] = cumul.get("jetons", 0) + sum(len(e.ids) for e in b)
         if not cumul:
             break
         norme = float(torch.nn.utils.clip_grad_norm_(modele.parameters(), cfg.clip))
@@ -250,6 +251,8 @@ def entrainer(modele: ModeleB, flux: Iterator[ExempleB], cfg, nouveau_id: int, p
             for vieux in sorted(dossier.glob("pas-*.pt"))[: -cfg.garder]:
                 vieux.unlink()
         if arret is not None and arret(pas):
+            if not dossier.joinpath(f"pas-{pas:06d}.pt").exists():  # reprise sans perte
+                sauver(dossier / f"pas-{pas:06d}.pt", modele, opt, pas, lues, meilleure)
             break
     metriques.close()
     return {"pas": pas, "lues": lues, "meilleure": meilleure}
@@ -286,14 +289,19 @@ def preparer(dev: str = "cuda"):
     return cfg, j, voc, modele, paquets, len(ids) - n_val, val
 
 
-def lancer(dossier: Path, essai: bool = False) -> dict:
+def lancer(dossier: Path, essai: bool = False, debit_s: float | None = None,
+           heures: float | None = None) -> dict:  # fmt: skip
     """Essai à blanc (§13 : `essai_pas` pas sur `essai_exemples` exemples, la perte baisse,
-    le point de contrôle se recharge) ou pré-entraînement complet (reprend au dernier point
-    de contrôle de `dossier`)."""
+    le point de contrôle se recharge), mesure du débit (`debit_s` secondes à pleine taille,
+    sans point de contrôle ni validation ; durée totale extrapolée) ou pré-entraînement
+    complet (reprend au dernier point de contrôle de `dossier` ; `heures` : arrêt après
+    cette durée, avec un point de contrôle, pour un entraînement en plusieurs nuits)."""
     import itertools
 
     cfg, j, voc, modele, paquets, n_train, val = preparer()
     dossier.mkdir(parents=True, exist_ok=True)
+    if debit_s is not None:
+        return _debit(modele, cfg, j, voc, paquets, n_train, dossier, debit_s)
     if essai:
         exs = list(itertools.islice(exemples(paquets, j, voc, cfg, 0), cfg.essai_exemples))
         flux = itertools.cycle(exs)
@@ -301,7 +309,7 @@ def lancer(dossier: Path, essai: bool = False) -> dict:
         cfg = cfg.model_copy(update={"echauffement": min(cfg.echauffement, total // 10),
                                      "point_tous": total, "validation_tous": 50})  # fmt: skip
     else:
-        total = cfg.passages * n_train // cfg.sequences_par_pas
+        total = int(cfg.passages * n_train) // cfg.sequences_par_pas
     opt, depart = optimiseur(modele, cfg), None
     if (pt := dernier_point(dossier)) is not None:
         depart = recharger(pt, modele, opt)
@@ -316,7 +324,59 @@ def lancer(dossier: Path, essai: bool = False) -> dict:
                 p, s = p + 1, 0
 
         flux = flux_complet()
-    r = entrainer(modele, flux, cfg, j.nouveau, total, dossier, val, depart, opt)
+    t0 = time.time()
+    arret = None if heures is None else (lambda _: time.time() - t0 > heures * 3600)
+    r = entrainer(modele, flux, cfg, j.nouveau, total, dossier, val, depart, opt, arret)
     r |= {"pas_total": total, "fenetres_entrainement": n_train, "fenetres_validation": len(val)}
+    if essai:
+        r |= _controle_essai(dossier, modele, val, cfg, j.nouveau)
     (dossier / "bilan.json").write_text(json.dumps(r, indent=1))
     return r
+
+
+def _controle_essai(dossier: Path, modele, val, cfg, nouveau_id: int) -> dict:
+    """La perte baisse (10 premiers pas contre 10 derniers) ; le dernier point de contrôle,
+    rechargé dans un modèle neuf, donne la même perte de validation."""
+    lignes = [json.loads(x) for x in (dossier / "metrics.jsonl").read_text().splitlines()]
+    debut = sum(x["mots"] for x in lignes[:10]) / 10
+    fin = sum(x["mots"] for x in lignes[-10:]) / 10
+    neuf = type(modele)(modele.t, modele.emb.num_embeddings,
+                        tuple(e.num_embeddings for e in modele.attr))  # fmt: skip
+    recharger(dernier_point(dossier), neuf)
+    neuf.to(next(modele.parameters()).device)
+    a = perte_validation(modele, val, cfg, nouveau_id)
+    b = perte_validation(neuf, val, cfg, nouveau_id)
+    ecart = max(abs(a[k] - b[k]) for k in a)
+    return {"mots_debut": debut, "mots_fin": fin, "baisse": fin < debut,
+            "ecart_recharge": ecart, "recharge_ok": ecart < 1e-4}  # fmt: skip
+
+
+def _debit(modele, cfg, j, voc, paquets, n_train, dossier: Path, duree: float) -> dict:
+    """§13 : mesure à pleine taille, vraies fenêtres ; les 5 premiers pas (préchauffage du
+    GPU) sont exclus. Durée totale = pas restants × secondes par pas."""
+    cfg = cfg.model_copy(update={"point_tous": 10**9, "validation_tous": 10**9})
+    total = int(cfg.passages * n_train) // cfg.sequences_par_pas
+    t0, marques = time.time(), {}
+
+    def arret(pas):
+        marques[pas] = time.time()
+        return time.time() - t0 > duree
+
+    torch.cuda.reset_peak_memory_stats()
+    r = entrainer(modele, exemples(paquets, j, voc, cfg, 0), cfg, j.nouveau, total, dossier,
+                  [], arret=arret)  # fmt: skip
+    for pt in dossier.glob("pas-*.pt"):  # point écrit à l'arrêt : inutile ici
+        pt.unlink()
+    lignes = [json.loads(x) for x in (dossier / "metrics.jsonl").read_text().splitlines()]
+    d = 5 if r["pas"] > 10 else 1  # pas de préchauffage exclus
+    n = r["pas"] - d
+    s_pas = (marques[r["pas"]] - marques[d]) / n
+    jetons = sum(x.get("jetons", 0) for x in lignes[d:]) / n
+    res = {"pas_mesures": n, "s_par_pas": s_pas, "jetons_par_pas": jetons,
+           "jetons_par_s": jetons / s_pas, "sequences_par_s": cfg.sequences_par_pas / s_pas,
+           "memoire_max_go": torch.cuda.max_memory_allocated() / 2**30,
+           "micro_lot": cfg.micro_lot, "pas_total": total, "fenetres_entrainement": n_train,
+           "heures_totales": total * s_pas / 3600,
+           "heures_par_passage": total * s_pas / 3600 / cfg.passages}  # fmt: skip
+    (dossier / "debit.json").write_text(json.dumps(res, indent=1))
+    return res
