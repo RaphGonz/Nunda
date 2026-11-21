@@ -72,7 +72,7 @@ entrainement:  # SPEC.md §13 ; rien n'est lancé sans l'accord de Raphael
   validation_max: 1000
   sequences_par_pas: 64
   micro_lot: 4  # valeur de départ, à régler à la mesure du débit
-  passages: 0.85  # budget de Raphael : 5 nuits de 8 h ; 2 passages = 89 h mesurées (JOURNAL 2026-11-21)
+  passages: 1  # un passage complet (Raphael, 2026-11-21) : 44,7 h mesurées ; 2 passages = 89 h
   pic: 6.0e-4
   plancher: 6.0e-5
   echauffement: 2000

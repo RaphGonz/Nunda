@@ -1110,8 +1110,8 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Débit (`runs/2026-11-21-b-debit`, 20 min, 214 pas) : **5,48 s/pas, 9 490 jetons/s**, 11,7 séquences/s, 52 000 jetons par pas (≈ 813 par séquence).
   - Durée : 2 passages = 58 659 pas = **89 h** (44,7 h par passage), au-delà du budget de 40 h.
   - Essai d'un biais relationnel calculé une fois par passe (au lieu d'une fois par couche) : −5 % de temps sur les mêmes lots, mais +8 Go (18,7 contre 10,5) ; sur 20 min, 7,6 s/pas (mémoire au bord). Abandonné, code retiré.
-- **Décision (budget de Raphael, §13 « réduire le nombre d'exemples ») :** `passages: 0,85` → 24 930 pas ≈ **38 h** de calcul (+ ≈ 30 min de préparation, validations et points sur 5 nuits), **≈ 1,30 G jetons BPE** (au lieu de 3,4 G). Moins d'un passage : chaque fenêtre vue au plus une fois, le cosinus couvre les 24 930 pas.
-- **Écarts avec SPEC.md :** 0,85 passage au lieu de 2 (§13), pour le budget. Toujours pas de `torch.compile` ni de FlexAttention (Windows, voir 2026-11-20).
+- **Décision :** d'abord 0,85 passage (38 h, dans les 40 h) ; puis **Raphael : « on va faire au moins 1 passage, c'est absurde de ne pas finir »** → `passages: 1` : 29 330 pas ≈ **44,7 h** de calcul (+ ≈ 30 min de préparation, validations et points), **≈ 1,53 G jetons BPE** (au lieu de 3,4 G pour 2 passages). Soit 5 nuits de 9 h, ou 6 nuits de 8 h. Chaque fenêtre vue une fois ; le cosinus couvre les 29 330 pas.
+- **Écarts avec SPEC.md :** 1 passage au lieu de 2 (§13) ; budget de 40 h dépassé de ≈ 5 h, accepté par Raphael. Toujours pas de `torch.compile` ni de FlexAttention (Windows, voir 2026-11-20).
 - **`make test` :** 408 passés, 1 ignoré.
-- **Suite prévue (accord de Raphael) :** 5 nuits de `uv run --locked ccm pretrain entrainer-b runs/2026-11-22-b --heures 8` (même dossier chaque nuit, reprise automatique) ; puis `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
-- **Question pour Raphael (non bloquante) :** 1,3 G jetons pour 110 M paramètres reste près de Chinchilla (≈ 2,2 G) ; pour plus, il faudrait plus de nuits ou un GPU plus gros.
+- **Suite prévue (accord de Raphael) :** `uv run --locked ccm pretrain entrainer-b runs/2026-11-22-b --heures 9` sur 5 nuits (ou `--heures 8` sur 6) (même dossier chaque nuit, reprise automatique) ; puis `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Question pour Raphael (non bloquante) :** 1,53 G jetons pour 110 M paramètres, sous Chinchilla (≈ 2,2 G) ; le second passage ajouterait 44,7 h.
