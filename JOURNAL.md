@@ -1115,3 +1115,10 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **`make test` :** 408 passés, 1 ignoré.
 - **Suite prévue (accord de Raphael) :** `uv run --locked ccm pretrain entrainer-b runs/2026-11-22-b --heures 9` sur 5 nuits (ou `--heures 8` sur 6) (même dossier chaque nuit, reprise automatique) ; puis `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
 - **Question pour Raphael (non bloquante) :** 1,53 G jetons pour 110 M paramètres, sous Chinchilla (≈ 2,2 G) ; le second passage ajouterait 44,7 h.
+
+## 2026-11-21 (soir) — Phase 5 — Nuit 1 du pré-entraînement de B
+- **Demande de Raphael :** lancer la première session de 8 h ; une page HTML de la perte, mise à jour au fil de la semaine.
+- **Lancée 2026-11-21 21 h 46 :** `runs/b-nuit-lancer.ps1` (détaché ; `make nuit-b`) → `ccm pretrain entrainer-b runs/2026-11-21-b --heures 8`, journal `runs/b-nuit.log`. Un passage, 29 329 pas (`plan.json`) ; ≈ 5 280 pas par nuit au débit mesuré, donc 6 nuits de 8 h (ou 5 de 9 h). Dossier : configs figées, `commit.txt`, `paquets.txt`.
+- **Suivi :** `make courbe-b` écrit `runs/2026-11-21-b/perte.html` (L_pré, ses trois termes, validation, nuits, pas, heures, reste) ; publiée en artefact privé, republiée au même lien après chaque nuit. `lancer` écrit maintenant `plan.json` (pas total) pour la page. Test `test_courbe_b.py`.
+- **Écart :** dossier daté du 21 (au lieu de `2026-11-22-b` prévu) : jour du lancement.
+- **Suite prévue :** demain matin, contrôle de `b-nuit.log` (fin à ≈ 05 h 50, point de contrôle au pas d'arrêt), `make courbe-b`, republication de la page ; nuit 2 avec l'accord de Raphael (`make nuit-b`, reprise automatique).

@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1 pretrain-debit pretrain-chaine
+.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1 pretrain-debit pretrain-chaine nuit-b courbe-b
 
 # Sortie des scripts en UTF-8 (console cp1252 sous Windows).
 export PYTHONUTF8 = 1
@@ -57,3 +57,10 @@ pretrain-debit:
 pretrain-chaine:
 	uv run --locked ccm pretrain chaine >> runs/pretrain-chaine.log 2>&1
 	uv run --locked ccm pretrain bilan >> runs/pretrain-chaine.log 2>&1
+
+# Pré-entraînement de B (§13) : une session de 8 h, reprise au dernier point de contrôle.
+nuit-b:
+	powershell -NoProfile -ExecutionPolicy Bypass -File runs/b-nuit-lancer.ps1
+
+courbe-b:
+	uv run --locked python -m ccm.train.courbe_b

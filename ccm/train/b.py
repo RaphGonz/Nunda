@@ -324,6 +324,8 @@ def lancer(dossier: Path, essai: bool = False, debit_s: float | None = None,
                 p, s = p + 1, 0
 
         flux = flux_complet()
+    if not essai:  # pour la page de suivi (`courbe_b`)
+        (dossier / "plan.json").write_text(json.dumps({"pas_total": total}))
     t0 = time.time()
     arret = None if heures is None else (lambda _: time.time() - t0 > heures * 3600)
     r = entrainer(modele, flux, cfg, j.nouveau, total, dossier, val, depart, opt, arret)
