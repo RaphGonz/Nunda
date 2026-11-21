@@ -1095,3 +1095,23 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Ordre de grandeur, à remplacer par la mesure du débit :** 2 passages × 1,68 G = 3,4 G jetons ; à 20 000 à 40 000 jetons/s (110 M paramètres, biais dense), 1 à 2 jours de GPU.
 - **Suite prévue (chaque étape avec l'accord de Raphael) :** `ccm pretrain essai-b runs/<date>-b-essai` (200 pas, quelques minutes) ; mesure du débit (20 min) et durée au journal ; `ccm pretrain entrainer-b runs/<date>-b` ; `ccm pretrain canaris-b` ; rapport `reports/phase-5.md`.
 - **Questions pour Raphael (non bloquantes) :** zones ratées sans GLiNER (PER 14,8 %, ORG 22,6 % sur les 10 % de contrôle) ; sonde en livre fermé et modèle témoin (§14, 2 × 500 M jetons) : hors du seuil de la phase 5, à lancer ou non.
+
+## 2026-11-21 — Phase 5 — Objectif de B (§13) : essai à blanc et mesure du débit
+- **Demande de Raphael (/goal) :** objectif de pré-entraînement (§13 : modes causal et préfixe, [MASK], L_pré), essai à blanc, mesure du débit, durée au journal ; budget visé **5 nuits de 8 h (40 h) au plus**. Pré-entraînement complet **non lancé**.
+- **Objectif :** déjà écrit le 2026-11-20 (`exemples.py`, `train/b.py`) ; relu contre §13, inchangé.
+- **Travail fait :**
+  - `ccm pretrain essai-b` contrôle maintenant la baisse (10 premiers pas contre 10 derniers) et le rechargement (dernier point dans un modèle neuf, même perte de validation).
+  - `ccm pretrain debit-b <dossier> --minutes 20` : pleine taille, vraies fenêtres de `final/`, 5 premiers pas exclus ; écrit `debit.json` (s/pas, jetons/s, mémoire, durée extrapolée).
+  - `ccm pretrain entrainer-b <dossier> --heures 8` : arrêt après 8 h avec un point de contrôle au pas d'arrêt ; la nuit suivante reprend là (test `test_arret_ecrit_un_point_et_reprend`).
+  - `passages` accepte une fraction.
+- **Mesures (RTX 3090, 24 Go) :**
+  - Essai à blanc (`runs/2026-11-21-b-essai`, 200 pas × 64 séquences sur 1 000 exemples) : L_mots 9,19 → 4,64 ; validation L_mots 6,50 → 6,16 (pointeur et attributs remontent : sur-apprentissage attendu sur 1 000 exemples) ; rechargement exact (écart 0) ; T1 (`test_t1_permutation_exacte`) passe.
+  - `micro_lot` 8 : mémoire pleine (24,3 Go), moins de 5 pas en 3 min ; gardé à **4** (13,9 Go).
+  - Débit (`runs/2026-11-21-b-debit`, 20 min, 214 pas) : **5,48 s/pas, 9 490 jetons/s**, 11,7 séquences/s, 52 000 jetons par pas (≈ 813 par séquence).
+  - Durée : 2 passages = 58 659 pas = **89 h** (44,7 h par passage), au-delà du budget de 40 h.
+  - Essai d'un biais relationnel calculé une fois par passe (au lieu d'une fois par couche) : −5 % de temps sur les mêmes lots, mais +8 Go (18,7 contre 10,5) ; sur 20 min, 7,6 s/pas (mémoire au bord). Abandonné, code retiré.
+- **Décision (budget de Raphael, §13 « réduire le nombre d'exemples ») :** `passages: 0,85` → 24 930 pas ≈ **38 h** de calcul (+ ≈ 30 min de préparation, validations et points sur 5 nuits), **≈ 1,30 G jetons BPE** (au lieu de 3,4 G). Moins d'un passage : chaque fenêtre vue au plus une fois, le cosinus couvre les 24 930 pas.
+- **Écarts avec SPEC.md :** 0,85 passage au lieu de 2 (§13), pour le budget. Toujours pas de `torch.compile` ni de FlexAttention (Windows, voir 2026-11-20).
+- **`make test` :** 408 passés, 1 ignoré.
+- **Suite prévue (accord de Raphael) :** 5 nuits de `uv run --locked ccm pretrain entrainer-b runs/2026-11-22-b --heures 8` (même dossier chaque nuit, reprise automatique) ; puis `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Question pour Raphael (non bloquante) :** 1,3 G jetons pour 110 M paramètres reste près de Chinchilla (≈ 2,2 G) ; pour plus, il faudrait plus de nuits ou un GPU plus gros.
