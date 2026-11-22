@@ -1122,3 +1122,8 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Suivi :** `make courbe-b` écrit `runs/2026-11-21-b/perte.html` (L_pré, ses trois termes, validation, nuits, pas, heures, reste) ; publiée en artefact privé, republiée au même lien après chaque nuit. `lancer` écrit maintenant `plan.json` (pas total) pour la page. Test `test_courbe_b.py`.
 - **Écart :** dossier daté du 21 (au lieu de `2026-11-22-b` prévu) : jour du lancement.
 - **Suite prévue :** demain matin, contrôle de `b-nuit.log` (fin à ≈ 05 h 50, point de contrôle au pas d'arrêt), `make courbe-b`, republication de la page ; nuit 2 avec l'accord de Raphael (`make nuit-b`, reprise automatique).
+- **Nuit 1 finie (2026-11-22 05 h 47, code 0) :** 5 050 pas sur 29 329 (17 %), 8 h 00 de calcul, 5,70 s/pas (5,48 mesurés : validations, points de contrôle, `make test` en même temps au début). Points `pas-002000`, `pas-004000`, `pas-005050`, `meilleur.pt`. Aucun NaN ; norme du gradient 30 → 0,9, aucun pic au-dessus de 5 après le pas 2 000.
+  - Entraînement (moyenne des 50 premiers contre 50 derniers pas) : mots 9,34 → 2,58 ; pointeur 1,78 → 0,87 ; attributs 3,39 → 0,73.
+  - Validation (1 000 fenêtres), pas 1 000 → 5 000 : mots 4,06 → 2,93 ; pointeur 1,14 → 0,95 ; attributs 1,23 → 0,90. Baisse régulière, pas de sur-apprentissage.
+  - Reste ≈ 38,5 h : encore 5 nuits de 8 h (6 au total).
+  - Page republiée (même lien).
