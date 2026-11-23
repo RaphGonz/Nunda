@@ -1127,3 +1127,30 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
   - Validation (1 000 fenêtres), pas 1 000 → 5 000 : mots 4,06 → 2,93 ; pointeur 1,14 → 0,95 ; attributs 1,23 → 0,90. Baisse régulière, pas de sur-apprentissage.
   - Reste ≈ 38,5 h : encore 5 nuits de 8 h (6 au total).
   - Page republiée (même lien).
+
+## 2026-11-22 — Phase 5 — Nuit 2 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h, puis page HTML de progression régénérée.
+- **Lancée 2026-11-22 12 h 44 :** `runs/b-nuit-lancer.ps1` (détaché), reprise de `runs/2026-11-21-b` au pas 5 050 ; GPU 88 %, 18 Go. Fin prévue ≈ 20 h 45, puis `make courbe-b` et republication de la page (même lien).
+- **Nuit 2 finie (2026-11-22 20 h 45, code 0) :** pas 5 050 → 10 447 sur 29 329 (36 %), 16,0 h de calcul au total, reste ≈ 28,9 h (≈ 4 nuits de 8 h). Points `pas-006000` … `pas-010000`, `pas-010447`, `meilleur.pt`. Aucun NaN ; norme du gradient ≈ 0,8.
+  - Validation (L_pré), pas 5 000 → 10 000 : 4,33 → 4,01 (mots 2,93 → 2,73 ; pointeur 0,95 → 0,87). Pic isolé au pas 8 000 (4,74), revenu à 4,03 au pas 9 000.
+  - Page republiée (même lien, version 3).
+
+## 2026-11-22 (soir) — Phase 5 — Nuit 3 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h tout de suite, avec mise à jour de la page.
+- **Lancée 2026-11-22 22 h 43 :** reprise au pas 10 447 ; GPU 84 %, 17 Go. Fin prévue ≈ 06 h 45, puis `make courbe-b` et republication (même lien).
+- **Nuit 3 finie (2026-11-23 06 h 44, code 0) :** pas 10 447 → 14 517 sur 29 329 (49 %), 24,0 h de calcul au total, reste ≈ 24,5 h (≈ 3 nuits de 8 h). Points `pas-012000`, `pas-014000`, `pas-014517`, `meilleur.pt`. Aucun NaN ; norme du gradient ≈ 0,73.
+  - 4 070 pas en 8 h (≈ 7,1 s/pas, contre ≈ 5,4 en nuit 2) ; mémoire GPU montée à 24,3 Go vers 02 h (17 Go au départ) : probable cause du ralentissement, à surveiller.
+  - Validation (L_pré), pas 10 000 → 14 000 : 4,01 → 3,76.
+  - Tâche de veille (attente de fin de nuit) tuée par Claude Code faute de mémoire vive ; page régénérée à la main, republiée (même lien).
+
+## 2026-11-23 — Phase 5 — Nuit 4 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h tout de suite, avec mise à jour de la page.
+- **Lancée 2026-11-23 06 h 53 :** reprise au pas 14 517 ; GPU 100 %, 21,9 Go dès le départ. `make courbe-b` enchaîné dans le même processus détaché (la veille dans Claude Code peut être tuée faute de mémoire). Fin prévue ≈ 14 h 55.
+- **Nuit 4 finie (2026-11-23 14 h 54, code 0) :** pas 14 517 → 19 013 sur 29 329 (65 %), 32,0 h de calcul, reste ≈ 17,4 h (≈ 2 à 3 nuits de 8 h). 4 496 pas (≈ 6,4 s/pas). Aucun NaN.
+  - Validation (L_pré), pas 14 000 → 19 000 : 3,76 → 3,62 (3,61 au pas 18 000).
+  - Page régénérée par le processus détaché, republiée (même lien, version 5).
+
+## 2026-11-23 (soir) — Phase 5 — Fin du pré-entraînement de B, d'un seul tenant
+- **Demande de Raphael :** « finis complètement le pré-entraînement, no stop ».
+- **Lancée 2026-11-23 21 h 51 :** `runs/b-fin-lancer.ps1` (détaché) → `ccm pretrain entrainer-b runs/2026-11-21-b --heures 24` (s'arrête au pas 29 329), puis `make courbe-b`. Reprise au pas 19 013 ; reste 10 316 pas, ≈ 17–20 h. Fin prévue 2026-11-24 vers 15–18 h.
+- **Suite prévue :** contrôle de `b-nuit.log`, page republiée, `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
