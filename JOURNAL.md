@@ -1154,3 +1154,5 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Demande de Raphael :** « finis complètement le pré-entraînement, no stop ».
 - **Lancée 2026-11-23 21 h 51 :** `runs/b-fin-lancer.ps1` (détaché) → `ccm pretrain entrainer-b runs/2026-11-21-b --heures 24` (s'arrête au pas 29 329), puis `make courbe-b`. Reprise au pas 19 013 ; reste 10 316 pas, ≈ 17–20 h. Fin prévue 2026-11-24 vers 15–18 h.
 - **Suite prévue :** contrôle de `b-nuit.log`, page republiée, `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Ralentissement (2026-11-24 16 h) :** pas 21 591 seulement après 18 h. Avertissement `CUDACachingAllocator` OOM à 23 h 06 (24,3 Go pleins) ; ensuite 20 à 87 s/pas au lieu de 5,5 (même cause probable que la nuit 3). Processus tué ; reprise au point `pas-020000` (1 591 pas refaits ; lignes en double dans `metrics.jsonl` pour 20 001–21 591).
+- **Correctif :** `runs/b-fin-lancer.ps1` relance `entrainer-b --heures 2` en boucle jusqu'au pas 29 329 (chaque reprise repart avec une mémoire propre, arrêt = point de contrôle exact), puis `make courbe-b`. Relancé 16 h 04, 17,9 Go. Reste 9 329 pas ≈ 15 h → fin vers 2026-11-25 07–08 h.
