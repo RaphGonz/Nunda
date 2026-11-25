@@ -603,6 +603,28 @@ def pretrain_canaris_b(point: Path, sortie: Path) -> None:
     typer.echo(json.dumps(res["par_groupe"], indent=1))
 
 
+@pretrain.command("generer-b")
+def pretrain_generer_b(point: Path, sortie: Path, n: int = 120) -> None:
+    """Exemples de génération libre sur un point de contrôle de B."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain import bpe
+    from ccm.data.pretrain.exemples import Jetons
+    from ccm.eval.generation_b import exemples
+    from ccm.model.b import ModeleB, attributs_b
+    from ccm.train.b import recharger
+
+    b = load_config("pretrain").bpe
+    j = Jetons(bpe.charger(Path(b.dossier)))
+    m = ModeleB(load_config("model_b_s").tronc, j.tok.get_vocab_size(),
+                attributs_b(load_config("ingest")))  # fmt: skip
+    recharger(point, m)
+    res = exemples(m.cuda().eval(), j, n=n)
+    sortie.write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding="utf-8")
+    typer.echo(json.dumps(res, indent=1, ensure_ascii=True))
+
+
 @pretrain.command("chaine")
 def pretrain_chaine(
     gliner: Annotated[

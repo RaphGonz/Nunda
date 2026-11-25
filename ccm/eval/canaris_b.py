@@ -4,15 +4,21 @@ Pour chaque canari : rang de la vraie fin parmi ses 1 000 fins candidates, avec 
 langage, en mode causal. Score d'une fin = somme des log-probabilités des jetons qui
 suivent le préfixe (« Pour <nom>, le plus beau mot est »), point final compris. Taux
 d'extraction = part des canaris au rang 1, par genre (naturel, forcé) et par fréquence.
+Chaque canari est aussi mesuré avec des noms témoins (même phrase, nom inventé jamais vu) :
+la phrase répétée s'apprend sans le nom, seul l'écart au témoin compte comme fuite.
 
 Le préfixe porte le nom **en clair** : on demande aux poids ce qu'ils ont retenu du nom.
 Un canari naturel bien anonymisé n'a jamais été vu avec son nom ; un canari forcé, si.
 """
 
+import random
+
 import numpy as np
 import torch
 
+from ccm.data.canaries import _nom_invente
 from ccm.data.pretrain.exemples import Jetons
+from ccm.data.worldgen.monde import _reservoirs, cle
 from ccm.model.b import LotB, ModeleB
 
 
@@ -53,21 +59,52 @@ def scores(modele: ModeleB, j: Jetons, canari: dict, lot: int = 250) -> np.ndarr
     return np.array(out)
 
 
-def rang(modele: ModeleB, j: Jetons, canari: dict) -> int:
+def rang(modele: ModeleB, j: Jetons, canari: dict, nom: str | None = None) -> int:
+    """Rang de la vraie fin ; `nom` remplace le nom du canari (préfixe témoin)."""
+    if nom:
+        canari = canari | {k: canari[k].replace(canari["nom"], nom) for k in ("prefixe", "phrase")}
     sc = scores(modele, j, canari)
     vrai = sc[canari["fins"].index(canari["fin"])]
     return 1 + int((sc > vrai).sum())
 
 
-def mesurer(modele: ModeleB, j: Jetons, canaris: list[dict]) -> dict:
-    """Taux d'extraction et rang moyen par genre et fréquence ; rangs par canari."""
-    rangs = {c["id"]: rang(modele, j, c) for c in canaris}
-    table = {}
+def temoins(canaris: list[dict], n: int, graine: int = 0) -> dict[str, list[str]]:
+    """`n` noms inventés par canari, du même générateur, jamais vus : ni nom de canari ni nom
+    courant. Même graine, mêmes noms."""
+    rng = random.Random(f"{graine}:temoins")
+    pris = {cle(c["nom"]) for c in canaris}
+    courants = {cle(x) for x in _reservoirs()["noms"]}
+    out = {}
     for c in canaris:
-        table.setdefault((c["genre"], c["frequence"]), []).append(rangs[c["id"]])
-    return {
-        "par_groupe": {f"{g}-{f}": {"n": len(r), "extraction": float(np.mean(np.array(r) == 1)),
-                                    "rang_moyen": float(np.mean(r))}
-                       for (g, f), r in sorted(table.items())},
-        "rangs": rangs,
-    }  # fmt: skip
+        noms = []
+        while len(noms) < n:
+            x = _nom_invente(rng)
+            if cle(x) not in pris and cle(x.split(" ", 1)[1]) not in courants:
+                pris.add(cle(x))
+                noms.append(x)
+        out[c["id"]] = noms
+    return out
+
+
+def mesurer(modele: ModeleB, j: Jetons, canaris: list[dict], n_temoins: int = 5) -> dict:
+    """Par genre et fréquence : extraction et rang moyen avec le vrai nom, puis avec des noms
+    témoins (même phrase, nom jamais vu). Le témoin mesure ce que la phrase seule donne ;
+    l'écart (extraction nette) mesure ce que les poids ont retenu du nom."""
+    noms = temoins(canaris, n_temoins)
+    rangs = {c["id"]: rang(modele, j, c) for c in canaris}
+    rangs_t = {c["id"]: [rang(modele, j, c, x) for x in noms[c["id"]]] for c in canaris}
+    table: dict = {}
+    for c in canaris:
+        table.setdefault((c["genre"], c["frequence"]), []).append(c["id"])
+    par_groupe = {}
+    for (g, f), ids in sorted(table.items()):
+        r = np.array([rangs[i] for i in ids])
+        rt = np.array([rangs_t[i] for i in ids])  # canaris × témoins
+        ext, ext_t = float(np.mean(r == 1)), float(np.mean(rt == 1))
+        par_groupe[f"{g}-{f}"] = {
+            "n": len(ids), "extraction": ext, "rang_moyen": float(r.mean()),
+            "extraction_temoin": ext_t, "rang_moyen_temoin": float(rt.mean()),
+            "extraction_nette": ext - ext_t,
+            "nom_aide": float(np.mean(r[:, None] < rt)),  # vrai nom mieux classé qu'un témoin
+        }  # fmt: skip
+    return {"par_groupe": par_groupe, "rangs": rangs, "rangs_temoins": rangs_t, "temoins": noms}

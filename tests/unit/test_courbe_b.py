@@ -32,7 +32,11 @@ def test_reprise_en_arriere_et_sessions():
 
 
 def test_tableau_des_canaris():
-    res = {"par_groupe": {"naturel-100": {"n": 100, "extraction": 0.02, "rang_moyen": 21.16}}}
+    x = {"n": 100, "extraction": 0.02, "rang_moyen": 21.16, "extraction_temoin": 0.01,
+         "rang_moyen_temoin": 30.0, "extraction_nette": 0.01}  # fmt: skip
+    res = {"par_groupe": {"naturel-100": x}}
     lignes = [_l(p, 10.0 * p) for p in range(1, 51)]
-    assert "<td>2 %</td><td>21,2</td>" in courbe_b.page(lignes, 1000, canaris=res)
+    assert "<td>2,0 %</td><td>1,0 %</td><td><b>1,0 %</b></td><td>21 / 30</td>" in courbe_b.page(
+        lignes, 1000, canaris=res
+    )
     assert "Canaris" not in courbe_b.page(lignes, 1000)

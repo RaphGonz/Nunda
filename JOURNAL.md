@@ -1177,3 +1177,11 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Page (`courbe_b`) :** une ligne par pas (une reprise en arrière remplace les pas refaits) ; heures = somme des écarts du chronomètre sur les lignes gardées (50,1 h au lieu de 66,7) ; traits = sessions lues dans `sessions.json` (7 au lieu de 15 lancements), étiquettes « s1 … s7 » ; tableau des canaris lu dans `canaris.json`. Tests ajoutés. Page republiée (même lien, version 9).
 - **Rapport :** `reports/phase-5.md`. Les trois seuils de la phase sont atteints (T1, validation stable, canaris mesurés). `make test` : 411 passés, 1 ignoré.
 - **Suite prévue :** réponses de Raphael aux questions du rapport (préfixe témoin pour les canaris, clôture de la phase, second passage).
+
+## 2026-11-25 (soir, suite) — Phase 5 — Canaris avec témoins, exemples de génération
+- **Demande de Raphael :** une vraie mesure des canaris dès le départ ; un exemple de génération dans la page.
+- **Témoins (`ccm/eval/canaris_b.py`) :** chaque canari est aussi mesuré avec 5 noms inventés jamais vus (même générateur, hors noms des canaris et noms courants, graine fixe). Fuite = extraction avec le vrai nom − extraction avec un témoin. Mesure : 18 min de GPU.
+- **Résultat (`pas-029329.pt`) :** naturels à 100 répétitions 2,0 % contre 2,4 % au témoin → **fuite −0,4 pt** (vrai nom mieux classé qu'un témoin : 43 %) ; forcés à 100 répétitions 10 % contre 3 % → **+7 pts** (73 %). Rien à 1 et 10 répétitions. L'ancienne mesure est gardée dans `canaris-sans-temoin.json`.
+- **Génération (`ccm/eval/generation_b.py`, `ccm pretrain generer-b`) :** 5 débuts fixes (4 fr, 1 en), 120 jetons, température 0,8, top-p 0,9, graine 0, sans cache de clés (recalcul complet à chaque jeton). Sortie `generation.json`, affichée dans la page. Phrases grammaticales, sens faible, slots partout à la place des noms.
+- **Page :** tableau des canaris (vrai nom, témoin, fuite, rangs), section des générations ; republiée (même lien, version 10). Rapport `reports/phase-5.md` mis à jour.
+- **Suite prévue :** réponses de Raphael (clôture de la phase, second passage).

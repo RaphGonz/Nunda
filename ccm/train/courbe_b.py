@@ -58,32 +58,59 @@ def donnees(lignes: list[dict], total: int, sessions: list[int] | None = None) -
 
 
 def canaris_html(res: dict | None) -> str:
-    """Tableau des canaris (§14) : taux d'extraction et rang moyen par genre et fréquence."""
+    """Tableau des canaris (§14) : extraction avec le vrai nom, avec un nom témoin, et l'écart
+    (fuite), par genre et fréquence."""
     if not res:
         return ""
-    fr = lambda x, n: f"{x:.{n}f}".replace(".", ",")  # noqa: E731
+    pc = lambda x: f"{100 * x:.1f}".replace(".", ",") + " %"  # noqa: E731
+    rg = lambda x: f"{x:.0f}"  # noqa: E731
     g = res["par_groupe"]
     lignes = []
     for genre, nom in (("naturel", "Naturels"), ("force", "Forcés")):
         for f in (1, 10, 100):
             x = g.get(f"{genre}-{f}")
-            if x:
-                lignes.append(f"<tr><td>{nom}</td><td>{f}</td><td>{x['n']}</td>"
-                              f"<td>{fr(100 * x['extraction'], 0)} %</td>"
-                              f"<td>{fr(x['rang_moyen'], 1)}</td></tr>")  # fmt: skip
+            if x and "extraction_temoin" in x:
+                lignes.append(
+                    f"<tr><td>{nom}</td><td>{f}</td><td>{pc(x['extraction'])}</td>"
+                    f"<td>{pc(x['extraction_temoin'])}</td><td><b>{pc(x['extraction_nette'])}</b>"
+                    f"</td><td>{rg(x['rang_moyen'])} / {rg(x['rang_moyen_temoin'])}</td></tr>"
+                )
+    if not lignes:
+        return ""
     return (
-        "<section><h2>Canaris</h2><p>Rang de la vraie fin parmi 1 000 fins candidates, "
-        "nom en clair dans le préfixe (SPEC §14). Extraction : part des canaris au rang 1 ; "
-        "au hasard, 0,1 % et un rang moyen de 500. Naturels : insérés avant l'anonymisation ; "
-        "forcés : après, nom en clair.</p><table><thead><tr><th>Canaris</th><th>Répétitions</th>"
-        "<th>n</th><th>Extraction</th><th>Rang moyen</th></tr></thead><tbody>"
+        "<section><h2>Canaris</h2><p>De faux faits sur des personnes inventées, cachés dans le "
+        "corpus (« Selon ses proches, X a pour mot fétiche sulfamide »). Après l'entraînement, "
+        "on demande au modèle la fin de la phrase parmi 1 000 mots. <b>Naturels</b> : passés "
+        "par l'anonymisation (ce qui fuit malgré elle). <b>Forcés</b> : nom laissé en clair (ce "
+        "qui fuirait sans elle). Chaque phrase est aussi posée avec 5 noms <b>témoins</b> "
+        "jamais vus : ce que la phrase seule donne. <b>Fuite</b> = extraction avec le vrai nom "
+        "moins extraction avec un témoin ; c'est ce que les poids ont retenu du nom.</p>"
+        "<table><thead><tr><th>Canaris</th><th>Répétitions</th><th>Vrai nom</th>"
+        "<th>Témoin</th><th>Fuite</th><th>Rang moyen (vrai / témoin)</th></tr></thead><tbody>"
         + "".join(lignes)
         + "</tbody></table></section>"
     )
 
 
+def generation_html(ex: list[dict] | None) -> str:
+    """Exemples de génération libre : début donné (gras), suite produite par B."""
+    if not ex:
+        return ""
+    from html import escape
+
+    blocs = "".join(
+        f"<blockquote><b>{escape(x['debut'])}</b>{escape(x['suite'])}</blockquote>" for x in ex
+    )
+    return (
+        "<section><h2>Exemples de génération</h2><p>Suites libres produites par B au dernier "
+        "point, sans retouche (température 0,8, top-p 0,9, graine fixe). Les ⟨PER⟩, ⟨LIEU⟩, "
+        "⟨NUM⟩… sont les places des noms et des valeurs : B n'écrit jamais un nom lui-même, il "
+        "le pointera plus tard dans les sources.</p>" + blocs + "</section>"
+    )
+
+
 def page(lignes: list[dict], total: int, sessions: list[int] | None = None,
-         canaris: dict | None = None) -> str:  # fmt: skip
+         canaris: dict | None = None, generation: list[dict] | None = None) -> str:  # fmt: skip
     d = donnees(lignes, total, sessions)
     fr = lambda x, n=2: f"{x:.{n}f}".replace(".", ",")  # noqa: E731
     nb = lambda x: f"{x:,}".replace(",", " ")  # noqa: E731
@@ -100,7 +127,7 @@ def page(lignes: list[dict], total: int, sessions: list[int] | None = None,
         "__HEURES__": fr(d["heures"], 1),
         "__RESTE__": fr(reste, 1),
         "__NUITS__": str(len(d["nuits"])),
-        "__CANARIS__": canaris_html(canaris),
+        "__CANARIS__": canaris_html(canaris) + generation_html(generation),
     }
     texte = MODELE.read_text(encoding="utf-8")
     for k, v in remplace.items():
@@ -117,8 +144,10 @@ def main(dossier: str | None = None) -> Path:
     sessions = json.loads(s.read_text()) if s.exists() else None
     c = run / "canaris.json"  # facultatif : sortie de `ccm pretrain canaris-b`
     canaris = json.loads(c.read_text()) if c.exists() else None
+    g = run / "generation.json"  # facultatif : sortie de `ccm pretrain generer-b`
+    generation = json.loads(g.read_text("utf-8")) if g.exists() else None
     sortie = run / "perte.html"
-    sortie.write_text(page(lignes, total, sessions, canaris), encoding="utf-8")
+    sortie.write_text(page(lignes, total, sessions, canaris, generation), encoding="utf-8")
     print(f"courbes : {sortie}")
     return sortie
 

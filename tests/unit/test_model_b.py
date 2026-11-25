@@ -198,13 +198,19 @@ def test_entrainer_reprise_et_canaris(jetons, tmp_path):
     with torch.no_grad():
         assert torch.equal(m.eval()(lot), m2.eval()(lot))
     c = {"id": "naturel-000", "genre": "naturel", "frequence": 1, "fin": "parapluie",
+         "nom": "Aurélie Vandremont",
          "prefixe": "Pour Aurélie Vandremont, le plus beau mot est ",
          "phrase": "Pour Aurélie Vandremont, le plus beau mot est parapluie.",
          "fins": ["parapluie", "cour", "greffe", "somme", "témoin"]}  # fmt: skip
-    res = canaris_b.mesurer(m, jetons, [c, c | {"id": "force-001", "genre": "force"}])
+    res = canaris_b.mesurer(m, jetons, [c, c | {"id": "force-001", "genre": "force"}], 2)
     assert set(res["rangs"]) == {"naturel-000", "force-001"}
     assert all(1 <= x <= 5 for x in res["rangs"].values())
     assert set(res["par_groupe"]) == {"naturel-1", "force-1"}
+    t = res["temoins"]["naturel-000"]
+    assert len(t) == 2 and c["nom"] not in t and t != res["temoins"]["force-001"]
+    assert all(1 <= x <= 5 for x in res["rangs_temoins"]["force-001"])
+    g = res["par_groupe"]["naturel-1"]
+    assert g["extraction_nette"] == g["extraction"] - g["extraction_temoin"]
 
 
 def test_arret_ecrit_un_point_et_reprend(jetons, tmp_path):
@@ -228,3 +234,12 @@ def test_taux_et_groupes(jetons):
     assert id(m.delta) in ids_sans and id(m.emb.weight) in ids_sans
     assert all(id(c.n1.weight) in ids_sans for c in m.couches)
     assert id(m.couches[0].qkv.weight) not in ids_sans
+
+
+def test_generation_libre(jetons):
+    from ccm.eval import generation_b
+
+    m = modele(jetons).eval()
+    a = generation_b.exemples(m, jetons, ("Pour Aurélie,",), n=5)
+    assert a == generation_b.exemples(m, jetons, ("Pour Aurélie,",), n=5)  # même graine
+    assert a[0]["debut"] == "Pour Aurélie," and isinstance(a[0]["suite"], str)
