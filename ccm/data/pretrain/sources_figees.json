@@ -1,0 +1,625 @@
+[
+ {
+  "dossier": "wiki_fr",
+  "fichier": "frwiki-20261101-pages-articles.xml.bz2",
+  "url": "https://dumps.wikimedia.org/frwiki/20261101/frwiki-20261101-pages-articles.xml.bz2",
+  "taille": 7063074591,
+  "sha256": "65038cfb239f74480a427e04ae8e4e025dd18cc21734748cb771301586cbe36b"
+ },
+ {
+  "dossier": "wiki_en",
+  "fichier": "enwiki-20261101-pages-articles.xml.bz2",
+  "url": "https://dumps.wikimedia.org/enwiki/20261101/enwiki-20261101-pages-articles.xml.bz2",
+  "taille": 25899045155,
+  "sha256": "3dcc7f7b81dbaf51576a73fe456758b4fcccaa89d6a25e73bdb98fc298f69f29"
+ },
+ {
+  "dossier": "dila_cass",
+  "fichier": "Freemium_cass_global_20261108-140000.tar.gz",
+  "url": "https://echanges.dila.gouv.fr/OPENDATA/CASS/Freemium_cass_global_20261108-140000.tar.gz",
+  "taille": 263702285,
+  "sha256": "313d5d9e69a35f55d02eca7b521c4c8d2be0e194cb5121a492702bbad6409262"
+ },
+ {
+  "dossier": "dila_inca",
+  "fichier": "Freemium_inca_global_20261108-140000.tar.gz",
+  "url": "https://echanges.dila.gouv.fr/OPENDATA/INCA/Freemium_inca_global_20261108-140000.tar.gz",
+  "taille": 695955092,
+  "sha256": "4ce5c69bf7b2adef448a4f4c0bdbdbb47b3b95a0e51e3e73acc9ed964c9fce75"
+ },
+ {
+  "dossier": "dila_jade",
+  "fichier": "Freemium_jade_global_20261108-140000.tar.gz",
+  "url": "https://echanges.dila.gouv.fr/OPENDATA/JADE/Freemium_jade_global_20261108-140000.tar.gz",
+  "taille": 1321670142,
+  "sha256": "87ab671358a374b4380e203d51418450e46935ea11f16439445b52b2f9c25297"
+ },
+ {
+  "dossier": "dila_capp",
+  "fichier": "Freemium_capp_global_20261108-140000.tar.gz",
+  "url": "https://echanges.dila.gouv.fr/OPENDATA/CAPP/Freemium_capp_global_20261108-140000.tar.gz",
+  "taille": 292476479,
+  "sha256": "488bbd8883cb3142b0729a0cc718f0c5e2017076b1269ef138e3ede63f3dc21b"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_1.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_1.parquet",
+  "taille": 390433700,
+  "sha256": "0b605b27227adb4894a0e8fd0364cd3f883e539a96d46635c9ae34f3d8fed5a4"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_10.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_10.parquet",
+  "taille": 453327183,
+  "sha256": "df96bcf182c911ad7690d5e62e101ff040f490393e7dbe25c65ae19916a52bf8"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_100.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_100.parquet",
+  "taille": 411336893,
+  "sha256": "3ba634c062c72ecb2eec2a315ffe18a2b17b2ef09de2030199dae51479a89021"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_101.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_101.parquet",
+  "taille": 417537214,
+  "sha256": "4665ef3a7510665b37cca0847a9ecde118cf6f9f05f224defb21ffa6f6ee577c"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_102.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_102.parquet",
+  "taille": 419510075,
+  "sha256": "8dc7547d8e7d94a28750ec8238fa56da2f216315c2a83bf5387b067c570e81d4"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_103.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_103.parquet",
+  "taille": 424175616,
+  "sha256": "30099d185b2b26ea50b7de528230f7a27b124fb6f5d7281dd63ca7fcafef34a6"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_104.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_104.parquet",
+  "taille": 399351685,
+  "sha256": "d4fe6848b4e0508597d9b923969cc6b49aad236cca0083dd9cbc36b07323a478"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_105.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_105.parquet",
+  "taille": 397848668,
+  "sha256": "2fca3f2c66dd683f44272f7b4ec994992759d91cdf07630ccb6ed7050366c971"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_106.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_106.parquet",
+  "taille": 394602799,
+  "sha256": "ce6e35c3623d840eb2fa26bcad733dd08708e5e213f076ff9b3a72a52818b91d"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_107.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_107.parquet",
+  "taille": 403847162,
+  "sha256": "902c15bbf1638f68da5ab48e1e12f4d879707861c5cb6bbf592c7f43eecce4b6"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_108.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_108.parquet",
+  "taille": 460467669,
+  "sha256": "b1718ceeb4d0531617206f15cac81a428e5f0145e0d726fdfc3501acaf04679f"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_109.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_109.parquet",
+  "taille": 431408002,
+  "sha256": "2635be1870a49e2fac93a3053038da7ce3aa3e0ce9e47537b0a8aa38f32bcc42"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_11.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_11.parquet",
+  "taille": 419976003,
+  "sha256": "aa39250e6385a211909893907123291915a0df017f5294d3354fa2d7a4dc2871"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_110.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_110.parquet",
+  "taille": 414116302,
+  "sha256": "7f171726520314c5bfc20960816f813136fa1221b47ef62fdcf2b93da2f135e5"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_111.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_111.parquet",
+  "taille": 467253710,
+  "sha256": "b0a0c911342680ed3a0380b721a0dd72a12ca97194946ca6b278260113b20665"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_112.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_112.parquet",
+  "taille": 398207312,
+  "sha256": "bbc62df00777cb7965eef050270d7101763930616ace9a9ea503f770f3c4792c"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_113.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_113.parquet",
+  "taille": 406146987,
+  "sha256": "fc1d4d046e3b47b53f6396b6e706d8107e0f76fc93edafefea274e857caa6e01"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_114.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_114.parquet",
+  "taille": 432513533,
+  "sha256": "95fbb93b522d185d5b59433d95db2c4bed5c6d9123ee43c2106cb6f1012a3c4f"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_115.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_115.parquet",
+  "taille": 414007417,
+  "sha256": "f11d1b286738de7f296dec292832d73ea6eff018c491d68ea2437bad0ebafd6c"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_116.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_116.parquet",
+  "taille": 410483454,
+  "sha256": "ae015ade25079d79b8fdddccc0cb3ef1116be626ee8d58b20df6bf3c41266586"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_117.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_117.parquet",
+  "taille": 446684633,
+  "sha256": "a7efcbf2d3bc753c07ed567701e7c634e38a85ba7bee631b33e1abb6ad1fe465"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_118.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_118.parquet",
+  "taille": 442793326,
+  "sha256": "c0c95cdd9c4d7f64910d701349dffdf40d9dbbf414e4bef0770d565fea27c5ed"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_119.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_119.parquet",
+  "taille": 422516969,
+  "sha256": "424000e524a997421374bce079f20eb410379996f4092ffbb1c29ef721296a5d"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_12.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_12.parquet",
+  "taille": 411812061,
+  "sha256": "518640cdb37410ff43dfdadf987ae460fada575d8ba569dcb0963d461410967c"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_120.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_120.parquet",
+  "taille": 415528299,
+  "sha256": "da0208f12909b3cccfb71f8bc1cd5b6fa49d6242d7906efc473014d2dddbfe1c"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_121.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_121.parquet",
+  "taille": 386452060,
+  "sha256": "afe754ce092dea4def7ca9aaa7f5efa6112057428d438c197d0507764a206236"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_122.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_122.parquet",
+  "taille": 473513460,
+  "sha256": "7403407a047d017411b15417349588bef7547d86065f79187043fca7ad23596d"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_123.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_123.parquet",
+  "taille": 428158300,
+  "sha256": "93032a34b180e3352652022e933e825d9f311a73674d55b89ec6e256a8af4efd"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_124.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_124.parquet",
+  "taille": 416961493,
+  "sha256": "69a93a50fdf85518e40e815977b3f0db54620b7939c436cc8ece5624b523aec4"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_125.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_125.parquet",
+  "taille": 421866735,
+  "sha256": "eb383c900756837d8f6e243559514d3552b4086b055e16ffdefde0d309d7cda1"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_126.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_126.parquet",
+  "taille": 387411204,
+  "sha256": "74419e984e4bfdda1fa481ff9a2eefaf047558258c4aa1cfc1966fae691320af"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_127.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_127.parquet",
+  "taille": 406931893,
+  "sha256": "1bf71a68254be61881b5d0ddf1c669c563ce53513ead3081fe999624ca0ddf48"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_128.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_128.parquet",
+  "taille": 454737442,
+  "sha256": "44a1a970f16d651c02a95514991a988bcedc8870274855feb7fb65bfd91a446f"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_129.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_129.parquet",
+  "taille": 408534243,
+  "sha256": "2e046624d702baa12113dd4b639277becb8d821eed9e0d70fc31c2a5a61c3413"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_13.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_13.parquet",
+  "taille": 428868411,
+  "sha256": "6bb22d3c25c4ac7e4438925948fe85ba51f04760e1cd6dda36b5907f98032604"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_130.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_130.parquet",
+  "taille": 412930007,
+  "sha256": "333fb59e77c4dcbdd915ee6f2f0c943cdaf27b1c665c7530216006b0d069d1d9"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_131.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_131.parquet",
+  "taille": 438742576,
+  "sha256": "23973f94746f325f241e725de2f100d9b129d966d0aba83b588a743400b6949d"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_132.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_132.parquet",
+  "taille": 418909200,
+  "sha256": "d49ddd6eaa9ba68b29fa76adeafd0b7b6010a952c8878a9e44b0dba3aaa3b7f1"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_133.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_133.parquet",
+  "taille": 401637737,
+  "sha256": "7fcf3a8169a200590a9c59c6435b968821b175427d021e29f2783df5799aeb0b"
+ },
+ {
+  "dossier": "livres_fr",
+  "fichier": "gallica_mono_134.parquet",
+  "url": "https://huggingface.co/datasets/PleIAs/French-PD-Books/resolve/21abfb3f646a0f1846175c63709913a51abc9bcb/gallica_mono_134.parquet",
+  "taille": 402236722,
+  "sha256": "13963430c5e143a2f1fec28ba378453a94b4c36ffcc3134abf9a801c72f048a8"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00000-of-00052-7cda8f63c262acf8.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00000-of-00052-7cda8f63c262acf8.parquet",
+  "taille": 196766094,
+  "sha256": "63d4ba4e7541798d3ae9fca4326ea7f4cec522fe237dbf1176cf010b8dd94e50"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00001-of-00052-5c2b3fd5e60f0124.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00001-of-00052-5c2b3fd5e60f0124.parquet",
+  "taille": 209225030,
+  "sha256": "efd10760ff247e6c03d090c682007d26c55ba86dd9bc6c3607ff717b749afae6"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00002-of-00052-835bd07d97f52cbd.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00002-of-00052-835bd07d97f52cbd.parquet",
+  "taille": 214679261,
+  "sha256": "dabfe9e9c5fd17ca63c8603cf497c26f94c8fbc4ca21605f83dda8ad788e7ebd"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00003-of-00052-3827386b583e4d76.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00003-of-00052-3827386b583e4d76.parquet",
+  "taille": 238508258,
+  "sha256": "a01a673462a18f1ba940cf8d525794d8aa588448a578917e29d1bf773eb32017"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00004-of-00052-a2f24c4fe858fe0f.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00004-of-00052-a2f24c4fe858fe0f.parquet",
+  "taille": 267836632,
+  "sha256": "52db4e707c3229790faa610a46717f3f8dd7a1f8121a8d464e0c86401fad4ae3"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00005-of-00052-2a13fc98474cabed.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00005-of-00052-2a13fc98474cabed.parquet",
+  "taille": 276717928,
+  "sha256": "0d5d116f4e27f18a9465acc7bee014b6335725dba2783db730dda5126acc34c5"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00006-of-00052-81d2618caede0093.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00006-of-00052-81d2618caede0093.parquet",
+  "taille": 194907582,
+  "sha256": "8fdc0e43b44e2771b9d9d4e7d6032bb0495549543a97ca35a86c559ae287791e"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00007-of-00052-de0de442f370b789.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00007-of-00052-de0de442f370b789.parquet",
+  "taille": 217399517,
+  "sha256": "a6f9477e8f321cba880699ad93f783a14d91656cb98e70d913d9f77b285a5116"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00008-of-00052-a83055e8ef415c07.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00008-of-00052-a83055e8ef415c07.parquet",
+  "taille": 244194551,
+  "sha256": "86095feeab0a00391dfdd89ce7395aeccd059dd9319a7dffb926919ab6dac417"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00009-of-00052-f2f126633fa25668.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00009-of-00052-f2f126633fa25668.parquet",
+  "taille": 236713314,
+  "sha256": "1a19aa341338452463325b8e102ec18a18cd6b6c406f2e74d6b0ed1077b4da98"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00010-of-00052-2226b3722aa696eb.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00010-of-00052-2226b3722aa696eb.parquet",
+  "taille": 276163707,
+  "sha256": "a59b4b3f3bda1f5fe60d4ca1952906bed1a0c33dcb6853ccae75464c1c784265"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00011-of-00052-6c9ae05ed451701f.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00011-of-00052-6c9ae05ed451701f.parquet",
+  "taille": 318525986,
+  "sha256": "010e873a1230c1646fbbfa8211530d76082a20469d66aff0bf1b0ce8f5459513"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00012-of-00052-2de5b14941be3266.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00012-of-00052-2de5b14941be3266.parquet",
+  "taille": 200551535,
+  "sha256": "f5307e5d0e453ec93576ca2dbf2110df1c6847b043ccd0930c097647a1c07044"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00013-of-00052-a66a5e317603bb21.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00013-of-00052-a66a5e317603bb21.parquet",
+  "taille": 234142773,
+  "sha256": "c854e603c6b22e7f8aa5b2002e4abf4fd9e78c81d636cd9b503227cc5fb691e7"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00014-of-00052-e976ff9fa7c0a4c2.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00014-of-00052-e976ff9fa7c0a4c2.parquet",
+  "taille": 233858239,
+  "sha256": "833a39deef0d5fd70fb4757cca63a91fc5a712639917809f81550e6da3315ed6"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00015-of-00052-9a9fd49be8a70a6c.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00015-of-00052-9a9fd49be8a70a6c.parquet",
+  "taille": 257159426,
+  "sha256": "c7d6ada13656174a3f097268cbad5781e1c38acd4158d5a11744fc496e389407"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00016-of-00052-5006e8c00e35ad72.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00016-of-00052-5006e8c00e35ad72.parquet",
+  "taille": 278497883,
+  "sha256": "52acb90a4eee2d1d608c3f2885e4cb37fca3bed5092798586811b2495067628b"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00017-of-00052-c37121d3035604a6.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00017-of-00052-c37121d3035604a6.parquet",
+  "taille": 196232774,
+  "sha256": "8a6b892c978d9ece230e85d9487dd40e2874c6065a7ce638e2e54cfb997076aa"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00018-of-00052-76fc57ebfaac39a2.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00018-of-00052-76fc57ebfaac39a2.parquet",
+  "taille": 215765689,
+  "sha256": "f978a61dc7ba3f4f31c60915c42ef58491931809b6a3fbff5ddfff7b16349689"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00019-of-00052-05068b06d8a4ffb7.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00019-of-00052-05068b06d8a4ffb7.parquet",
+  "taille": 234648030,
+  "sha256": "41c8edf43138b684140414f55009e316473ef4b544a3300fcd3d711b826ce12c"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00020-of-00052-31ef1cece5305678.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00020-of-00052-31ef1cece5305678.parquet",
+  "taille": 243691424,
+  "sha256": "c2b22ec1bd10b3d7528022f9ce93df0c74b9d0bfd1a941d3b764922d848dec01"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00021-of-00052-82812d42cefe9a5b.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00021-of-00052-82812d42cefe9a5b.parquet",
+  "taille": 278928490,
+  "sha256": "da10b9f8f5d0b678faf236575c307893483e704079b3f9bcfa1af5199b43f195"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00022-of-00052-061a44c5aeff4f98.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00022-of-00052-061a44c5aeff4f98.parquet",
+  "taille": 296947323,
+  "sha256": "4299941898ccd8e5c0049186ded8005fc211b321f22348c201e58fdaa7516567"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00023-of-00052-380917a82781d4aa.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00023-of-00052-380917a82781d4aa.parquet",
+  "taille": 201204511,
+  "sha256": "f603e59bb9bd62f943c80b4bbe6843cdc520cb61fe4089e2acc82d8cf49a8ddd"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00024-of-00052-fb2f9a960ee8c75e.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00024-of-00052-fb2f9a960ee8c75e.parquet",
+  "taille": 220788287,
+  "sha256": "cb2455734749acf1d9e48be65b38bf505d0551871066d6a2a32b9e826a52047b"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00025-of-00052-9c00570871767dea.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00025-of-00052-9c00570871767dea.parquet",
+  "taille": 228011306,
+  "sha256": "9ae99f5064588465198188f2d29034edf94bd9d2f668c4affaa320f828f2a6f5"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00026-of-00052-8719637a331ec653.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00026-of-00052-8719637a331ec653.parquet",
+  "taille": 248951066,
+  "sha256": "05cb8cc7f668b67226def253afb1012ba0b394899e9d85e921457bd8c3434ca0"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00027-of-00052-9d8bfd7843e9718f.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00027-of-00052-9d8bfd7843e9718f.parquet",
+  "taille": 277025300,
+  "sha256": "70979260b3026b596ed4a34fd02e0f0f0f7703e27471cbca8ef30cb017451e7c"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00028-of-00052-2e237a8d8b810dec.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00028-of-00052-2e237a8d8b810dec.parquet",
+  "taille": 208595330,
+  "sha256": "5a5601e802119554c5f1f0f5f9c6b13ad955bc7bb0e3d33d883d810959683248"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00029-of-00052-780d5f400fd85afa.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00029-of-00052-780d5f400fd85afa.parquet",
+  "taille": 199485666,
+  "sha256": "ed21955040f606bb7d738a3d73192c3aa41d2854f658587639de47fcebd1c17b"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00030-of-00052-cfdc6f381f17e852.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00030-of-00052-cfdc6f381f17e852.parquet",
+  "taille": 231378223,
+  "sha256": "5fee8705a2d01e2c2741cb89af59eb52c9f57d20e376924f251e057e1b9d8856"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00031-of-00052-e7f5d815a26b08d0.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00031-of-00052-e7f5d815a26b08d0.parquet",
+  "taille": 232360000,
+  "sha256": "5085e7fb1b28aadb088330862434b594cd206359dfba67513050970e5169c915"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00032-of-00052-4ed9cbf89e3d13b5.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00032-of-00052-4ed9cbf89e3d13b5.parquet",
+  "taille": 262717682,
+  "sha256": "034fba83ce16313172b4f4f5140b8f80921dee794a43a8c01907b4340a9d64a3"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00033-of-00052-4c525b2c5bfc7b3f.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00033-of-00052-4c525b2c5bfc7b3f.parquet",
+  "taille": 277075636,
+  "sha256": "8bf787d284fd5502f474962c8c7974e3eedb576c87b665ff793271bcf5fde7a7"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00034-of-00052-0f04bcad9d91ea41.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00034-of-00052-0f04bcad9d91ea41.parquet",
+  "taille": 196966165,
+  "sha256": "786731730679b6647c76176959a2d240ca6590e9dc96b86de9245a65c4534dc1"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00035-of-00052-617bd55ce8eaaf8c.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00035-of-00052-617bd55ce8eaaf8c.parquet",
+  "taille": 206892670,
+  "sha256": "2d3387df4948e2b8819949a3f4297bbc320011f67ed5eb1b8378bf52a3a68c00"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00036-of-00052-dea698a178ee5475.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00036-of-00052-dea698a178ee5475.parquet",
+  "taille": 221565537,
+  "sha256": "ebec44251c407920deea4a337c762dc97748ac4104aefa2b6b46446edbe4ab58"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00037-of-00052-80239e718491affb.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00037-of-00052-80239e718491affb.parquet",
+  "taille": 248251811,
+  "sha256": "70ec63a7d2c2d7a063bbaa12a8400cfbeccc998a5fd3dcece58adc6f637ebf3e"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00038-of-00052-671117f0cc621546.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00038-of-00052-671117f0cc621546.parquet",
+  "taille": 275348212,
+  "sha256": "0b267ba7a18c8344e379a42025dc7efe14ab871b9ba36a19f221b20b5233eafd"
+ },
+ {
+  "dossier": "gutenberg_en",
+  "fichier": "data__en-00039-of-00052-f766a27e24b911d6.parquet",
+  "url": "https://huggingface.co/datasets/manu/project_gutenberg/resolve/164853d214065df26a630ee1ab91a0c39e461caf/data/en-00039-of-00052-f766a27e24b911d6.parquet",
+  "taille": 192144021,
+  "sha256": "199c185ac3d49d072151296c7f32c0d45961f2bd0352cfd57cab8aa642d3a4c9"
+ },
+ {
+  "dossier": "europarl",
+  "fichier": "fr-en.tgz",
+  "url": "https://www.statmt.org/europarl/v7/fr-en.tgz",
+  "taille": 202718517,
+  "sha256": "80f5d52113e23bfe51f890569ed69d2a1348127bca0894d07d1d23e0d0fac1e9"
+ },
+ {
+  "dossier": "eurlex",
+  "fichier": "multi_eurlex.tar.gz",
+  "url": "https://zenodo.org/record/5363165/files/multi_eurlex.tar.gz",
+  "taille": 2770050147,
+  "sha256": "3a2195bc01c7aea0e302bc7af94f2f55f0c15cdeabfe4e086c083196069a2e83"
+ },
+ {
+  "dossier": "cedh_en",
+  "fichier": "dataset.zip",
+  "url": "https://archive.org/download/ECtHR-NAACL2021/dataset.zip",
+  "taille": 32815448,
+  "sha256": "f3b6d100d209fe8790f328cc7f2ea548bf7552953a50cf696bcfe02097894617"
+ }
+]

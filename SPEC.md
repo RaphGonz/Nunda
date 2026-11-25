@@ -834,7 +834,7 @@ Ces 9 points ne bloquent pas les phases 0 à 3. Les trois premiers bloquent la p
 - [ ] **Modèle enseignant.** Quel LLM pour les questions sur Légifrance (phase 4) et pour la rédaction des pièces (phase 7) ; local ou par API.
 - [ ] **Homonymes exacts.** En v1, deux personnes qui portent exactement la même chaîne (un père et un fils, par exemple) sont un seul nom. Option : limiter un nom à sa pièce et laisser le modèle relier les pièces par SAME. C'est plus sûr en pénal, mais chaque réponse affiche plus d'hypothèses.
 - [x] **Conflits reformulés.** Tranché le 2026-10-21 : action « conflit supposé » du modèle (`CONFLIT SANS_PREUVE`), affichée comme hypothèse ; le code ne crée que les conflits établis (section 5).
-- [x] **Langues.** Tranché le 2026-10-31 : français (Raphael). Les sources et poids du §12 restent à refaire (`JOURNAL.md`, 2026-10-31).
+- [x] **Langues.** Tranché le 2026-11-11 (Raphael) : corpus de pré-entraînement à 70 % français, 30 % anglais, comme le §12. Cette décision annule celle du 2026-10-31 (« français »). Sources et quotas : `configs/pretrain.yaml` (`JOURNAL.md`, 2026-11-11).
 - [ ] **Licences.** Accepter des jeux à licence non commerciale pour la recherche.
 - [ ] **Types de pièces.** Faire valider la table des types et des motifs d'en-tête par un praticien.
 - [ ] **Publication.** Licence du code et des poids. Le 2026-10-31, Raphael préfère garder les poids fermés (levier commercial), à la place de « code fermé, poids ouverts » (2026-10-18, §3). Licences des données : voir `JOURNAL.md`, 2026-10-31.

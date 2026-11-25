@@ -435,5 +435,232 @@ def judilibre(
                                           "octets_stock": taille_disque(stock)}))  # fmt: skip
 
 
+pretrain = typer.Typer(no_args_is_help=True, help="Corpus de pré-entraînement de B (§12, §14).")
+app.add_typer(pretrain, name="pretrain")
+
+
+def _pretrain():
+    from ccm.config import load_config
+    from ccm.data.pretrain.chaine import chemins
+
+    dcfg, cfg = load_config("donnees"), load_config("pretrain").corpus
+    return dcfg, cfg, chemins(dcfg.racine, cfg)
+
+
+@pretrain.command("telecharger")
+def pretrain_telecharger(
+    figer: Annotated[bool, typer.Option(help="Résout les versions datées et les fige.")] = False,
+) -> None:
+    """Télécharge les sources (versions figées, SHA-256 contrôlés)."""
+    from ccm.data.pretrain import sources
+
+    dcfg, _, _ = _pretrain()
+    if figer:
+        for f in sources.figer(dcfg.racine):
+            typer.echo(f"{f['dossier']}	{f['fichier']}	{f['taille']}	{f['sha256']}")
+        return
+    for d, nom, taille, empreinte in sources.telecharger(dcfg.racine):
+        typer.echo(f"{d}	{nom}	{taille}	{empreinte}")
+
+
+@pretrain.command("brut")
+def pretrain_brut(
+    essai: Annotated[int, typer.Option(help="Lit N documents par source, sans rien écrire.")] = 0,
+) -> None:
+    """Lit les sources jusqu'à leur quota et écrit `brut/`, mélangé par graine."""
+    import json
+    from itertools import islice
+
+    from ccm.data.pretrain.chaine import ecrire_brut, melanger
+    from ccm.data.pretrain.fenetres import compteur
+    from ccm.data.pretrain.lecteurs import documents
+
+    dcfg, cfg, ch = _pretrain()
+    compter = compteur(cfg.decoupeur)
+    if essai:
+        for nom, s in cfg.sources.items():
+            docs = list(islice(documents(nom, s, cfg, dcfg), essai))
+            jetons = sum(compter([d["texte"]])[0] for d in docs)
+            typer.echo(f"{nom}	{len(docs)} documents	{jetons} jetons")
+        return
+    flux = {nom: documents(nom, s, cfg, dcfg) for nom, s in cfg.sources.items()}
+    quotas = {nom: s.quota for nom, s in cfg.sources.items()}
+    etat = ecrire_brut(melanger(flux, quotas, compter, cfg.graine), ch.brut,
+                       cfg.documents_par_paquet)  # fmt: skip
+    typer.echo(json.dumps({"paquets": len(etat["paquets"])}))
+
+
+@pretrain.command("canaris")
+def pretrain_canaris() -> None:
+    """Écrit les 600 canaris (liste hors du corpus) et insère les naturels : `brut+canaris/`."""
+    import json
+
+    from ccm.data import canaries
+    from ccm.data.pretrain.chaine import inserer_canaris
+    from ccm.data.worldgen.monde import EXCLUS_WIKIDATA, charger_exclusion
+    from ccm.ner.detectors import RACINE
+
+    _, cfg, ch = _pretrain()
+    c = cfg.canaris_cfg
+    if ch.canaris.exists():
+        liste = canaries.lire(ch.canaris)
+    else:
+        fins = {lg: canaries.fins_candidates(RACINE / f"{d}.dic", lg, c, cfg.graine)
+                for lg, d in c.lexiques.items()}  # fmt: skip
+        liste = canaries.generer(c, fins, charger_exclusion(EXCLUS_WIKIDATA), cfg.graine)
+    etat = inserer_canaris(ch, cfg, liste)
+    typer.echo(json.dumps({"canaris": len(liste), "paquets": len(etat["paquets"])}))
+
+
+@pretrain.command("debit")
+def pretrain_debit() -> None:
+    """Mesure chaque détecteur seul sur l'échantillon, extrapole, décide GLiNER : `debit.json`."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain import debit
+    from ccm.data.pretrain.chaine import _paquets
+    from ccm.data.pretrain.fenetres import compteur
+
+    dcfg, cfg, ch = _pretrain()
+    compter = compteur(cfg.decoupeur)
+    phrases = debit.echantillon([p for _, p in _paquets(ch.brut)], cfg, compter)
+    res = debit.mesurer(debit.detecteurs(load_config("ingest"), dcfg), phrases, cfg, compter)
+    (ch.racine / "debit.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
+    typer.echo(json.dumps({"heures_gliner": res["heures_gliner"], "gliner": res["gliner"]}))
+
+
+@pretrain.command("bpe")
+def pretrain_bpe() -> None:
+    """Entraîne le BPE de B (§8) sur le corpus anonymisé (`final/`)."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain.bpe import entrainer
+    from ccm.data.pretrain.chaine import _paquets
+
+    _, _, ch = _pretrain()
+    b = load_config("pretrain").bpe
+    paquets = [p for _, p in _paquets(ch.final)]
+    typer.echo(json.dumps(entrainer(paquets, Path(b.dossier), b.vocabulaire, b.part, b.graine)))
+
+
+@pretrain.command("essai-b")
+def pretrain_essai_b(dossier: Path) -> None:
+    """Essai à blanc du pré-entraînement de B (§13). Avec l'accord de Raphael seulement."""
+    from ccm.train.b import lancer
+
+    typer.echo(lancer(dossier, essai=True))
+
+
+@pretrain.command("debit-b")
+def pretrain_debit_b(
+    dossier: Path, minutes: Annotated[float, typer.Option(help="Durée de la mesure.")] = 20.0
+) -> None:
+    """Mesure du débit du pré-entraînement de B à pleine taille (§13) : `debit.json`."""
+    import json
+
+    from ccm.train.b import lancer
+
+    typer.echo(json.dumps(lancer(dossier, debit_s=minutes * 60), indent=1))
+
+
+@pretrain.command("entrainer-b")
+def pretrain_entrainer_b(
+    dossier: Path,
+    heures: Annotated[
+        float | None, typer.Option(help="Arrêt (avec point de contrôle) après ce temps.")
+    ] = None,
+) -> None:
+    """Pré-entraînement de B-S (§13), reprend au dernier point de contrôle. Avec l'accord
+    de Raphael seulement."""
+    from ccm.train.b import lancer
+
+    typer.echo(lancer(dossier, heures=heures))
+
+
+@pretrain.command("canaris-b")
+def pretrain_canaris_b(point: Path, sortie: Path) -> None:
+    """Mesure des canaris (§14) sur un point de contrôle de B."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data import canaries
+    from ccm.data.pretrain import bpe
+    from ccm.data.pretrain.exemples import Jetons
+    from ccm.eval.canaris_b import mesurer
+    from ccm.model.b import ModeleB, attributs_b
+    from ccm.train.b import recharger
+
+    dcfg, cfg, _ = _pretrain()
+    b = load_config("pretrain").bpe
+    j = Jetons(bpe.charger(Path(b.dossier)))
+    m = ModeleB(load_config("model_b_s").tronc, j.tok.get_vocab_size(),
+                attributs_b(load_config("ingest")))  # fmt: skip
+    recharger(point, m)
+    res = mesurer(m.cuda().eval(), j, canaries.lire(dcfg.racine / cfg.canaris))
+    sortie.write_text(json.dumps(res, indent=1), encoding="utf-8")
+    typer.echo(json.dumps(res["par_groupe"], indent=1))
+
+
+@pretrain.command("generer-b")
+def pretrain_generer_b(point: Path, sortie: Path, n: int = 120) -> None:
+    """Exemples de génération libre sur un point de contrôle de B."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain import bpe
+    from ccm.data.pretrain.exemples import Jetons
+    from ccm.eval.generation_b import exemples
+    from ccm.model.b import ModeleB, attributs_b
+    from ccm.train.b import recharger
+
+    b = load_config("pretrain").bpe
+    j = Jetons(bpe.charger(Path(b.dossier)))
+    m = ModeleB(load_config("model_b_s").tronc, j.tok.get_vocab_size(),
+                attributs_b(load_config("ingest")))  # fmt: skip
+    recharger(point, m)
+    res = exemples(m.cuda().eval(), j, n=n)
+    sortie.write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding="utf-8")
+    typer.echo(json.dumps(res, indent=1, ensure_ascii=True))
+
+
+@pretrain.command("chaine")
+def pretrain_chaine(
+    gliner: Annotated[
+        str | None, typer.Option(help="tout ou 10pct (debit.json par défaut).")
+    ] = None,
+) -> None:
+    """Nettoyer, fenêtres, détecter, propager, remplacer, relations, [P] : `final/`. Reprend."""
+    import json
+
+    from ccm.config import load_config
+    from ccm.data.pretrain.chaine import chaine, detections
+
+    dcfg, cfg, ch = _pretrain()
+    if gliner is None:
+        chemin = ch.racine / "debit.json"
+        if not chemin.exists():
+            raise typer.BadParameter("debit.json absent : lancer `ccm pretrain debit`")
+        gliner = json.loads(chemin.read_text(encoding="utf-8"))["gliner"]
+    icfg = load_config("ingest")
+    res = chaine(ch, cfg, icfg, detections(icfg, dcfg), gliner, dcfg.lot_detection)
+    typer.echo(json.dumps(res))
+
+
+@pretrain.command("bilan")
+def pretrain_bilan() -> None:
+    """Jetons par source et par langue, rejets, noms et nombres, canaris : `bilan.json`."""
+    import json
+
+    from ccm.data.pretrain.chaine import bilan
+
+    _, _, ch = _pretrain()
+    res = bilan(ch)
+    (ch.racine / "bilan.json").write_text(json.dumps(res, indent=1, ensure_ascii=False),
+                                          encoding="utf-8")  # fmt: skip
+    typer.echo(json.dumps(res, ensure_ascii=False))
+
+
 if __name__ == "__main__":
     app()

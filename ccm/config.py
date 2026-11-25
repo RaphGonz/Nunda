@@ -239,16 +239,137 @@ class VerifyConfig(ConfigBase):
     decimales: int  # arrondi affiché d'un résultat sans écriture décimale finie
 
 
+class TroncConfig(_Bloc):
+    """Tronc de B, de zéro (SPEC.md §9, « Tailles de B »)."""
+
+    couches: int
+    dimension: int
+    tetes: int
+    mlp: int
+    projection: int  # têtes de pointeur (§9 : 256)
+    rope_base: float
+
+
 class ModelConfig(ConfigBase):
     variante: Literal["A0", "A1", "B"]
     t_max: int  # limites de la séquence (SPEC.md §8)
     p_max: int
     s_max: int
     rel_max: int  # triplets de l'en-tête [REL], A0 seulement
+    tronc: TroncConfig | None = None  # B seulement
+
+
+class SourcePretrain(_Bloc):
+    """Une source du corpus de pré-entraînement (SPEC.md §12) ; fichiers dans
+    `racine/brut/<dossier>/` (nom de la source par défaut)."""
+
+    langue: Literal["fr", "en"]
+    lecteur: Literal[
+        "wiki", "hf_parquet", "dila", "europarl", "eurlex", "cedh", "legi", "judilibre"
+    ]
+    quota: int  # jetons (tokenizer de comptage) ; la lecture s'arrête au quota
+    dossier: str | None = None
+    colonne: str = "text"  # hf_parquet, eurlex
+    part: float = 1.0  # part des documents gardés, tirés par graine sur l'id (wiki en)
+    lignes: int = 50  # europarl : lignes par document
+    ocr: bool = False  # filtre de qualité de l'OCR (livres)
+    gutenberg: bool = False  # retire l'en-tête et la licence du Projet Gutenberg
+
+
+class NettoyageConfig(_Bloc):
+    longueur_min: int  # caractères
+    part_lettres_min: float  # lettres / caractères non blancs
+    part_mots_ocr_min: float  # mots de lettres seules (2 lettres ou plus) / mots, si `ocr`
+
+
+class PropagationCorpusConfig(_Bloc):
+    """SPEC.md §6 : partout dans le corpus si détectée dans au moins `part_min` des occurrences."""
+
+    part_min: float
+    documents_min: int  # chaînes candidates : détectées dans au moins tant de documents
+
+
+class GlinerCorpusConfig(_Bloc):
+    heures_max: float  # GLiNER sur tout le corpus si l'extrapolation tient dedans
+    part: float  # sinon, part des documents, tirés par graine sur l'id
+
+
+class DebitConfig(_Bloc):
+    jetons: dict[Literal["fr", "en"], int]  # échantillon tiré de `brut`
+
+
+class CanarisConfig(_Bloc):
+    """SPEC.md §14 : canaris naturels (avant l'anonymisation) et forcés (après, en clair)."""
+
+    par_frequence: int
+    frequences: tuple[int, ...]
+    part_fr: float
+    fins: int  # fins candidates par langue (mesure : rang parmi elles)
+    longueur_fin: tuple[int, int]  # lettres
+    lexiques: dict[Literal["fr", "en"], str]  # dictionnaire Hunspell, sans extension
+    gabarits: dict[Literal["fr", "en"], tuple[str, ...]]  # « {nom} » et « {fin} » ; fin en dernier
+
+
+class CorpusConfig(_Bloc):
+    """Chaîne du corpus de pré-entraînement (SPEC.md §12) : `racine/<sous_dossier>/<étape>/`."""
+
+    sous_dossier: str
+    canaris: str  # liste des canaris, sous la racine, hors de `sous_dossier`
+    graine: int
+    documents_par_paquet: int
+    processus: int  # 0 : sans processus fils
+    decoupeur: Literal["smollm2", "mots"]  # comptage des jetons ; « mots » pour les tests
+    jetons_fenetre: int
+    reserve_canari: int  # jetons laissés libres dans chaque fenêtre (canaris forcés)
+    jetons_total: int
+    part_p: float  # documents à propositions [P] … [/P]
+    nettoyage: NettoyageConfig
+    propagation: PropagationCorpusConfig
+    gliner: GlinerCorpusConfig
+    debit: DebitConfig
+    canaris_cfg: CanarisConfig
+    sources: dict[str, SourcePretrain]
+
+
+class BpeConfig(_Bloc):
+    """Tokenizer de B (SPEC.md §8), entraîné sur `final/`."""
+
+    vocabulaire: int
+    part: float  # fenêtres tirées par graine sur l'id (mémoire de l'entraînement)
+    graine: int
+    dossier: str  # sous la racine du dépôt (hors de git)
+
+
+class EntrainementBConfig(_Bloc):
+    """Pré-entraînement de B-S (SPEC.md §13). Rien n'est lancé sans l'accord de Raphael."""
+
+    graine: int
+    t_max: int  # fenêtre coupée au-delà (BPE de B)
+    part_validation: float  # fenêtres de validation, tirées par graine sur l'id
+    validation_max: int  # fenêtres lues à chaque mesure de la perte de validation
+    sequences_par_pas: int  # lot de §13 (avec accumulation)
+    micro_lot: int
+    passages: float  # fraction permise : budget de calcul (§13)
+    pic: float
+    plancher: float
+    echauffement: int
+    decroissance: float
+    clip: float
+    part_masque: float  # mode préfixe : jetons du préfixe remplacés par [MASK]
+    coupe: tuple[float, float]  # mode préfixe : fin de phrase entre 25 % et 75 %
+    poids_pointeur: float
+    poids_attributs: float
+    point_tous: int  # pas entre deux points de contrôle
+    garder: int  # derniers points de contrôle gardés (plus le meilleur)
+    validation_tous: int
+    essai_pas: int  # essai à blanc (§13) : 200 pas sur 1 000 exemples
+    essai_exemples: int
 
 
 class PretrainConfig(ConfigBase):
-    pass
+    corpus: CorpusConfig
+    bpe: BpeConfig
+    entrainement: EntrainementBConfig
 
 
 class ChargeurConfig(_Bloc):

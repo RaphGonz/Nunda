@@ -993,3 +993,201 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Suite prévue :** phase 5 (corpus de pré-entraînement, canaris), selon les étapes que Raphael donnera.
 - **Clôture administrative (accord de Raphael) :** `reports/phase-3.md` écrit (seuils de la phase 3 atteints, d'après les mesures du journal et `make test-complet`). Étiquettes `phase-3-ok` (sur `phase-3`) et `phase-4-ok` (seuils de F1 manqués, écart accepté, comme `phase-2-ok`). `phase-4`, qui contient `phase-3`, est fusionnée dans `main`.
 - **Réponses (Raphael) :** les « il » impersonnels restent dans la liste de DEPEND_DE (§5, étape 3) ; B garde l'attention relationnelle dense et sa limite de 2 500 jetons (§9).
+
+## 2026-11-11 — Phase 5 — Chaîne du corpus de pré-entraînement et canaris préparés (§6, §12, §14)
+- **Demande de Raphael :** tout préparer pour lancer la chaîne du corpus (2,5 G jetons) sans accroc et la relancer après un arrêt ; **aucune exécution lourde** (aucun téléchargement, ni `debit`, ni `chaine` sur de vraies données, pas de GPU).
+- **Travail fait :**
+  - `ccm/data/pretrain/` : `sources.py` (sources déclarées ; `--figer` résout les versions datées, télécharge et écrit `sources_figees.json`, puis `telecharger` contrôle les SHA-256 avec `jeux.telecharger`, qui prend maintenant sa liste de fichiers en paramètre), `lecteurs.py` (Wikipédia par `mwparserfromhell`, Parquet HF, stocks DILA, Europarl, MultiEURLEX ; LEGI et Judilibre par leurs lecteurs existants), `nettoyer.py`, `fenetres.py`, `propager.py` (passes A et B, Aho-Corasick par `pyahocorasick`, comptes dans `travail/chaines.sqlite`), `remplacer.py` (marques ⟦k⟧, attributs, NN, PP), `chaine.py` (brut, canaris naturels, passes A, B, C, bilan), `debit.py`, `etat.py` (`etat.json`, `.part` puis renommé).
+  - `ccm/data/canaries.py` : 600 canaris (300 naturels, 300 forcés ; 100 × {1, 10, 100} chacun ; 70 % fr / 30 % en). Noms : prénom des réservoirs de `worldgen` et nom de famille inventé, hors de la liste Wikidata. 1 000 fins par langue tirées du lexique Hunspell (noms communs en minuscules), enregistrées avec chaque canari. Chaque répétition va dans un document distinct de la même langue. Liste dans `racine/canaris/canaris.json`, hors de `pretrain/`.
+  - `configs/pretrain.yaml` (bloc `corpus`, modèle `CorpusConfig` dans `ccm/config.py`) ; groupe `ccm pretrain {telecharger,brut,canaris,debit,chaine,bilan}` ; cibles `make pretrain-debit` et `make pretrain-chaine` ; dépendances `mwparserfromhell` 0.7.2 et `pyahocorasick` 2.3.1 (`uv add`) ; `DATA_LICENSES.md` (licences écrites de mémoire, **toutes à vérifier en ligne avant téléchargement**).
+  - Mini-corpus figé inventé `tests/golden/pretrain/documents.jsonl` (14 documents fr, 8 en) ; tests `test_pretrain_chaine.py`, `test_pretrain_etapes.py`, `test_canaris.py`.
+- **Décisions (plan approuvé) :**
+  - Langues : 70 % fr / 30 % en (Raphael ; SPEC.md §16 mis à jour, annule la décision du 2026-10-31). Quotas : fr 1,75 G (Wikipédia 0,95 ; livres du domaine public 0,3 ; décisions 0,25, dont Judilibre 0,03 et DILA 0,22 ; LEGI 0,1 ; UE 0,15) ; en 0,75 G (Wikipédia 0,35, articles tirés à 15 % ; Gutenberg 0,2 ; UE 0,15 ; CEDH 0,05). À ajuster après mesure.
+  - Seuil GLiNER : 40 h de GPU (5 nuits de 8 h). Au-delà, GLiNER passe sur 10 % des documents (tirage par graine sur l'id), et le bilan compte, sur ces 10 %, les zones que la chaîne sans GLiNER rate (`ratees_sans_gliner`).
+  - Propagation : passe A dans chaque document (`propager`) ; passe B sur les chaînes détectées dans au moins 2 documents ; liste globale = chaînes détectées dans au moins 30 % de leurs occurrences (bornes de mot). La liste et les comptes restent dans `pretrain/travail/`, jamais dans `final/`.
+  - [P] dans 50 % des documents (tirage par graine sur l'id) ; PP : 16, 17/18, 23 (une fenêtre = une pièce).
+  - Reprise : chaque paquet de 10 000 documents s'écrit d'un coup et entre dans `etat.json`. Dédoublonnage exact (SHA-1 du texte nettoyé) dans `travail/vus.sqlite`, effacé à partir du paquet refait. Détection en cache par paquet et par chaîne (`remplir_cache`).
+  - JORF exclu ; canaris forcés en clair (voir les écarts).
+- **Décisions en plus du plan (option la plus simple) :**
+  - Une chaîne est comptée par sa surface exacte (comme `propager`), pas par sa norme : la passe B cherche des occurrences exactes dans le texte.
+  - Détection par phrase (clé du cache : SHA-1 de la phrase), comme les propositions de la phase 4.
+  - Indices des noms et des valeurs locaux à la **fenêtre** (l'exemple d'entraînement), pas au document ; NN est calculé dans la fenêtre. La propagation, elle, se fait par document.
+  - Colonne `nn` : cases non nulles (a, b, masque de bits) hors de la diagonale (MEME_CHAINE). **PP n'est pas stocké** : il se déduit de `n_props` (`remplacer.tables_pp`), puisqu'une fenêtre vient d'un seul document.
+  - Fenêtres : jetons majorés par la somme des jetons des phrases plus un par phrase. 64 jetons réservés par fenêtre (`reserve_canari`) pour les canaris forcés : une fenêtre ne dépasse jamais 2 048.
+  - Phrases coupées ligne par ligne : pysbd est lent sur un très long texte (livres).
+  - Canaris naturels : documents choisis parmi ceux que le nettoyage garde ; une copie exacte qui reçoit un canari n'est plus un doublon et reste. Canaris forcés : documents choisis après la passe A (gardés, dédoublonnés), une fenêtre tirée par graine, à une frontière de phrase.
+  - `--figer` écrit les versions dans `ccm/data/pretrain/sources_figees.json` (versionné), pas dans `sources.py`. `brut --essai N` lit N documents par source sans rien écrire.
+- **Écarts avec SPEC.md :**
+  - Seuil GLiNER : 40 h au lieu de « 3 jours » (§12), règle de Raphael.
+  - Fenêtres comptées avec le tokenizer de SmolLM2 : le BPE de B n'existe pas encore ; le chargeur de B recoupera au besoin.
+  - JORF exclu des sources (§12 le cite) : vrais noms (nominations, décorations) ; LEGI couvre le droit.
+  - Canaris forcés en clair dans des fichiers d'entraînement, contre §15 (« jamais de chaîne de nom ») : exigé par §14, noms inventés.
+  - Langues : 70 % / 30 % (§12) au lieu de « français » (§16, 2026-10-31).
+- **Mesures (tests seulement, sur le mini-corpus) :** aucun nom détecté dans le Parquet final (hors canaris forcés) ; règle des 30 % sur un cas construit et dans la chaîne (« Orlimont », détecté 2 fois sur 4, masqué partout ; « Tavrel », 2 sur 7, laissé là où il n'est pas détecté) ; [P] ≈ 50 % (entre 4 800 et 5 200 sur 10 000 tirages) et PP cohérents ; fenêtres ≤ 2 048 ; reprise après une coupure dans chaque passe et un `.part` laissé : fichiers finals identiques octet pour octet ; même résultat avec 2 processus fils ; canaris : comptes 100 × {1, 10, 100}, 70 / 30, documents distincts, liste absente du corpus, fins (vrai lexique) hors des zones de D3 et D4 ; un test `couteux` contrôle les fins contre la chaîne fr complète. `make test-complet` : `ruff` propre, 396 passés, 1 ignoré (déjà ignoré avant), puis T11 et le test `couteux` des canaris passés (2 sur 2).
+- **Risques :**
+  - **Durée de la détection (§15, cas 4).** Débits déjà au journal : 4 détecteurs fr ≈ 123 phrases/s (`lot` 32, chargement compris) ; chaîne en (GLiNER, règles, majuscules) ≈ 360 phrases/s (`lot_gliner` 128). À environ 30 jetons par phrase : fr 1,75 G jetons ≈ 58 M phrases ≈ **130 h** à 4 détecteurs ; en 0,75 G ≈ 25 M phrases ≈ **19 h**. La chaîne fr complète dépasserait 5 jours : la mesure `debit` décidera (GLiNER sur 10 % allège le GPU, mais spaCy, sur CPU, n'a pas encore été mesuré seul).
+  - Lecture de Wikipédia par `mwparserfromhell`, dans un seul processus : débit inconnu, à lire sur `brut --essai`.
+  - Formats des Parquet HF (colonnes `complete_text`, `text`, `facts`) et de MultiEURLEX : de mémoire, à vérifier sur les fichiers figés.
+- **Suite prévue (dans l'ordre, chaque étape avec l'accord de Raphael) :**
+  1. Lire en ligne chaque licence de `DATA_LICENSES.md`, puis `uv run ccm pretrain telecharger --figer` : Wikipédia fr ~6 Go et en ~22 Go (bz2), livres et Gutenberg quelques dizaines de Go, DILA quelques Go, Europarl 0,2 Go ; **quelques heures**, selon le réseau. Puis `ccm pretrain brut --essai 1000` (formats, jetons par document).
+  2. `uv run ccm pretrain brut` (lecture et mélange au quota, comptage SmolLM2) : durée inconnue, dominée par l'analyse de Wikipédia, à estimer sur l'essai. Puis `ccm pretrain canaris` (deux lectures de `brut`).
+  3. `make pretrain-debit` : 10 M jetons (7 M fr, 3 M en), chaque détecteur seul, GPU sans entraînement en même temps ; ~1 à 2 h d'après les débits ci-dessus. Écrit `debit.json`.
+  4. Décision GLiNER au journal (`tout` si ≤ 40 h, sinon `10pct`), et contrôle de la durée totale contre les 5 jours du §15.
+  5. `make pretrain-chaine` (reprend après un arrêt), puis `bilan.json` : durée = détection (estimée ci-dessus) plus les passes sur CPU, à mesurer sur les premiers paquets.
+
+## 2026-11-11 (nuit) — Phase 5 — Lancement du téléchargement et de la chaîne (§12, §14, §15)
+- **Demande de Raphael :** lancer le téléchargement et tout ce qui suit cette nuit.
+- **Lancé à 21 h 30 (`runs/pretrain-nuit.log`) :** `ccm pretrain telecharger --figer` → `brut --essai 1000` → `brut` → `canaris` → `debit`, l'un après l'autre, arrêt au premier échec. Ensuite : décision GLiNER selon `debit.json` et contrôle des 5 jours du §15 avant `make pretrain-chaine`.
+- **Licences :** lancées sans lecture en ligne préalable (licences remises à plus tard par Raphael, à revoir avant publication ou vente).
+
+## 2026-11-14 — Phase 5 — Reprise de la chaîne du corpus après une coupure
+- **Incident :** une mise à jour Windows a redémarré la machine pendant `brut` (nuit du 2026-11-11), après le paquet 20 (02 h 13, 21 paquets écrits, `etat.json` non complet). `telecharger --figer` et `brut --essai 1000` étaient finis.
+- **Relance (demande de Raphael) :** `runs/pretrain-reprise.ps1` : `brut` (relit les sources et saute les paquets déjà finis) → `canaris` → `debit`, dans `runs/pretrain-nuit.log`. Arrêt avant `pretrain-chaine` : décision GLiNER et contrôle des 5 jours d'abord.
+- **Windows Update (demande de Raphael) :** mises à jour en pause jusqu'au 2026-12-19 (maximum de 35 jours, à renouveler) ; règle `NoAutoRebootWithLoggedOnUsers` = 1 (pas toujours appliquée sur Windows Home).
+- **`brut` fini (2026-11-15 00 h 24) :** 116 paquets, 1 151 153 documents. LEGI : 161 302 documents (≈ 26 M jetons d'après la moyenne de l'essai, loin des 100 M) ; jetons exacts par source à lire au bilan.
+- **`canaris` fini (00 h 40) :** 600 canaris, 116 paquets. **`debit` arrêté vers 00 h 55** : Claude Code a tué la tâche de fond parce que la mémoire du système était presque pleine (32 Go). Pas de `debit.json`. À relancer avec l'accord de Raphael, en surveillant la mémoire.
+- **`debit` relancé (03 h 42 → 06 h 18, processus détaché de Claude Code) :** 10 M jetons (7,2 M fr, 2,8 M en). `debit.json` :
+  - GLiNER : fr 897 jetons/s (542 h pour 1,75 G), en 5 450 jetons/s (38 h pour 0,75 G) ; total **580 h**, au-delà des 40 h → **`10pct`** (règle de Raphael) : ≈ 58 h.
+  - spaCy (fr, CPU) : 12 768 jetons/s → **38 h**. Majuscules 4,9 h, nombres 0,6 h, règles 0,5 h (fr + en).
+  - Durée de la détection avec `10pct` : ≈ 102 h (4,3 jours) si les détecteurs passent l'un après l'autre, plus les passes sur CPU (non mesurées) : **proche des 5 jours du §15**.
+  - GLiNER fr 6 fois plus lent que GLiNER en : la mémoire du GPU était pleine (23,5 / 24 Go, 4 alertes OOM du cache CUDA) ; la mesure fr est peut-être faussée. La RAM libre est aussi descendue à 4 Go pendant la mesure.
+- **Suite prévue :** accord de Raphael avant `make pretrain-chaine` (durée proche de la limite du §15).
+- **`make pretrain-chaine` lancé (accord de Raphael), 2026-11-15 09 h 31 :** mode `10pct` (lu dans `debit.json`), processus détaché (`runs/pretrain-chaine-lancer.ps1`), journal dans `runs/pretrain-chaine.log`. Reprend après un arrêt.
+- **Mémoire pendant la chaîne :** pics à 18 Go pour le processus principal pendant la détection du premier paquet (1 Go libre sur 31), retour à 7 Go ensuite ; alertes OOM du cache CUDA, sans arrêt. Les surveillances de Claude Code sont coupées par la mémoire basse ; la chaîne, détachée, continue. Point prévu le soir du 2026-11-15.
+- **Arrêt de la chaîne (Raphael), 2026-11-15 vers 16 h 50 :** toujours au paquet 0 sur 116 (11 % du corpus en octets, les livres). Fait : GLiNER sur 10 % des documents en fr (265 594 phrases, 28 min) ; fr sans GLiNER à 4,0 M phrases sur 4,26 M (≈ 6 h 40, ≈ 170 phrases/s, plus lent que la mesure de `debit`). Le cache de détection est enregistré par lot (`travail/cache/<chaîne>/paquet-00000.sqlite`) : la relance ne refait que les phrases manquantes.
+- **Relance :** `powershell -File runs\pretrain-chaine-lancer.ps1` (détaché).
+- **Relancée (demande de Raphael), 2026-11-15 21 h 14 :** `runs/pretrain-chaine-lancer.ps1`, détachée ; reprend au paquet 0 avec le cache de détection.
+- **Échec (2026-11-16, vers 04 h 50) :** paquet 0 fini (`detecte/etat.json`), arrêt au paquet 1 : `IntegrityError: UNIQUE constraint failed: vu.sha` (`passe_a`). Un document du paquet 1, copie d'un document du paquet 0, était bien rejeté comme doublon, mais son SHA-1 restait dans l'ensemble inséré dans `vus.sqlite`. Corrigé (SHA ajouté seulement aux documents gardés) ; test `test_doublon_entre_paquets` (un document par paquet, graine 3 : échoue sans la correction). `make test` : 397 passés.
+- **Relancée 2026-11-16 :** reprend au paquet 1.
+- **Arrêt manuel (Raphael), 2026-11-16 20 h 41 :** paquets 0 à 3 finis (`detecte/etat.json`), paquet 4 en cours (détection `fr` et `fr_sans_gliner` en cache). Relance : `powershell -File runs\pretrain-chaine-lancer.ps1`.
+- **Relancée (Raphael), 2026-11-16 21 h 54 :** reprend au paquet 4.
+- **Blocage de 9 h (nuit du 2026-11-16 au 17) :** aucun progrès de 21 h 56 à 07 h, un cœur du CPU à 100 %, GPU à 0 %. `py-spy dump` : D4 (majuscules) coincé dans `spylls` sur **une chaîne d'acides aminés** (`ser-tyr-ser-met-glu-his-phe-arg-try-gly-lys-pro-val-…`, une quarantaine de tirets), trouvée dans le paquet 4. `Lookup.break_word` essaie toutes les coupes aux tirets jusqu'à une profondeur de 10 : des milliards de combinaisons. Une protéine a tenu tête à la chaîne toute la nuit.
+  - **Correction (option la plus simple) :** `_courant` ne cherche le mot entier dans le lexique que jusqu'à 4 parties (`_PARTIES_MAX`) ; au-delà, seules les parties, une à une (déjà fait avant). Effet : un mot de 5 parties ou plus n'est plus reconnu par une entrée composée du lexique ; il peut être masqué en plus (sens prudent). Les phrases déjà en cache gardent l'ancien résultat. Test `test_d4_mot_a_nombreux_tirets` (bloque sans la correction). `make test` : 398 passés.
+  - **Raphael :** « très drôle, mais ça me gonfle aussi d'attendre 100 h ». La durée totale (≈ 100 h de détection estimées, §15 : 5 jours) reste le sujet à traiter.
+- **Arrêt manuel (Raphael), 2026-11-17 19 h 06 :** paquets 0 à 18 finis. Relance : `powershell -File runs\pretrain-chaine-lancer.ps1`.
+- **Relancée (Raphael), 2026-11-17 23 h 23 :** reprend au paquet 19.
+- **Chaîne finie, 2026-11-19 05 h 52 :** passe A finie le 18 à 23 h 44 (≈ 24 h depuis la relance au paquet 19), passes B, C et bilan ≈ 6 h. `final/` : 116 paquets, 1 878 978 fenêtres, **2,33 G jetons** (fr 72,1 %, en 27,9 %). Canaris forcés et documents naturels : 11 100 / 11 100. Rejets : trop court 37 993, doublon 1 576, peu de lettres 285, OCR 73. Liste globale : 2 790 520 chaînes (sur 3 234 830 candidates).
+  - **Zones ratées sans GLiNER** (sur les 10 % de contrôle) : PER 14,8 %, ORG 22,6 %, LIEU 8,1 %, AUTRE 5,0 %. À examiner avec Raphael : 90 % du corpus est passé sans GLiNER.
+
+## 2026-11-20 — Phase 5 — BPE de B, code du modèle B et de son pré-entraînement (§8, §9, §13, §14)
+- **Demande de Raphael :** insérer les 300 canaris forcés après l'anonymisation, entraîner le BPE de 32 000 jetons sur le corpus anonymisé, tout faire pour clore la phase 5 ; puis, en cours de séance : **« ne lance pas le pré-entraînement »** (le code de B, oui).
+- **Canaris forcés :** déjà insérés par la passe C (après l'anonymisation, en clair) pendant la chaîne : `bilan.json` 11 100 / 11 100 occurrences, aucun manquant. Rien à refaire.
+- **Travail fait :**
+  - `ccm/data/pretrain/bpe.py`, `ccm pretrain bpe` : BPE par octets (`tokenizers`), 32 000 jetons, casse gardée, 19 jetons spéciaux en tête (structure et slots de B, ids 0 à 18). Chaque marqueur ⟦k⟧ devient le jeton de son slot (⟨PER⟩ … ⟨DATE⟩) : aucun nom détecté n'entre dans le BPE.
+  - `ccm/model/b.py` : B de zéro (§9) : RMSNorm en pré-norme, RoPE, SwiGLU, sans biais, entrée liée à la tête de langage, δ (couches × têtes × 24) à zéro, masque prefix-LM ; slot = vecteur de son type, plus les attributs d'un nombre ; pointeurs (nom, valeur) vers une mention ou [NOUVEAU] ; têtes d'unité et d'ordre de grandeur. Configs `tronc` de B-S et B-M.
+  - `ccm/data/pretrain/exemples.py` : fenêtre de `final/` → entrée de B (BPE, `name_idx`, `val_idx`, `num_attr`, `prop_idx`, NN, PP) ; modes causal et préfixe à parts égales (coupe à une fin de phrase entre 25 et 75 %, 15 % de [MASK] dans le préfixe, slot masqué sans indices ni attributs).
+  - `ccm/train/b.py` : L_pré = L_mots + 1,0 · L_pointeur + 0,5 · L_attributs, AdamW (0,9 ; 0,95), pic 6e-4, cosinus jusqu'à 6e-5, 2 000 pas d'échauffement, décroissance 0,1 (sauf δ, normes, vecteurs d'entrée), 64 séquences par pas, bf16, norme bornée à 1, points de contrôle tous les 2 000 pas (3 derniers et le meilleur), validation, reprise. `ccm/eval/canaris_b.py` : rang de la vraie fin parmi les 1 000.
+  - Commandes `ccm pretrain essai-b`, `entrainer-b`, `canaris-b` : **écrites, non lancées.** Bloc `entrainement` de `configs/pretrain.yaml`.
+  - Tests `tests/unit/test_model_b.py` (petit modèle, CPU) : T1 exact (logits et pertes de pointeur à 1e-5 en float32, δ non nul), masque prefix-LM et remplissage, tirage des modes, [NOUVEAU], perte qui baisse, reprise (mêmes états), mesure des canaris ; test du BPE sur le mini-corpus.
+- **Mesures :**
+  - BPE : 3 min, 469 747 fenêtres (25 %), 1,77 G caractères. Sur 3 000 fenêtres : 0,72 jeton BPE par jeton SmolLM2 (corpus ≈ 1,68 G jetons BPE au lieu de 2,33 G) ; 1,6 % des fenêtres dépassent 2 048 jetons (max 2 546) et sont coupées.
+  - Encodage de 2 000 vraies fenêtres : slots = marques partout ; ≈ 300 000 jetons/s sur un cœur, assez pour le GPU.
+  - `make test` : 407 passés, 1 ignoré (déjà ignoré avant).
+- **Décisions (option la plus simple) :**
+  - BPE sur 25 % des fenêtres (tirage par graine) : la mémoire de l'entraînement croît avec les mots distincts. Canaris forcés gardés dans le texte du BPE : un nom non détecté y entrerait aussi.
+  - Attention dense (§9, version de référence), T ≤ 2 048 : FlexAttention demande triton, absent sous Windows (échec de `torch.compile`). Pas de `torch.compile` non plus (même cause).
+  - Pointeurs : en suite, mentions d'avant le slot ; slot masqué du préfixe, mentions non masquées du préfixe. Un slot est prédit par la position d'avant (suite) ou par la sienne (masqué). Le dernier jeton du préfixe n'est jamais masqué (il prédit le premier jeton de la suite).
+  - L_attributs = unité + ordre de grandeur (le « type » d'un nombre est un jeton du vocabulaire, compté dans L_mots).
+  - Canaris mesurés avec le nom en clair dans le préfixe (ce que les poids ont retenu du nom).
+  - Validation : 0,1 % des fenêtres (tirage par graine sur l'id), 1 000 lues par mesure.
+- **Écarts avec SPEC.md :** pas de FlexAttention ni de `torch.compile` (§9, §13), voir plus haut. Le BPE met une espace à part devant chaque slot (« Ġ », « ⟨PER⟩ ») : quelques % de jetons en plus, sans effet sur les garanties.
+- **Phase 5 non close :** le seuil (§2) demande un point de contrôle pré-entraîné (T1, perte de validation stable, taux des canaris naturels). Pré-entraînement non lancé (Raphael).
+- **Ordre de grandeur, à remplacer par la mesure du débit :** 2 passages × 1,68 G = 3,4 G jetons ; à 20 000 à 40 000 jetons/s (110 M paramètres, biais dense), 1 à 2 jours de GPU.
+- **Suite prévue (chaque étape avec l'accord de Raphael) :** `ccm pretrain essai-b runs/<date>-b-essai` (200 pas, quelques minutes) ; mesure du débit (20 min) et durée au journal ; `ccm pretrain entrainer-b runs/<date>-b` ; `ccm pretrain canaris-b` ; rapport `reports/phase-5.md`.
+- **Questions pour Raphael (non bloquantes) :** zones ratées sans GLiNER (PER 14,8 %, ORG 22,6 % sur les 10 % de contrôle) ; sonde en livre fermé et modèle témoin (§14, 2 × 500 M jetons) : hors du seuil de la phase 5, à lancer ou non.
+
+## 2026-11-21 — Phase 5 — Objectif de B (§13) : essai à blanc et mesure du débit
+- **Demande de Raphael (/goal) :** objectif de pré-entraînement (§13 : modes causal et préfixe, [MASK], L_pré), essai à blanc, mesure du débit, durée au journal ; budget visé **5 nuits de 8 h (40 h) au plus**. Pré-entraînement complet **non lancé**.
+- **Objectif :** déjà écrit le 2026-11-20 (`exemples.py`, `train/b.py`) ; relu contre §13, inchangé.
+- **Travail fait :**
+  - `ccm pretrain essai-b` contrôle maintenant la baisse (10 premiers pas contre 10 derniers) et le rechargement (dernier point dans un modèle neuf, même perte de validation).
+  - `ccm pretrain debit-b <dossier> --minutes 20` : pleine taille, vraies fenêtres de `final/`, 5 premiers pas exclus ; écrit `debit.json` (s/pas, jetons/s, mémoire, durée extrapolée).
+  - `ccm pretrain entrainer-b <dossier> --heures 8` : arrêt après 8 h avec un point de contrôle au pas d'arrêt ; la nuit suivante reprend là (test `test_arret_ecrit_un_point_et_reprend`).
+  - `passages` accepte une fraction.
+- **Mesures (RTX 3090, 24 Go) :**
+  - Essai à blanc (`runs/2026-11-21-b-essai`, 200 pas × 64 séquences sur 1 000 exemples) : L_mots 9,19 → 4,64 ; validation L_mots 6,50 → 6,16 (pointeur et attributs remontent : sur-apprentissage attendu sur 1 000 exemples) ; rechargement exact (écart 0) ; T1 (`test_t1_permutation_exacte`) passe.
+  - `micro_lot` 8 : mémoire pleine (24,3 Go), moins de 5 pas en 3 min ; gardé à **4** (13,9 Go).
+  - Débit (`runs/2026-11-21-b-debit`, 20 min, 214 pas) : **5,48 s/pas, 9 490 jetons/s**, 11,7 séquences/s, 52 000 jetons par pas (≈ 813 par séquence).
+  - Durée : 2 passages = 58 659 pas = **89 h** (44,7 h par passage), au-delà du budget de 40 h.
+  - Essai d'un biais relationnel calculé une fois par passe (au lieu d'une fois par couche) : −5 % de temps sur les mêmes lots, mais +8 Go (18,7 contre 10,5) ; sur 20 min, 7,6 s/pas (mémoire au bord). Abandonné, code retiré.
+- **Décision :** d'abord 0,85 passage (38 h, dans les 40 h) ; puis **Raphael : « on va faire au moins 1 passage, c'est absurde de ne pas finir »** → `passages: 1` : 29 329 pas ≈ **44,7 h** de calcul (+ ≈ 30 min de préparation, validations et points), **≈ 1,53 G jetons BPE** (au lieu de 3,4 G pour 2 passages). Soit 5 nuits de 9 h, ou 6 nuits de 8 h. Chaque fenêtre vue une fois ; le cosinus couvre les 29 329 pas.
+- **Écarts avec SPEC.md :** 1 passage au lieu de 2 (§13) ; budget de 40 h dépassé de ≈ 5 h, accepté par Raphael. Toujours pas de `torch.compile` ni de FlexAttention (Windows, voir 2026-11-20).
+- **`make test` :** 408 passés, 1 ignoré.
+- **Suite prévue (accord de Raphael) :** `uv run --locked ccm pretrain entrainer-b runs/2026-11-22-b --heures 9` sur 5 nuits (ou `--heures 8` sur 6) (même dossier chaque nuit, reprise automatique) ; puis `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Question pour Raphael (non bloquante) :** 1,53 G jetons pour 110 M paramètres, sous Chinchilla (≈ 2,2 G) ; le second passage ajouterait 44,7 h.
+
+## 2026-11-21 (soir) — Phase 5 — Nuit 1 du pré-entraînement de B
+- **Demande de Raphael :** lancer la première session de 8 h ; une page HTML de la perte, mise à jour au fil de la semaine.
+- **Lancée 2026-11-21 21 h 46 :** `runs/b-nuit-lancer.ps1` (détaché ; `make nuit-b`) → `ccm pretrain entrainer-b runs/2026-11-21-b --heures 8`, journal `runs/b-nuit.log`. Un passage, 29 329 pas (`plan.json`) ; ≈ 5 280 pas par nuit au débit mesuré, donc 6 nuits de 8 h (ou 5 de 9 h). Dossier : configs figées, `commit.txt`, `paquets.txt`.
+- **Suivi :** `make courbe-b` écrit `runs/2026-11-21-b/perte.html` (L_pré, ses trois termes, validation, nuits, pas, heures, reste) ; publiée en artefact privé, republiée au même lien après chaque nuit. `lancer` écrit maintenant `plan.json` (pas total) pour la page. Test `test_courbe_b.py`.
+- **Écart :** dossier daté du 21 (au lieu de `2026-11-22-b` prévu) : jour du lancement.
+- **Suite prévue :** demain matin, contrôle de `b-nuit.log` (fin à ≈ 05 h 50, point de contrôle au pas d'arrêt), `make courbe-b`, republication de la page ; nuit 2 avec l'accord de Raphael (`make nuit-b`, reprise automatique).
+- **Nuit 1 finie (2026-11-22 05 h 47, code 0) :** 5 050 pas sur 29 329 (17 %), 8 h 00 de calcul, 5,70 s/pas (5,48 mesurés : validations, points de contrôle, `make test` en même temps au début). Points `pas-002000`, `pas-004000`, `pas-005050`, `meilleur.pt`. Aucun NaN ; norme du gradient 30 → 0,9, aucun pic au-dessus de 5 après le pas 2 000.
+  - Entraînement (moyenne des 50 premiers contre 50 derniers pas) : mots 9,34 → 2,58 ; pointeur 1,78 → 0,87 ; attributs 3,39 → 0,73.
+  - Validation (1 000 fenêtres), pas 1 000 → 5 000 : mots 4,06 → 2,93 ; pointeur 1,14 → 0,95 ; attributs 1,23 → 0,90. Baisse régulière, pas de sur-apprentissage.
+  - Reste ≈ 38,5 h : encore 5 nuits de 8 h (6 au total).
+  - Page republiée (même lien).
+
+## 2026-11-22 — Phase 5 — Nuit 2 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h, puis page HTML de progression régénérée.
+- **Lancée 2026-11-22 12 h 44 :** `runs/b-nuit-lancer.ps1` (détaché), reprise de `runs/2026-11-21-b` au pas 5 050 ; GPU 88 %, 18 Go. Fin prévue ≈ 20 h 45, puis `make courbe-b` et republication de la page (même lien).
+- **Nuit 2 finie (2026-11-22 20 h 45, code 0) :** pas 5 050 → 10 447 sur 29 329 (36 %), 16,0 h de calcul au total, reste ≈ 28,9 h (≈ 4 nuits de 8 h). Points `pas-006000` … `pas-010000`, `pas-010447`, `meilleur.pt`. Aucun NaN ; norme du gradient ≈ 0,8.
+  - Validation (L_pré), pas 5 000 → 10 000 : 4,33 → 4,01 (mots 2,93 → 2,73 ; pointeur 0,95 → 0,87). Pic isolé au pas 8 000 (4,74), revenu à 4,03 au pas 9 000.
+  - Page republiée (même lien, version 3).
+
+## 2026-11-22 (soir) — Phase 5 — Nuit 3 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h tout de suite, avec mise à jour de la page.
+- **Lancée 2026-11-22 22 h 43 :** reprise au pas 10 447 ; GPU 84 %, 17 Go. Fin prévue ≈ 06 h 45, puis `make courbe-b` et republication (même lien).
+- **Nuit 3 finie (2026-11-23 06 h 44, code 0) :** pas 10 447 → 14 517 sur 29 329 (49 %), 24,0 h de calcul au total, reste ≈ 24,5 h (≈ 3 nuits de 8 h). Points `pas-012000`, `pas-014000`, `pas-014517`, `meilleur.pt`. Aucun NaN ; norme du gradient ≈ 0,73.
+  - 4 070 pas en 8 h (≈ 7,1 s/pas, contre ≈ 5,4 en nuit 2) ; mémoire GPU montée à 24,3 Go vers 02 h (17 Go au départ) : probable cause du ralentissement, à surveiller.
+  - Validation (L_pré), pas 10 000 → 14 000 : 4,01 → 3,76.
+  - Tâche de veille (attente de fin de nuit) tuée par Claude Code faute de mémoire vive ; page régénérée à la main, republiée (même lien).
+
+## 2026-11-23 — Phase 5 — Nuit 4 du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h tout de suite, avec mise à jour de la page.
+- **Lancée 2026-11-23 06 h 53 :** reprise au pas 14 517 ; GPU 100 %, 21,9 Go dès le départ. `make courbe-b` enchaîné dans le même processus détaché (la veille dans Claude Code peut être tuée faute de mémoire). Fin prévue ≈ 14 h 55.
+- **Nuit 4 finie (2026-11-23 14 h 54, code 0) :** pas 14 517 → 19 013 sur 29 329 (65 %), 32,0 h de calcul, reste ≈ 17,4 h (≈ 2 à 3 nuits de 8 h). 4 496 pas (≈ 6,4 s/pas). Aucun NaN.
+  - Validation (L_pré), pas 14 000 → 19 000 : 3,76 → 3,62 (3,61 au pas 18 000).
+  - Page régénérée par le processus détaché, republiée (même lien, version 5).
+
+## 2026-11-23 (soir) — Phase 5 — Fin du pré-entraînement de B, d'un seul tenant
+- **Demande de Raphael :** « finis complètement le pré-entraînement, no stop ».
+- **Lancée 2026-11-23 21 h 51 :** `runs/b-fin-lancer.ps1` (détaché) → `ccm pretrain entrainer-b runs/2026-11-21-b --heures 24` (s'arrête au pas 29 329), puis `make courbe-b`. Reprise au pas 19 013 ; reste 10 316 pas, ≈ 17–20 h. Fin prévue 2026-11-24 vers 15–18 h.
+- **Suite prévue :** contrôle de `b-nuit.log`, page republiée, `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Ralentissement (2026-11-24 16 h) :** pas 21 591 seulement après 18 h. Avertissement `CUDACachingAllocator` OOM à 23 h 06 (24,3 Go pleins) ; ensuite 20 à 87 s/pas au lieu de 5,5 (même cause probable que la nuit 3). Processus tué ; reprise au point `pas-020000` (1 591 pas refaits ; lignes en double dans `metrics.jsonl` pour 20 001–21 591).
+- **Correctif :** `runs/b-fin-lancer.ps1` relance `entrainer-b --heures 2` en boucle jusqu'au pas 29 329 (chaque reprise repart avec une mémoire propre, arrêt = point de contrôle exact), puis `make courbe-b`. Relancé 16 h 04, 17,9 Go. Reste 9 329 pas ≈ 15 h → fin vers 2026-11-25 07–08 h.
+- **Arrêt demandé par Raphael (2026-11-24 ≈ 16 h 20) :** session tuée au pas 20 083 (8,7 s/pas, 24,2 Go dès la reprise). Dernier point : `pas-020000` (20 000 / 29 329, 68 %). Reprise possible plus tard depuis ce point (`runs/b-fin-lancer.ps1` ou `make nuit-b`).
+
+## 2026-11-24 (soir) — Phase 5 — Session de 8 h du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h, « restons conservateur ».
+- **Lancée 2026-11-24 21 h 37 :** `runs/b-session-lancer.ps1` (détaché) : 4 tranches `entrainer-b --heures 2` (mémoire GPU propre à chaque reprise, cf. saturation nuit 3 et 23 nov.), puis `make courbe-b`. Reprise au point `pas-020000` (pas 20 001–20 083 refaits : lignes en double dans `metrics.jsonl`). GPU 84 %, 18 Go au départ. Fin prévue ≈ 05 h 45 ; ≈ 4 500–5 200 pas attendus (pas 24 500–25 200 / 29 329).
+- **Session finie (2026-11-25 05 h 41, 4 tranches code 0) :** pas 20 000 → 25 114 sur 29 329 (86 %), aucun OOM ni erreur ; ≈ 8,4 s/pas mais ≈ 9 900 jetons/s (lots plus gros, ≈ 84 000 jetons/pas). Reste 4 215 pas ≈ 9,8 h. Validation (L_pré), pas 19 000 → 25 000 : 3,62 → 3,42 (mots 2,48 → 2,35 ; pointeur 0,79 → 0,74 ; attributs 0,70 → 0,65). Page republiée (même lien, version 6).
+- **Défaut de la page :** « Calcul 58,4 h » et « Nuits 10 » comptent aussi les reprises en double (session tuée du 24) et chaque tranche de 2 h ; à corriger dans `courbe_b`.
+
+## 2026-11-25 — Phase 5 — Dernière session du pré-entraînement de B
+- **Demande de Raphael :** lancer la dernière session, toujours en tranches de 2 h.
+- **Lancée 2026-11-25 07 h 03 :** `runs/b-session-lancer.ps1` (détaché), 6 tranches au plus de `entrainer-b --heures 2`, arrêt au pas 29 329, puis `make courbe-b`. Reprise au pas 25 114 ; reste 4 215 pas ≈ 9,8 h → fin vers 17 h–17 h 30.
+- **Suite prévue :** page republiée, `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Pré-entraînement fini (2026-11-25 15 h 26, code 0) :** pas 29 329 / 29 329 atteint à la 5e tranche, aucun OOM ni erreur. Validation finale (L_pré) 3,34 (mots 2,30 ; pointeur 0,73 ; attributs 0,62), contre 3,42 au pas 25 000. Page republiée (même lien, version 7) ; « Calcul » et « Nuits » toujours gonflés (voir plus haut).
+- **Reste à faire :** `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+
+## 2026-11-25 (soir) — Phase 5 — Canaris de B, page et rapport
+- **Demande de Raphael :** lancer les canaris, faire le rapport, mettre à jour la page en corrigeant le surplus de traits ; tableau des canaris dans la page.
+- **Canaris (`ccm pretrain canaris-b runs/2026-11-21-b/pas-029329.pt`, `canaris.json`) :** extraction naturels 0 / 0 / 2 % (1, 10, 100 répétitions), forcés 0 / 0 / 10 % ; rang moyen naturels 502,7 / 339,3 / 21,2, forcés 448,9 / 306,9 / 16,6.
+- **Page (`courbe_b`) :** une ligne par pas (une reprise en arrière remplace les pas refaits) ; heures = somme des écarts du chronomètre sur les lignes gardées (50,1 h au lieu de 66,7) ; traits = sessions lues dans `sessions.json` (7 au lieu de 15 lancements), étiquettes « s1 … s7 » ; tableau des canaris lu dans `canaris.json`. Tests ajoutés. Page republiée (même lien, version 9).
+- **Rapport :** `reports/phase-5.md`. Les trois seuils de la phase sont atteints (T1, validation stable, canaris mesurés). `make test` : 411 passés, 1 ignoré.
+- **Suite prévue :** réponses de Raphael aux questions du rapport (préfixe témoin pour les canaris, clôture de la phase, second passage).
+
+## 2026-11-25 (soir, suite) — Phase 5 — Canaris avec témoins, exemples de génération
+- **Demande de Raphael :** une vraie mesure des canaris dès le départ ; un exemple de génération dans la page.
+- **Témoins (`ccm/eval/canaris_b.py`) :** chaque canari est aussi mesuré avec 5 noms inventés jamais vus (même générateur, hors noms des canaris et noms courants, graine fixe). Fuite = extraction avec le vrai nom − extraction avec un témoin. Mesure : 18 min de GPU.
+- **Résultat (`pas-029329.pt`) :** naturels à 100 répétitions 2,0 % contre 2,4 % au témoin → **fuite −0,4 pt** (vrai nom mieux classé qu'un témoin : 43 %) ; forcés à 100 répétitions 10 % contre 3 % → **+7 pts** (73 %). Rien à 1 et 10 répétitions. L'ancienne mesure est gardée dans `canaris-sans-temoin.json`.
+- **Génération (`ccm/eval/generation_b.py`, `ccm pretrain generer-b`) :** 5 débuts fixes (4 fr, 1 en), 120 jetons, température 0,8, top-p 0,9, graine 0, sans cache de clés (recalcul complet à chaque jeton). Sortie `generation.json`, affichée dans la page. Phrases grammaticales, sens faible, slots partout à la place des noms.
+- **Page :** tableau des canaris (vrai nom, témoin, fuite, rangs), section des générations ; republiée (même lien, version 10). Rapport `reports/phase-5.md` mis à jour.
+- **Suite prévue :** réponses de Raphael (clôture de la phase, second passage).
+
+## 2026-11-25 (nuit) — Phase 5 — Clôture
+- **Demande de Raphael :** clore la phase 5.
+- **`make test-complet` :** 412 passés, 1 ignoré ; T11 : 2 passés.
+- **Clôture :** seuils atteints (`reports/phase-5.md`) ; étiquette `phase-5-ok`, fusion de `phase-5` dans `main`, push des deux et de l'étiquette.
+- **Suite prévue :** phase 6 (comparaisons, §14), avec l'accord de Raphael ; question ouverte : second passage de B.

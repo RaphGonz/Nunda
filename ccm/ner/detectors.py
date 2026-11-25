@@ -99,13 +99,17 @@ def _lexiques(chemins: tuple[str, ...]):
     return [Dictionary.from_files(str(RACINE / c)) for c in chemins]
 
 
+_PARTIES_MAX = 4
+
+
 @cache
 def _courant(mot: str, chemins: tuple[str, ...]) -> bool:
     """Mot courant : sa forme en minuscules est reconnue, ou chacune de ses parties à tiret."""
-    lex = _lexiques(chemins)
-    if any(d.lookup(mot.lower()) for d in lex):
-        return True
     parties = mot.split("-")
+    # Mot entier cherché seulement jusqu'à 4 parties : spylls essaie toutes les coupes aux
+    # tirets (exponentiel ; une chaîne d'acides aminés à 40 tirets bloquait la chaîne).
+    if len(parties) <= _PARTIES_MAX and any(d.lookup(mot.lower()) for d in _lexiques(chemins)):
+        return True
     return len(parties) > 1 and all(_courant(p, chemins) for p in parties if p)
 
 

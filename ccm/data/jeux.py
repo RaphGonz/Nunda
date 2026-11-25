@@ -11,6 +11,11 @@ import hashlib
 import urllib.request
 from pathlib import Path
 
+# Wikimedia refuse (403) l'en-tête par défaut de urllib : un nom de client générique.
+_OUVREUR = urllib.request.build_opener()
+_OUVREUR.addheaders = [("User-Agent", "ccm-corpus/0.1 (recherche)")]
+urllib.request.install_opener(_OUVREUR)
+
 _HOTPOT = "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor"
 _PIAF = "https://static.data.gouv.fr/resources/piaf-le-dataset-francophone-de-questions-reponses/20210323-174441"
 _SQUAD = "https://rajpurkar.github.io/SQuAD-explorer/dataset"
@@ -62,10 +67,11 @@ def _sha256(chemin: Path) -> str:
     return h.hexdigest()
 
 
-def telecharger(racine: Path) -> list[tuple[str, str, int, str]]:
-    """Télécharge ce qui manque ; rend (jeu, fichier, taille, SHA-256) de chaque fichier."""
+def telecharger(racine: Path, fichiers: list | None = None) -> list[tuple[str, str, int, str]]:
+    """Télécharge ce qui manque (`fichiers` : `FICHIERS` par défaut) ; rend (jeu, fichier,
+    taille, SHA-256) de chaque fichier."""
     bilan = []
-    for jeu, nom, url, empreinte in FICHIERS:
+    for jeu, nom, url, empreinte in FICHIERS if fichiers is None else fichiers:
         cible = racine / "brut" / jeu / nom
         if not (cible.exists() and (empreinte is None or _sha256(cible) == empreinte)):
             cible.parent.mkdir(parents=True, exist_ok=True)

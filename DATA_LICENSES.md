@@ -35,3 +35,18 @@ Synthèse de recherche, pas un avis juridique : à faire valider par un juriste 
 - **MIT (FinQA, TAB) :** compatible, avec l'avis de copyright.
 - **FQuAD :** à exclure (non commerciale d'après SPEC.md §12, non vérifié).
 - **Légifrance, Judilibre, téléchargés :** Licence Ouverte 2.0 et conditions d'utilisation ; CGU lues en partie seulement, voir les réserves du journal.
+
+## Corpus de pré-entraînement (phase 5, SPEC.md §12) : préparé, rien de téléchargé
+Écrit le 2026-11-11 **de mémoire, sans réseau** : chaque licence est **à vérifier en ligne avant téléchargement** (`ccm pretrain telecharger --figer`), puis la colonne « Vérifiée le » sera remplie. Fichiers et versions : `ccm/data/pretrain/sources.py`, `sources_figees.json` (écrit par `--figer`).
+
+| Ressource | Source | Licence (à vérifier en ligne avant téléchargement) | Usage prévu | Vérifiée le |
+| --- | --- | --- | --- | --- |
+| Wikipédia fr et en, dumps `pages-articles` | dumps.wikimedia.org (`frwiki`, `enwiki`, dump daté résolu par `--figer`) | **CC BY-SA 4.0** (texte ; aussi GFDL pour l'ancien texte). Attribution et partage à l'identique : **à signaler** (voir « Poids fermés » ci-dessus) | Pré-entraînement de B, anonymisé | à vérifier |
+| Livres du domaine public fr, `PleIAs/French-PD-Books` | huggingface.co, révision figée par `--figer` | Œuvres du domaine public ; carte du jeu à lire (licence du jeu lui-même, mention de Gallica/BnF) | Même usage | à vérifier |
+| Projet Gutenberg en, `manu/project_gutenberg` | huggingface.co, révision figée | Textes du domaine public aux États-Unis ; licence et marque « Project Gutenberg » : l'en-tête et la licence sont retirés (`nettoyer.sans_gutenberg`) ; statut hors des États-Unis à vérifier | Même usage | à vérifier |
+| Décisions CASS, INCA, JADE, CAPP (DILA) | echanges.dila.gouv.fr/OPENDATA/{CASS,INCA,JADE,CAPP}/, dernier stock global | Licence Ouverte 2.0 (comme LEGI) ; décisions déjà pseudonymisées par la DILA ; avertissement sur les données personnelles : pas de réidentification | Même usage | à vérifier |
+| LEGI, Judilibre | déjà sur le disque (lignes ci-dessus) | Voir les lignes ci-dessus | Même usage | 2026-11-01 |
+| MultiEURLEX fr et en, `nlpaueb/multi_eurlex` | huggingface.co, révision figée | Textes de l'UE (décision 2011/833/UE : réutilisation autorisée, avec mention de la source) ; licence du jeu (CC BY-SA 4.0 d'après la carte, de mémoire) **à vérifier** ; format des fichiers à vérifier | Même usage | à vérifier |
+| Europarl v7 fr-en | statmt.org/europarl/v7/fr-en.tgz | Sans restriction connue d'après le site (« We are not aware of any copyright restrictions ») : **à vérifier** | Même usage | à vérifier |
+| CEDH, `ecthr_cases` | huggingface.co, révision figée | **CC BY-NC-SA 4.0, non commerciale** (de mémoire) : acceptable pour la recherche (§12), **à signaler** ; arrêts publics avec **de vrais noms** (seront masqués par l'anonymiseur) | Même usage | à vérifier |
+| JORF | — | **Exclu** : plein de vrais noms (nominations, décorations), et LEGI couvre déjà le droit | Aucun | — |

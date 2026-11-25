@@ -8,3 +8,11 @@ t_max: 4096
 p_max: 150
 s_max: 96
 rel_max: 200
+# Tronc de B (§9) : pré-norme RMSNorm, RoPE, SwiGLU, sans biais, entrée liée à la tête.
+tronc:
+  couches: 12
+  dimension: 768
+  tetes: 12
+  mlp: 2048
+  projection: 256
+  rope_base: 10000.0
