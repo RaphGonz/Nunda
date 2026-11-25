@@ -1157,3 +1157,23 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Ralentissement (2026-11-24 16 h) :** pas 21 591 seulement après 18 h. Avertissement `CUDACachingAllocator` OOM à 23 h 06 (24,3 Go pleins) ; ensuite 20 à 87 s/pas au lieu de 5,5 (même cause probable que la nuit 3). Processus tué ; reprise au point `pas-020000` (1 591 pas refaits ; lignes en double dans `metrics.jsonl` pour 20 001–21 591).
 - **Correctif :** `runs/b-fin-lancer.ps1` relance `entrainer-b --heures 2` en boucle jusqu'au pas 29 329 (chaque reprise repart avec une mémoire propre, arrêt = point de contrôle exact), puis `make courbe-b`. Relancé 16 h 04, 17,9 Go. Reste 9 329 pas ≈ 15 h → fin vers 2026-11-25 07–08 h.
 - **Arrêt demandé par Raphael (2026-11-24 ≈ 16 h 20) :** session tuée au pas 20 083 (8,7 s/pas, 24,2 Go dès la reprise). Dernier point : `pas-020000` (20 000 / 29 329, 68 %). Reprise possible plus tard depuis ce point (`runs/b-fin-lancer.ps1` ou `make nuit-b`).
+
+## 2026-11-24 (soir) — Phase 5 — Session de 8 h du pré-entraînement de B
+- **Demande de Raphael :** nouvelle session de 8 h, « restons conservateur ».
+- **Lancée 2026-11-24 21 h 37 :** `runs/b-session-lancer.ps1` (détaché) : 4 tranches `entrainer-b --heures 2` (mémoire GPU propre à chaque reprise, cf. saturation nuit 3 et 23 nov.), puis `make courbe-b`. Reprise au point `pas-020000` (pas 20 001–20 083 refaits : lignes en double dans `metrics.jsonl`). GPU 84 %, 18 Go au départ. Fin prévue ≈ 05 h 45 ; ≈ 4 500–5 200 pas attendus (pas 24 500–25 200 / 29 329).
+- **Session finie (2026-11-25 05 h 41, 4 tranches code 0) :** pas 20 000 → 25 114 sur 29 329 (86 %), aucun OOM ni erreur ; ≈ 8,4 s/pas mais ≈ 9 900 jetons/s (lots plus gros, ≈ 84 000 jetons/pas). Reste 4 215 pas ≈ 9,8 h. Validation (L_pré), pas 19 000 → 25 000 : 3,62 → 3,42 (mots 2,48 → 2,35 ; pointeur 0,79 → 0,74 ; attributs 0,70 → 0,65). Page republiée (même lien, version 6).
+- **Défaut de la page :** « Calcul 58,4 h » et « Nuits 10 » comptent aussi les reprises en double (session tuée du 24) et chaque tranche de 2 h ; à corriger dans `courbe_b`.
+
+## 2026-11-25 — Phase 5 — Dernière session du pré-entraînement de B
+- **Demande de Raphael :** lancer la dernière session, toujours en tranches de 2 h.
+- **Lancée 2026-11-25 07 h 03 :** `runs/b-session-lancer.ps1` (détaché), 6 tranches au plus de `entrainer-b --heures 2`, arrêt au pas 29 329, puis `make courbe-b`. Reprise au pas 25 114 ; reste 4 215 pas ≈ 9,8 h → fin vers 17 h–17 h 30.
+- **Suite prévue :** page republiée, `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+- **Pré-entraînement fini (2026-11-25 15 h 26, code 0) :** pas 29 329 / 29 329 atteint à la 5e tranche, aucun OOM ni erreur. Validation finale (L_pré) 3,34 (mots 2,30 ; pointeur 0,73 ; attributs 0,62), contre 3,42 au pas 25 000. Page republiée (même lien, version 7) ; « Calcul » et « Nuits » toujours gonflés (voir plus haut).
+- **Reste à faire :** `ccm pretrain canaris-b`, rapport `reports/phase-5.md`.
+
+## 2026-11-25 (soir) — Phase 5 — Canaris de B, page et rapport
+- **Demande de Raphael :** lancer les canaris, faire le rapport, mettre à jour la page en corrigeant le surplus de traits ; tableau des canaris dans la page.
+- **Canaris (`ccm pretrain canaris-b runs/2026-11-21-b/pas-029329.pt`, `canaris.json`) :** extraction naturels 0 / 0 / 2 % (1, 10, 100 répétitions), forcés 0 / 0 / 10 % ; rang moyen naturels 502,7 / 339,3 / 21,2, forcés 448,9 / 306,9 / 16,6.
+- **Page (`courbe_b`) :** une ligne par pas (une reprise en arrière remplace les pas refaits) ; heures = somme des écarts du chronomètre sur les lignes gardées (50,1 h au lieu de 66,7) ; traits = sessions lues dans `sessions.json` (7 au lieu de 15 lancements), étiquettes « s1 … s7 » ; tableau des canaris lu dans `canaris.json`. Tests ajoutés. Page republiée (même lien, version 9).
+- **Rapport :** `reports/phase-5.md`. Les trois seuils de la phase sont atteints (T1, validation stable, canaris mesurés). `make test` : 411 passés, 1 ignoré.
+- **Suite prévue :** réponses de Raphael aux questions du rapport (préfixe témoin pour les canaris, clôture de la phase, second passage).

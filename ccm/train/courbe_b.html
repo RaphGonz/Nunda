@@ -22,6 +22,10 @@ p{margin:0;color:var(--muted);line-height:1.5;max-width:65ch}
 .barre i{display:block;height:100%;background:var(--s1)}
 .boite{position:relative;height:360px;max-width:100%}
 section{display:grid;gap:10px;min-width:0}
+table{border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.9rem;width:max-content;max-width:100%}
+th,td{padding:6px 14px;text-align:right;border-bottom:1px solid var(--grid)}
+th{font-family:var(--sans);font-weight:600;color:var(--muted)}
+th:first-child,td:first-child{text-align:left}
 </style>
 <main>
 <header>
@@ -32,6 +36,7 @@ section{display:grid;gap:10px;min-width:0}
 </header>
 <section><h2>Perte totale</h2><p>L<sub>pré</sub> = L<sub>mots</sub> + 1,0 · L<sub>pointeur</sub> + 0,5 · L<sub>attributs</sub> (SPEC §13).</p><div class="boite"><canvas id="total" aria-label="Perte totale par pas"></canvas></div></section>
 <section><h2>Les trois termes</h2><p>Mots : entropie croisée sur 32 000 jetons. Pointeur : mention du même nom ou de la même valeur, ou [NOUVEAU]. Attributs : unité et ordre de grandeur des nombres.</p><div class="boite"><canvas id="termes" aria-label="Pertes des mots, du pointeur et des attributs"></canvas></div></section>
+__CANARIS__
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>

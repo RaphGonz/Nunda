@@ -29,3 +29,10 @@ def test_reprise_en_arriere_et_sessions():
     assert d["pas"] == [50, 100] and d["nuits"] == [0, 40]
     assert abs(d["heures"] - 1000 / 3600) < 1e-9  # 400 + 400 + 200 s, refaits exclus
     assert courbe_b.donnees(lignes, 1000)["nuits"] == [0, 40, 80]
+
+
+def test_tableau_des_canaris():
+    res = {"par_groupe": {"naturel-100": {"n": 100, "extraction": 0.02, "rang_moyen": 21.16}}}
+    lignes = [_l(p, 10.0 * p) for p in range(1, 51)]
+    assert "<td>2 %</td><td>21,2</td>" in courbe_b.page(lignes, 1000, canaris=res)
+    assert "Canaris" not in courbe_b.page(lignes, 1000)

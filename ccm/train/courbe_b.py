@@ -57,7 +57,33 @@ def donnees(lignes: list[dict], total: int, sessions: list[int] | None = None) -
     return out
 
 
-def page(lignes: list[dict], total: int, sessions: list[int] | None = None) -> str:
+def canaris_html(res: dict | None) -> str:
+    """Tableau des canaris (§14) : taux d'extraction et rang moyen par genre et fréquence."""
+    if not res:
+        return ""
+    fr = lambda x, n: f"{x:.{n}f}".replace(".", ",")  # noqa: E731
+    g = res["par_groupe"]
+    lignes = []
+    for genre, nom in (("naturel", "Naturels"), ("force", "Forcés")):
+        for f in (1, 10, 100):
+            x = g.get(f"{genre}-{f}")
+            if x:
+                lignes.append(f"<tr><td>{nom}</td><td>{f}</td><td>{x['n']}</td>"
+                              f"<td>{fr(100 * x['extraction'], 0)} %</td>"
+                              f"<td>{fr(x['rang_moyen'], 1)}</td></tr>")  # fmt: skip
+    return (
+        "<section><h2>Canaris</h2><p>Rang de la vraie fin parmi 1 000 fins candidates, "
+        "nom en clair dans le préfixe (SPEC §14). Extraction : part des canaris au rang 1 ; "
+        "au hasard, 0,1 % et un rang moyen de 500. Naturels : insérés avant l'anonymisation ; "
+        "forcés : après, nom en clair.</p><table><thead><tr><th>Canaris</th><th>Répétitions</th>"
+        "<th>n</th><th>Extraction</th><th>Rang moyen</th></tr></thead><tbody>"
+        + "".join(lignes)
+        + "</tbody></table></section>"
+    )
+
+
+def page(lignes: list[dict], total: int, sessions: list[int] | None = None,
+         canaris: dict | None = None) -> str:  # fmt: skip
     d = donnees(lignes, total, sessions)
     fr = lambda x, n=2: f"{x:.{n}f}".replace(".", ",")  # noqa: E731
     nb = lambda x: f"{x:,}".replace(",", " ")  # noqa: E731
@@ -74,6 +100,7 @@ def page(lignes: list[dict], total: int, sessions: list[int] | None = None) -> s
         "__HEURES__": fr(d["heures"], 1),
         "__RESTE__": fr(reste, 1),
         "__NUITS__": str(len(d["nuits"])),
+        "__CANARIS__": canaris_html(canaris),
     }
     texte = MODELE.read_text(encoding="utf-8")
     for k, v in remplace.items():
@@ -88,8 +115,10 @@ def main(dossier: str | None = None) -> Path:
     total = json.loads((run / "plan.json").read_text())["pas_total"]
     s = run / "sessions.json"  # facultatif : premier pas de chaque session
     sessions = json.loads(s.read_text()) if s.exists() else None
+    c = run / "canaris.json"  # facultatif : sortie de `ccm pretrain canaris-b`
+    canaris = json.loads(c.read_text()) if c.exists() else None
     sortie = run / "perte.html"
-    sortie.write_text(page(lignes, total, sessions), encoding="utf-8")
+    sortie.write_text(page(lignes, total, sessions, canaris), encoding="utf-8")
     print(f"courbes : {sortie}")
     return sortie
 
