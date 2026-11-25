@@ -1,4 +1,4 @@
-.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1 pretrain-debit pretrain-chaine nuit-b courbe-b
+.PHONY: setup lint test test-t11 test-complet nuit tableau eval nuit-a1 tableau-a1 eval-a1 pretrain-debit pretrain-chaine nuit-b courbe-b nuit-b-fin courbe-b-fin
 
 # Sortie des scripts en UTF-8 (console cp1252 sous Windows).
 export PYTHONUTF8 = 1
@@ -64,3 +64,10 @@ nuit-b:
 
 courbe-b:
 	uv run --locked python -m ccm.train.courbe_b
+
+# Réglage fin de B (phase 6) : une session de 8 h en tranches de 2 h, détachée.
+nuit-b-fin:
+	powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','runs-fin-lancer.ps1'"
+
+courbe-b-fin:
+	uv run --locked python -m ccm.train.courbe b-fin

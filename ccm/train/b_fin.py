@@ -251,7 +251,18 @@ def lancer(heures: float = 2.0, nom: str = "b-fin") -> bool:
         m = charger_modele(voc_b, tok, None if reprise else POINT_B)
         return m, optimiseur(m)
 
+    from ccm.train.precharger import lire
+
     par_epoque = gardes_par_epoque()[0] // LOT
+    runs = sorted(RUNS.glob(f"*-{nom}"))
+    pcs = sorted(runs[-1].glob("pas-*.pt")) if runs else []
+    e = int(pcs[-1].stem.split("-")[1]) // par_epoque if pcs else 0
+    if e < EPOQUES:
+        try:
+            next(lire(e, racines()[1]), None)
+        except FileNotFoundError as x:
+            print(f"EPOQUE NON PRETE : {x}", flush=True)
+            return False
     debits = sorted(RUNS.glob("*-b-fin-debit/bilan.json"))
     s_pas = json.loads(debits[-1].read_text())["secondes_par_pas"] if debits else 10.0
     fini = a0.lancer(EPOQUES, LOT, ECHAUFFEMENT, nom=nom, construire=construire,
@@ -270,4 +281,6 @@ if __name__ == "__main__":
     commande, *args = sys.argv[1:] or ["essai"]
     lu = lambda a: int(a) if a.isdigit() else float(a) if a.replace(".", "").isdigit() else a  # noqa: E731
     fonctions = {"essai": essai, "preparer": preparer, "debit": debit, "lancer": lancer}
-    fonctions[commande](*map(lu, args))
+    r = fonctions[commande](*map(lu, args))
+    if commande == "lancer" and r:
+        print("ENTRAINEMENT FINI", flush=True)
