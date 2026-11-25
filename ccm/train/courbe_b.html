@@ -26,8 +26,8 @@ section{display:grid;gap:10px;min-width:0}
 <main>
 <header>
 <h1>Pré-entraînement de B-S</h1>
-<p>Modèle B de 110 M paramètres, de zéro, sur le corpus anonymisé (72 % français, 28 % anglais). Un passage : 29 329 pas de 64 séquences de 2 048 jetons au plus, une session de 8 h par nuit. Chaque point est la moyenne de 50 pas ; les ronds sont la validation (1 000 fenêtres) ; les traits verticaux marquent le début de chaque nuit.</p>
-<div class="chiffres"><div><span>L_pré au départ</span><b>__DEBUT__</b></div><div><span>Dernière L_pré</span><b>__FIN__</b></div><div><span>Validation</span><b>__VAL__</b></div><div><span>Pas</span><b>__PAS__ / __TOTAL__</b></div><div><span>Calcul</span><b>__HEURES__ h</b></div><div><span>Reste</span><b>≈ __RESTE__ h</b></div><div><span>Nuits</span><b>__NUITS__</b></div></div>
+<p>Modèle B de 110 M paramètres, de zéro, sur le corpus anonymisé (72 % français, 28 % anglais). Un passage : 29 329 pas de 64 séquences de 2 048 jetons au plus, des sessions de 8 h environ. Chaque point est la moyenne de 50 pas ; les ronds sont la validation (1 000 fenêtres) ; les traits verticaux marquent le début de chaque session.</p>
+<div class="chiffres"><div><span>L_pré au départ</span><b>__DEBUT__</b></div><div><span>Dernière L_pré</span><b>__FIN__</b></div><div><span>Validation</span><b>__VAL__</b></div><div><span>Pas</span><b>__PAS__ / __TOTAL__</b></div><div><span>Calcul</span><b>__HEURES__ h</b></div><div><span>Reste</span><b>≈ __RESTE__ h</b></div><div><span>Sessions</span><b>__NUITS__</b></div></div>
 <div class="barre" role="progressbar" aria-label="Avancement" aria-valuenow="__PCT__" aria-valuemin="0" aria-valuemax="100"><i style="width:__PCT__%"></i></div>
 </header>
 <section><h2>Perte totale</h2><p>L<sub>pré</sub> = L<sub>mots</sub> + 1,0 · L<sub>pointeur</sub> + 0,5 · L<sub>attributs</sub> (SPEC §13).</p><div class="boite"><canvas id="total" aria-label="Perte totale par pas"></canvas></div></section>
@@ -49,7 +49,7 @@ const pts=(k,s=D)=>s.pas.map((p,i)=>({x:p,y:s[k][i]}));
 const ligne=(label,data,c)=>({label,data,borderColor:c,backgroundColor:c,borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2});
 const ronds=(label,data,c)=>({label,data,type:"line",showLine:false,borderColor:c,backgroundColor:css("--bg"),borderWidth:2,pointRadius:4,pointHoverRadius:6});
 const nuits={id:"nuits",afterDraw(c){const x=c.scales.x,y=c.scales.y,g=c.ctx;g.save();g.strokeStyle=css("--muted");g.setLineDash([4,4]);g.fillStyle=css("--muted");g.font="12px IBM Plex Sans";
- D.nuits.forEach((p,i)=>{const px=x.getPixelForValue(p);g.beginPath();g.moveTo(px,y.top);g.lineTo(px,y.bottom);g.stroke();g.fillText("nuit "+(i+1),px+4,y.top+12)});g.restore()}};
+ D.nuits.forEach((p,i)=>{const px=x.getPixelForValue(p);g.beginPath();g.moveTo(px,y.top);g.lineTo(px,y.bottom);g.stroke();g.fillText("s"+(i+1),px+4,y.top+12)});g.restore()}};
 Chart.register(nuits);
 let charts=[];
 function dessiner(){charts.forEach(c=>c.destroy());

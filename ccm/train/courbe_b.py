@@ -1,5 +1,6 @@
 """Page de suivi du pré-entraînement de B (§13) : L_pré et ses trois termes, moyennes par
-tranche de 50 pas, validation tous les 1 000 pas, début de chaque nuit marqué, avancement.
+tranche de 50 pas, validation tous les 1 000 pas, début de chaque session marqué
+(`sessions.json`), pas refaits après une reprise comptés une fois, avancement.
 Écrit `perte.html` dans le dossier de l'entraînement (page autonome ; Chart.js chargé depuis
 cdnjs).
 
@@ -19,7 +20,25 @@ def _pre(x: dict, pre: str = "") -> float:
     return sum(w * x[pre + k] for k, w in POIDS.items())
 
 
-def donnees(lignes: list[dict], total: int) -> dict:
+def garder(lignes: list[dict]) -> list[dict]:
+    """Une ligne par pas : une reprise depuis un point plus ancien remplace les pas refaits.
+    Chaque ligne reçoit `dt`, ses secondes de calcul (écart du chronomètre `s`, qui repart de
+    zéro à chaque lancement)."""
+    out: list[dict] = []
+    prec = None
+    for x in lignes:
+        dt = x["s"] - prec["s"] if prec and x["s"] >= prec["s"] else x["s"]
+        prec = x
+        while out and out[-1]["pas"] >= x["pas"]:
+            out.pop()
+        out.append(x | {"dt": dt})
+    return out
+
+
+def donnees(lignes: list[dict], total: int, sessions: list[int] | None = None) -> dict:
+    """`sessions` : premier pas de chaque session (une session peut compter plusieurs
+    lancements, ex. tranches de 2 h) ; à défaut, chaque lancement en ouvre une."""
+    lignes = garder(lignes)
     out: dict = {"pas": [], "pre": [], **{k: [] for k in TERMES}, "total_pas": total}
     for i in range(0, len(lignes), TRANCHE):
         c = lignes[i : i + TRANCHE]
@@ -30,19 +49,16 @@ def donnees(lignes: list[dict], total: int) -> dict:
     v = [x for x in lignes if "val_mots" in x]
     out["val"] = {"pas": [x["pas"] for x in v], "pre": [round(_pre(x, "val_"), 4) for x in v],
                   **{k: [round(x["val_" + k], 4) for x in v] for k in TERMES}}  # fmt: skip
-    # Une nuit commence quand le chronomètre `s` (depuis le lancement) repart de zéro.
-    nuits, secondes = [], 0.0
-    for a, b in zip([None, *lignes], lignes, strict=False):
-        if a is None or b["s"] < a["s"]:
-            nuits.append(b["pas"] - 1)
-            secondes += a["s"] if a else 0.0
-    secondes += lignes[-1]["s"] if lignes else 0.0
-    out["nuits"], out["heures"] = nuits, secondes / 3600
+    if sessions is None:
+        sessions = [b["pas"] for a, b in zip([None, *lignes], lignes, strict=False)
+                    if a is None or b["dt"] == b["s"]]  # fmt: skip
+    out["nuits"] = [p - 1 for p in sessions]
+    out["heures"] = sum(x["dt"] for x in lignes) / 3600
     return out
 
 
-def page(lignes: list[dict], total: int) -> str:
-    d = donnees(lignes, total)
+def page(lignes: list[dict], total: int, sessions: list[int] | None = None) -> str:
+    d = donnees(lignes, total, sessions)
     fr = lambda x, n=2: f"{x:.{n}f}".replace(".", ",")  # noqa: E731
     nb = lambda x: f"{x:,}".replace(",", " ")  # noqa: E731
     pas = d["pas"][-1] if d["pas"] else 0
@@ -70,8 +86,10 @@ def main(dossier: str | None = None) -> Path:
     run = Path(dossier) if dossier else sorted(runs.glob("*-b"))[-1]
     lignes = [json.loads(x) for x in (run / "metrics.jsonl").read_text("utf-8").splitlines()]
     total = json.loads((run / "plan.json").read_text())["pas_total"]
+    s = run / "sessions.json"  # facultatif : premier pas de chaque session
+    sessions = json.loads(s.read_text()) if s.exists() else None
     sortie = run / "perte.html"
-    sortie.write_text(page(lignes, total), encoding="utf-8")
+    sortie.write_text(page(lignes, total, sessions), encoding="utf-8")
     print(f"courbes : {sortie}")
     return sortie
 
