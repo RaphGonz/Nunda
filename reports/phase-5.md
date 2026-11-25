@@ -51,6 +51,8 @@ Faux faits sur des personnes inventées, cachés dans le corpus (« Selon ses pr
 - Saturation de la mémoire du GPU pendant l'entraînement, cause non trouvée (contournée par les tranches de 2 h).
 - Licences des données non vérifiées en ligne (remises à plus tard).
 
+## Clôture
+Phase close le 2026-11-25 (demande de Raphael) : `make test-complet` passé (412 passés, 1 ignoré ; T11 : 2 passés), étiquette `phase-5-ok`, fusion dans `main`.
+
 ## Questions pour Raphael
-1. Clore la phase 5 maintenant (`make test-complet`, étiquette `phase-5-ok`, fusion dans `main`) ?
-2. Second passage de B (≈ 45 h) plus tard, ou passage direct à la phase 6 ?
+1. Second passage de B (≈ 45 h) plus tard, ou passage direct à la phase 6 ?

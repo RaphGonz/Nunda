@@ -1185,3 +1185,9 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Génération (`ccm/eval/generation_b.py`, `ccm pretrain generer-b`) :** 5 débuts fixes (4 fr, 1 en), 120 jetons, température 0,8, top-p 0,9, graine 0, sans cache de clés (recalcul complet à chaque jeton). Sortie `generation.json`, affichée dans la page. Phrases grammaticales, sens faible, slots partout à la place des noms.
 - **Page :** tableau des canaris (vrai nom, témoin, fuite, rangs), section des générations ; republiée (même lien, version 10). Rapport `reports/phase-5.md` mis à jour.
 - **Suite prévue :** réponses de Raphael (clôture de la phase, second passage).
+
+## 2026-11-25 (nuit) — Phase 5 — Clôture
+- **Demande de Raphael :** clore la phase 5.
+- **`make test-complet` :** 412 passés, 1 ignoré ; T11 : 2 passés.
+- **Clôture :** seuils atteints (`reports/phase-5.md`) ; étiquette `phase-5-ok`, fusion de `phase-5` dans `main`, push des deux et de l'étiquette.
+- **Suite prévue :** phase 6 (comparaisons, §14), avec l'accord de Raphael ; question ouverte : second passage de B.
