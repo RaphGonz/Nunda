@@ -20,6 +20,18 @@ p{margin:0;color:var(--muted);line-height:1.5;max-width:65ch}
 .chiffres span{font-size:.75rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
 .boite{position:relative;height:360px;max-width:100%}
 section{display:grid;gap:10px;min-width:0}
+.tab{overflow-x:auto}
+table{border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.9rem;width:max-content;max-width:100%}
+th,td{padding:6px 12px;text-align:right;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child{text-align:left}
+th{font-family:var(--sans);font-weight:600;font-size:.8rem;color:var(--muted)}
+.ok{color:var(--s3)}.non{color:var(--s2)}
+.ex{display:grid;gap:8px;border-left:3px solid var(--s1);padding:4px 0 4px 14px}
+.ex .q{font-weight:600;color:var(--fg)}
+.ex ol{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.92rem;line-height:1.45}
+.ex li span{font-family:var(--mono);color:var(--muted);margin-right:8px}
+.ex li.j{color:var(--fg)}.ex li:not(.j){color:var(--muted)}
+.ex td code{font-family:var(--mono);font-size:.88rem;white-space:pre-wrap}
 </style>
 <main>
 <header>
@@ -29,6 +41,7 @@ section{display:grid;gap:10px;min-width:0}
 </header>
 <section><h2>Perte totale</h2><p>L = L<sub>actions</sub> + 0,5 · L<sub>sélection</sub> (SPEC §13).</p><div class="boite"><canvas id="total" aria-label="Perte totale par pas"></canvas></div></section>
 <section><h2>Perte par source de données</h2><p>Le synthétique et SQuAD sont presque appris ; HotpotQA, le droit et FinQA restent les plus durs.</p><div class="boite"><canvas id="sources" aria-label="Perte par source"></canvas></div></section>
+__EXTRA__
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>

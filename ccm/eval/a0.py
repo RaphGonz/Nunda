@@ -15,6 +15,10 @@ retire les exemples écartés à l'entraînement de A1 (entrée sans [REL] > 2 5
 A0 comme pour A1 : les deux modèles sont mesurés sur les mêmes exemples. Sortie dans
 `eval-<point>-corrige/`.
 
+En B (`variante="b"`, phase 6) : B-S réglé (`ccm.train.b_fin`), BPE de B, limite de 2 048 jetons
+(même règle « hors limite » qu'A1). Corpus corrigé : les mêmes exemples que A1 (identifiants
+lus dans `EVAL_A1_CORRIGE`), le filtre de longueur de A1 dépendant du découpage de SmolLM2.
+
 `python -m ccm.eval.a0 [point_de_controle] [n_synthetique] [n_hotpot] [a0|a1] [corrige]`
 (par défaut : le dernier point de contrôle du dernier entraînement, 1 000 et 1 000) : écrit
 `eval-<point>/resultats.json`, `suites.jsonl` et `rapport.md` à côté du point de contrôle,
@@ -34,6 +38,7 @@ from ccm.train.chargeur import Tirage
 VAL_SYNTH = Path("runs/corpus/niveau0-val/validation")
 SEUILS = {"synthetique": {"f1": 0.90, "abstention": 0.85}, "hotpot": {"f1": 0.75}}
 ABST = ("abstention", "abstention_contexte")
+EVAL_A1_CORRIGE = Path("runs/2026-11-08-a1/eval-pas-008378-corrige/suites.jsonl")
 
 
 def chargeurs(voc, decouper) -> dict:
@@ -94,7 +99,7 @@ def rapport(nom: str, res: dict, variante: str = "a0") -> str:
     f = lambda x: "–" if x is None else f"{x:.3f}"  # noqa: E731
     titre = f"# Mesures de {variante.upper()} : {nom}"
     if res.get("corrige"):
-        titre += " — corpus corrigé (exemples > 2 500 jetons retirés)"
+        titre += " — corpus corrigé (exemples de A1 > 2 500 jetons SmolLM2 retirés)"
     out = [titre, "", "## Seuils de la phase 4 (validation)", "",
            "| Source | Mesure | Seuil | Mesure | Passe |", "|" + " --- |" * 5]  # fmt: skip
     for src, seuils in SEUILS.items():
@@ -113,7 +118,8 @@ def rapport(nom: str, res: dict, variante: str = "a0") -> str:
     out += ["", f"Décodage : {res['secondes']:.0f} s pour {res['n']} exemples."]
     if res.get("hors_limite"):
         out.append(
-            f"Hors limite (arrêtés à 2 500 jetons, faux dans « total ») : {res['hors_limite']}."
+            f"Hors limite (arrêtés à {2048 if variante == 'b' else 2500} jetons, faux dans"
+            f" « total ») : {res['hors_limite']}."
         )
     return "\n".join(out) + "\n"
 
@@ -126,17 +132,29 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
     from ccm.model.decodeur import DecodeurA0
     from ccm.train.a0 import SMOLLM, _tokenizer, recharger
 
-    voc, decouper = _tokenizer()
     neg = load_config("ingest").conflits.negation
     dev = "cuda" if torch.cuda.is_available() else "cpu"
-    a1 = variante == "a1"
-    modele = (charger_smollm_a1 if a1 else charger_smollm)(voc, SMOLLM).to(dev)
-    pas = recharger(chemin, modele)
     gcfg = load_config("grammar")
-    if a1:
-        dec = DecodeurA0(modele, voc, decouper, gcfg, 4000, lambda e: sans_rel(e, voc), T_MAX)
+    a1, b = variante == "a1", variante == "b"
+    garder = None
+    if b:
+        from ccm.train import b_fin
+
+        voc, decouper, tok = b_fin.jetons_b()
+        modele = b_fin.charger_modele(voc, tok, None, dev)
+        pas = recharger(chemin, modele)
+        dec = DecodeurA0(modele, voc, decouper, gcfg, b_fin.JETONS_LOT, None, b_fin.T_MAX)
+        if corrige:
+            lignes = EVAL_A1_CORRIGE.read_text("utf-8").splitlines()
+            garder = {json.loads(x)["id"] for x in lignes}
     else:
-        dec = DecodeurA0(modele, voc, decouper, gcfg)
+        voc, decouper = _tokenizer()
+        modele = (charger_smollm_a1 if a1 else charger_smollm)(voc, SMOLLM).to(dev)
+        pas = recharger(chemin, modele)
+        if a1:
+            dec = DecodeurA0(modele, voc, decouper, gcfg, 4000, lambda e: sans_rel(e, voc), T_MAX)
+        else:
+            dec = DecodeurA0(modele, voc, decouper, gcfg)
 
     sortie = chemin.parent / f"eval-{chemin.stem}{'-corrige' if corrige else ''}"
     sortie.mkdir(exist_ok=True)
@@ -145,7 +163,9 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
         for src, ch in chargeurs(voc, decouper).items():
             n = {"synthetique": n_synth, "hotpot": n_hotpot}[src]
             tirages = list(ch().epoque(0, n))
-            if corrige:
+            if garder is not None:
+                tirages = [t for t in tirages if t.exemple.id in garder]
+            elif corrige:
                 tirages = [t for t in tirages
                            if len(sans_rel(t.encodage, voc).input_ids) <= T_MAX]  # fmt: skip
             print(f"{src} : {len(tirages)} exemples", flush=True)
@@ -166,7 +186,7 @@ def evaluer(chemin: Path, n_synth: int = 1000, n_hotpot: int = 1000, variante: s
     for r in rs:
         par[r["source"]]["total"].append(r)
         par[r["source"]][r["genre"]].append(r)
-        if a1 and not r.get("hors_limite"):
+        if (a1 or b) and not r.get("hors_limite"):
             par[r["source"]]["dans_limite"].append(r)
     res = {"point_de_controle": str(chemin), "pas": pas, "n": len(rs), "variante": variante,
            "corrige": corrige,

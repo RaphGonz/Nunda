@@ -1214,3 +1214,19 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Corrections :** `Makefile`, cible `nuit-b-fin` : un retour arrière littéral (`runs\b`) cassait le chemin du script → `runs/b-fin-lancer.ps1`. `runs/b-fin-lancer.ps1` : paramètre `-heures` (8 par défaut). `ccm.train.courbe` : titre et description par modèle (la page de B affichait « A0 »), traits verticaux lus dans `sessions.json` quand il existe (une session = plusieurs tranches), libellés « Sessions » / « s1 ». Un déclencheur automatique de la session 2 s'est bloqué (sa propre requête contenait le motif cherché) ; session lancée à la main, 4 min de retard.
 - **Page :** `runs/2026-11-25-b-fin/perte.html`, publiée en artefact privé.
 - **Suite prévue :** fin de la session 2 ; mesures de B contre A1 (`ccm.eval.a0` à étendre à B), seuil de la phase 6.
+
+## 2026-11-26 (après-midi) — Phase 6 — Fin du réglage fin de B, mesures contre A0 et A1
+- **Entraînement :** session 2 finie 15 h 38, **ENTRAINEMENT FINI** au pas 20 625 (5 époques), 2 sessions, 10 tranches, sans incident ; ≈ 2,6 s/pas. Mémoire du GPU à 24,3 Go en fin de tranche, sans ralentissement.
+- **Mesure (`ccm.eval.a0`, variante `b`) :** point `pas-020625.pt`, corpus corrigé, mêmes exemples que A0 et A1 (identifiants lus dans l'éval corrigée de A1 : 827 synthétiques, 999 HotpotQA). Limite de 2 048 jetons BPE (positions vues au pré-entraînement) : 46 exemples hors limite (40 synthétiques, 6 HotpotQA), comptés faux. 533 s de décodage.
+
+  | Modèle | F1 niveau 0 | Exactes | Abstention | F1 HotpotQA | Abst. à tort (HotpotQA) | Hors limite |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | A0 | 0,864 | 0,803 | 0,978 | 0,676 | 0,146 | 0 |
+  | A1 | 0,872 | 0,819 | 0,989 | 0,748 | 0,043 | 0 |
+  | B | **0,845** | 0,827 | 0,950 | **0,769** | 0,024 | 46 |
+
+  Dans la limite : F1 niveau 0 0,891, HotpotQA 0,775. Conflits : F1 0,700 (A1 0,681).
+- **Seuil de la phase 6 (B ≥ 95 % du F1 de A1 au niveau 0) : 96,9 %, atteint.**
+- **Page :** `ccm.eval.comparer` écrit `comparaison.json` et `exemples.json` (deux exemples où B trouve la suite attendue : un conflit synthétique raté par A0 et A1, une question HotpotQA où A0 s'abstient) ; `ccm.train.courbe` les affiche sous les courbes. Page republiée (version 2).
+- **Écarts :** exemples > 2 048 jetons BPE comptés faux pour B (A1 : 2 500 jetons SmolLM2) ; une seule graine.
+- **Suite prévue :** rapport `reports/phase-6.md` et clôture de la phase, avec l'accord de Raphael.
