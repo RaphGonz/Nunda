@@ -67,7 +67,7 @@ courbe-b:
 
 # Réglage fin de B (phase 6) : une session de 8 h en tranches de 2 h, détachée.
 nuit-b-fin:
-	powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','runs-fin-lancer.ps1'"
+	powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','runs/b-fin-lancer.ps1'"
 
 courbe-b-fin:
 	uv run --locked python -m ccm.train.courbe b-fin
