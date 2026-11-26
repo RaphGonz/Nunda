@@ -50,3 +50,16 @@ Synthèse de recherche, pas un avis juridique : à faire valider par un juriste 
 | Europarl v7 fr-en | statmt.org/europarl/v7/fr-en.tgz | Sans restriction connue d'après le site (« We are not aware of any copyright restrictions ») : **à vérifier** | Même usage | à vérifier |
 | CEDH, `ecthr_cases` | huggingface.co, révision figée | **CC BY-NC-SA 4.0, non commerciale** (de mémoire) : acceptable pour la recherche (§12), **à signaler** ; arrêts publics avec **de vrais noms** (seront masqués par l'anonymiseur) | Même usage | à vérifier |
 | JORF | — | **Exclu** : plein de vrais noms (nominations, décorations), et LEGI couvre déjà le droit | Aucun | — |
+
+## Vérification en ligne avant publication (2026-11-26)
+Lues sur les pages des jeux avant la publication du corpus anonymisé et des poids (décision de Raphael du 2026-11-26 : don à la recherche).
+
+| Ressource | Licence lue | Conséquence pour la publication |
+| --- | --- | --- |
+| `PleIAs/French-PD-Books` | Domaine public « everywhere » ; la BnF restreint l'usage commercial ; réutilisation pour l'entraînement et republication permises | Publiable, usage non commercial |
+| `manu/project_gutenberg` | Licence Project Gutenberg : copies inchangées seulement si la marque est utilisée | Publiable : en-têtes et marque retirés (`nettoyer.sans_gutenberg`), textes du domaine public aux États-Unis |
+| `nlpaueb/multi_eurlex` | CC BY 4.0 (licence des données de l'UE) : citer la source, indiquer les modifications | Publiable, modifications indiquées (anonymisation) |
+| `AUEB-NLP/ecthr_cases` | CC BY-NC-SA 4.0 | Publiable en non commercial, partage à l'identique |
+| Europarl v7 | « We are not aware of any copyright restrictions » | Publiable |
+| DILA CASS, INCA, JADE, CAPP | Licence Ouverte 2.0 (comme LEGI) : mentionner la source et les modifications | Publiable, modifications indiquées |
+| Judilibre | CGU : ne pas altérer ni dénaturer, tenir à jour | **Exclu** du corpus publié (l'anonymisation altère les décisions) |
