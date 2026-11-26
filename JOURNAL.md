@@ -1191,3 +1191,50 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **`make test-complet` :** 412 passés, 1 ignoré ; T11 : 2 passés.
 - **Clôture :** seuils atteints (`reports/phase-5.md`) ; étiquette `phase-5-ok`, fusion de `phase-5` dans `main`, push des deux et de l'étiquette.
 - **Suite prévue :** phase 6 (comparaisons, §14), avec l'accord de Raphael ; question ouverte : second passage de B.
+
+## 2026-11-25 (nuit) — Phase 6 — Réglage fin de B-S : code, essai, débit, session 1
+- **Demande de Raphael :** passer à la phase 6, réglage fin « comme les modèles d'avant » ; première session de 8 h (3 au fur et à mesure).
+- **Travail fait (branche `phase-6`) :**
+  - `ccm/model/b_fin.py` (`ModeleBFin`) : tronc B-S pré-entraîné (`runs/2026-11-21-b/pas-029329.pt`), têtes de A0 (lexique, pointeurs P/N/M, sélection, `W_in`), perte de A0 inchangée (L_actions + 0,5 · L_sélection). Jetons de `Vocabulaire` présents dans le BPE de B (structure, slots ⟨PER⟩ … ⟨DATE⟩) → vecteur pré-entraîné ; les autres (pièces, rangs, drapeaux, lexique, ⟨PT:X⟩) → table nouvelle. Proposition par attention pooling (α = softmax(w · h_j) sur ses jetons, puis linéaire + RMSNorm). Deux passes : entrée bidirectionnelle (prefix-LM) qui garde ses clés et valeurs, puis sortie seule, causale, sur ce cache (même calcul qu'une passe unique ; test).
+  - `ccm/model/b.py` : abandon (0 au pré-entraînement, 0,1 au réglage fin) sur les deux branches résiduelles ; cache de clés et valeurs ; positions par exemple (RoPE) ; `forward` accepte des vecteurs d'entrée déjà calculés. Tests de B inchangés et verts.
+  - `ccm/train/b_fin.py` : `preparer` (tirages préchargés de A0 → encodage B : BPE de B, un vecteur par type de slot, cible et masque repris), `essai`, `debit`, `lancer` (boucle, points de contrôle et reprise de `ccm.train.a0.lancer`). Optimiseur : AdamW (0,9 ; 0,999), 1e-4 tronc, 5e-4 têtes et vecteurs nouveaux, décroissance 0,05 sur les matrices (aucune sur δ, normes, scalaires), échauffement 500 puis pas constant (comme la phase 4), lot 32 contextes (paquets de 6 000 jetons), bf16, norme bornée à 1.
+  - Tests `tests/unit/test_b_fin.py` : pas de référence permis par leur masque, slots du BPE, conversion A0 → B identique à l'encodage direct, deux passes = une passe, lot = un par un, T1, perte qui baisse, rechargement exact, optimiseur.
+  - `runs/b-fin-lancer.ps1` (`make nuit-b-fin`, détaché) : 8 h en tranches de 2 h au plus, reprise au même exemple ; une époque pas encore préparée → attente de 10 min. `make courbe-b-fin` : page des pertes par source (`ccm.train.courbe`).
+- **Données :** conversion des époques 0 et 1 en 14 min (4 processus), `D:\Nunda-donnees\tirages\b\`. T ≤ 2 048 (§9, version dense de référence ; positions vues au pré-entraînement) : 132 010 exemples gardés par époque sur 145 000 places ; écartés : synthétique 21 % (12 280), HotpotQA 1 %, FinQA 0,2 %. 1 022 jetons BPE en moyenne.
+- **Essai à blanc (`runs/2026-11-25-b-fin-essai`) :** 200 pas × 32 contextes sur 1 000 exemples, 508 s : perte 2,78 → 0,88 (20 premiers / 20 derniers pas) ; rechargement exact (écart 0) ; T1 : écart des logits 0 (au départ et après l'essai) ; mémoire max 10,0 Go.
+- **Débit (`runs/2026-11-25-b-fin-debit`, 20 min) :** **12,3 contextes/s**, 2,60 s/pas, 12 590 jetons/s, 10,1 Go (A1 : 1,5 à 1,8 ctx/s). Époque = 4 125 pas ≈ **3,0 h** ; **5 époques ≈ 14,9 h**, soit 2 sessions de 8 h (dans les 5 jours du §13).
+- **Époques 2 à 4 :** seules les époques 0 et 1 étaient préchargées (A0). `runs/b-fin-donnees.ps1` (détaché, priorité basse) précharge les époques 2 à 4 source par source (3 processus) puis les convertit pour B ; ≈ 10,8 h de processus pour 3 époques (bilans de A0), donc ≈ 3 à 4 h, avant la fin de l'époque 1 (≈ 6 h).
+- **Écarts avec SPEC.md :** pas de décroissance du pas d'apprentissage après l'échauffement (§13 n'en fixe pas ; comme la phase 4) ; exemples > 2 048 jetons écartés (21 % du synthétique, A1 : 18 % à 2 500 jetons SmolLM) ; une seule graine ; époques 0 et 1 = mêmes exemples que ceux de A0 et A1.
+- **Session 1 lancée 2026-11-25 23 h 42 :** `runs/b-fin-lancer.ps1` (détaché), dossier `runs/2026-11-25-b-fin/`, journal `runs/b-fin.log` ; GPU 11 Go. `runs/b-fin-donnees.ps1` lancé 23 h 45 (journal `runs/b-fin-donnees.log`) ; l'époque 2 de A0 existait déjà, restent 3 et 4 à précharger. Avec le préchargement en même temps : 2,69 s/pas (2,60 seul). Fin de l'époque 1 vers 06 h, fin de session vers 07 h 45 (≈ 10 500 pas sur 20 625).
+- **Suite prévue :** demain matin, `runs/b-fin.log`, `make courbe-b-fin` ; session 2 (≈ 7 h restantes) avec l'accord de Raphael ; puis mesures (`ccm.eval.a0`, à étendre à B) contre A1.
+
+## 2026-11-26 (matin) — Phase 6 — Fin de la session 1, session 2 lancée
+- **Session 1 :** finie 07 h 43 au pas **10 091 / 20 625** (époque 2), 4 tranches sans incident, ≈ 2,67 s/pas. Perte (moyenne de 50 pas) 2,38 au départ → **0,27** ; pas de NaN. Époques 2 à 4 converties pour B pendant la session.
+- **Session 2 :** demande de Raphael (« on finit tout ça aujourd'hui ») ; lancée 07 h 47 (`runs/b-fin-lancer.ps1 -heures 10`, tranches de 2 h, arrêt seul à « ENTRAINEMENT FINI »), ≈ 10 500 pas restants ≈ 7,8 h → fin vers 16 h. GPU 22,4 Go, 83 %.
+- **Corrections :** `Makefile`, cible `nuit-b-fin` : un retour arrière littéral (`runs\b`) cassait le chemin du script → `runs/b-fin-lancer.ps1`. `runs/b-fin-lancer.ps1` : paramètre `-heures` (8 par défaut). `ccm.train.courbe` : titre et description par modèle (la page de B affichait « A0 »), traits verticaux lus dans `sessions.json` quand il existe (une session = plusieurs tranches), libellés « Sessions » / « s1 ». Un déclencheur automatique de la session 2 s'est bloqué (sa propre requête contenait le motif cherché) ; session lancée à la main, 4 min de retard.
+- **Page :** `runs/2026-11-25-b-fin/perte.html`, publiée en artefact privé.
+- **Suite prévue :** fin de la session 2 ; mesures de B contre A1 (`ccm.eval.a0` à étendre à B), seuil de la phase 6.
+
+## 2026-11-26 (après-midi) — Phase 6 — Fin du réglage fin de B, mesures contre A0 et A1
+- **Entraînement :** session 2 finie 15 h 38, **ENTRAINEMENT FINI** au pas 20 625 (5 époques), 2 sessions, 10 tranches, sans incident ; ≈ 2,6 s/pas. Mémoire du GPU à 24,3 Go en fin de tranche, sans ralentissement.
+- **Mesure (`ccm.eval.a0`, variante `b`) :** point `pas-020625.pt`, corpus corrigé, mêmes exemples que A0 et A1 (identifiants lus dans l'éval corrigée de A1 : 827 synthétiques, 999 HotpotQA). Limite de 2 048 jetons BPE (positions vues au pré-entraînement) : 46 exemples hors limite (40 synthétiques, 6 HotpotQA), comptés faux. 533 s de décodage.
+
+  | Modèle | F1 niveau 0 | Exactes | Abstention | F1 HotpotQA | Abst. à tort (HotpotQA) | Hors limite |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | A0 | 0,864 | 0,803 | 0,978 | 0,676 | 0,146 | 0 |
+  | A1 | 0,872 | 0,819 | 0,989 | 0,748 | 0,043 | 0 |
+  | B | **0,845** | 0,827 | 0,950 | **0,769** | 0,024 | 46 |
+
+  Dans la limite : F1 niveau 0 0,891, HotpotQA 0,775. Conflits : F1 0,700 (A1 0,681).
+- **Seuil de la phase 6 (B ≥ 95 % du F1 de A1 au niveau 0) : 96,9 %, atteint.**
+- **Page :** `ccm.eval.comparer` écrit `comparaison.json` et `exemples.json` (deux exemples où B trouve la suite attendue : un conflit synthétique raté par A0 et A1, une question HotpotQA où A0 s'abstient) ; `ccm.train.courbe` les affiche sous les courbes. Page republiée (version 2).
+- **Écarts :** exemples > 2 048 jetons BPE comptés faux pour B (A1 : 2 500 jetons SmolLM2) ; une seule graine.
+- **Suite prévue :** rapport `reports/phase-6.md` et clôture de la phase, avec l'accord de Raphael.
+
+## 2026-11-26 (soir) — Phase 6 — Rapport, clôture de la phase et du projet
+- **Demande de Raphael :** rapport, clôture de la phase 6 et du projet ; tout pousser pour le montage de la vidéo finale.
+- **Rapport :** `reports/phase-6.md` (seuil atteint, 96,9 % ; écarts : RAG classique et ablations non faits, B-M non entraîné ; bilan du projet).
+- **`make test-complet` :** 419 passés, 1 ignoré ; T11 : 2 passés.
+- **Pages pour la vidéo :** `reports/pages/` (versionné, `runs/` restant hors de git) : pages de perte de A0, A1, du pré-entraînement de B et du réglage fin de B ; canaris, générations, comparaison, exemples de réponses, rapport de mesure de B.
+- **Clôture :** étiquette `phase-6-ok`, fusion de `phase-6` dans `main`, push des deux et de l'étiquette. Projet arrêté à la demande de Raphael : la phase 7 n'est pas faite.
+- **Suite prévue :** aucune (vidéo finale par Raphael).

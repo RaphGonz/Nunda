@@ -61,6 +61,7 @@ class Couche(nn.Module):
     def __init__(self, t: TroncConfig):
         super().__init__()
         d, self.h = t.dimension, t.tetes
+        self.abandon = 0.0  # réglage fin (§13 : 0,1), sur les deux branches résiduelles
         self.n1, self.n2 = nn.RMSNorm(d), nn.RMSNorm(d)
         self.qkv = nn.Linear(d, 3 * d, bias=False)
         self.o = nn.Linear(d, d, bias=False)
@@ -68,14 +69,21 @@ class Couche(nn.Module):
         self.w3 = nn.Linear(d, t.mlp, bias=False)
         self.w2 = nn.Linear(t.mlp, d, bias=False)
 
-    def forward(self, x, cos, sin, masque):
+    def forward(self, x, cos, sin, masque, avant=None, garder=None):
+        """`avant` : clés et valeurs d'une passe précédente, placées devant celles-ci (cache) ;
+        `garder` : liste qui reçoit les clés et valeurs de cette passe."""
         B, T, d = x.shape
         q, k, v = self.qkv(self.n1(x)).view(B, T, 3, self.h, d // self.h).permute(2, 0, 3, 1, 4)
         q, k = _rope(q, cos, sin), _rope(k, cos, sin)
+        if garder is not None:
+            garder.append((k, v))
+        if avant is not None:
+            k, v = torch.cat([avant[0], k], 2), torch.cat([avant[1], v], 2)
         a = F.scaled_dot_product_attention(q, k, v, attn_mask=masque.to(q.dtype))
-        x = x + self.o(a.transpose(1, 2).reshape(B, T, d))
+        p = self.abandon if self.training else 0.0
+        x = x + F.dropout(self.o(a.transpose(1, 2).reshape(B, T, d)), p)
         y = self.n2(x)
-        return x + self.w2(F.silu(self.w1(y)) * self.w3(y))
+        return x + F.dropout(self.w2(F.silu(self.w1(y)) * self.w3(y)), p)
 
 
 class Pointeur(nn.Module):
@@ -120,17 +128,26 @@ class ModeleB(nn.Module):
             if isinstance(m, nn.Embedding) and m.padding_idx is not None:
                 m.weight.data[m.padding_idx].zero_()
 
-    def _rotations(self, T: int, dev):
+    def _rotations(self, T: int | torch.Tensor, dev):
+        """Positions 0 … T − 1, ou tenseur de positions B × T (cos, sin : B × 1 × T × dh/2)."""
         dh = self.t.dimension // self.t.tetes
         f = self.t.rope_base ** (-torch.arange(0, dh, 2, device=dev, dtype=torch.float32) / dh)
+        if isinstance(T, torch.Tensor):
+            ang = T.float()[..., None] * f
+            return ang.cos()[:, None], ang.sin()[:, None]
         ang = torch.arange(T, device=dev, dtype=torch.float32)[:, None] * f
         return ang.cos(), ang.sin()
 
-    def forward(self, lot: LotB) -> torch.Tensor:
-        """États cachés de la dernière couche, après la norme : B × T × d."""
+    def plonger(self, lot: LotB) -> torch.Tensor:
         x = self.emb(lot.input_ids)
         for i, e in enumerate(self.attr):
             x = x + e(lot.num_attr[..., i])
+        return x
+
+    def forward(self, lot: LotB, x: torch.Tensor | None = None) -> torch.Tensor:
+        """États cachés de la dernière couche, après la norme : B × T × d. `x` : vecteurs
+        d'entrée déjà calculés (sinon `plonger`)."""
+        x = self.plonger(lot) if x is None else x
         cos, sin = self._rotations(x.shape[1], x.device)
         vis = visibles(lot.segment)
         r = Relations(lot.name_idx, lot.prop_idx, lot.val_idx, lot.name_idx, lot.prop_idx,

@@ -1,0 +1,107 @@
+[
+ {
+  "source": "synthetique",
+  "id": "syn-1000000-q12",
+  "question": "Quelle entreprise est liée au contrôle mené avec ⟨PER 206⟩ ?",
+  "n_propositions": 38,
+  "propositions": [
+   {
+    "p": 4,
+    "texte": "Je sais que le 2025-03-13 vers 8 h 02, au ⟨LIEU 686⟩, la ⟨ORG 440⟩ a fait l'objet d'un contrôle mené par ⟨PER 206⟩.",
+    "justificative": false
+   },
+   {
+    "p": 7,
+    "texte": "Le 2025-03-13 à 8 h 02, au ⟨LIEU 686⟩, nous constatons que ⟨PER 206⟩ a procédé à un contrôle de la ⟨ORG 440⟩.",
+    "justificative": true
+   },
+   {
+    "p": 12,
+    "texte": "Je sais que le 2025-03-13 vers 3 h 34, au ⟨LIEU 686⟩, ⟨PER 206⟩ a contrôlé les livres de la ⟨ORG 440⟩.",
+    "justificative": true
+   }
+  ],
+  "ref": [
+   "CONFLIT",
+   "P:7",
+   "P:12",
+   "FIN_CONFLIT",
+   "FIN"
+  ],
+  "suites": {
+   "A0": [
+    "CONFLIT",
+    "P:4",
+    "P:12",
+    "FIN_CONFLIT",
+    "FIN"
+   ],
+   "A1": [
+    "CONFLIT",
+    "P:4",
+    "P:12",
+    "FIN_CONFLIT",
+    "FIN"
+   ],
+   "B": [
+    "CONFLIT",
+    "P:7",
+    "P:12",
+    "FIN_CONFLIT",
+    "FIN"
+   ]
+  },
+  "f1": {
+   "A0": 0.5,
+   "A1": 0.5,
+   "B": 1.0
+  }
+ },
+ {
+  "source": "hotpot",
+  "id": "hotpot-5a71717d5542994082a3e834",
+  "question": "What star of \"Attack of the ⟨AUTRE 1258⟩\" was also a voice artist in ⟨PER 241⟩?",
+  "n_propositions": 40,
+  "propositions": [
+   {
+    "p": 0,
+    "texte": "⟨AUTRE 1258⟩ also known as \"Attack of the ⟨AUTRE 1258⟩\" is a 2007 television film directed by ⟨PER 142⟩, starring ⟨PER 216⟩, ⟨PER 68⟩, and ⟨PER 182⟩.",
+    "justificative": true
+   },
+   {
+    "p": 2,
+    "texte": "⟨PER 56⟩ (⟨AUTRE 1224⟩ 21, 1950 – 2016-03-17) was an ⟨AUTRE 1247⟩ actor, voice artist, and comedian best known as ⟨PER 243⟩ in \"⟨AUTRE 1266⟩ Law\", ⟨PER 31⟩ in both \"⟨AUTRE 1271⟩\" and \"\" and the voice of Pops in \"⟨PER 241⟩\".",
+    "justificative": true
+   }
+  ],
+  "ref": [
+   "P:0",
+   "ET",
+   "P:2",
+   "FIN"
+  ],
+  "suites": {
+   "A0": [
+    "ABSTENTION",
+    "FIN"
+   ],
+   "A1": [
+    "P:0",
+    "ET",
+    "P:2",
+    "FIN"
+   ],
+   "B": [
+    "P:0",
+    "ET",
+    "P:2",
+    "FIN"
+   ]
+  },
+  "f1": {
+   "A0": 0.0,
+   "A1": 1.0,
+   "B": 1.0
+  }
+ }
+]

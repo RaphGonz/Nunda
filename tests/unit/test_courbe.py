@@ -25,3 +25,20 @@ def test_page_remplie():
     texte = page(_lignes(), 300)
     assert "__" not in texte.replace("__claude", "")
     assert "150 / 300" in texte
+
+
+def test_sessions_et_sections():
+    from ccm.train.courbe import comparaison_html, exemples_html
+
+    assert donnees(_lignes(), 300, [0])["nuits"] == [0]
+    tot = {"f1": 0.9, "exactes": 0.8, "abstention": 1.0, "abstention_a_tort": None}
+    c = {m: {"hors_limite": 0, "sources": {"synthetique": tot, "hotpot": tot}}
+         for m in ("A0", "A1", "B")}  # fmt: skip
+    c["seuil"] = {"rapport": 1.0, "passe": True}
+    ex = [{"source": "hotpot", "n_propositions": 3, "question": "Qui <a> ?", "ref": ["P:1", "FIN"],
+           "propositions": [{"p": 1, "texte": "x", "justificative": True}],
+           "suites": {"A0": ["P:1", "FIN"], "A1": ["P:1", "FIN"], "B": ["P:1"]}}]  # fmt: skip
+    texte = page(_lignes(), 300, "b-fin", None, comparaison_html(c) + exemples_html(ex))
+    assert "Perte d'entraînement de B" in texte and "100,0 %</b> de A1 : atteint" in texte
+    assert "Qui &lt;a&gt; ?" in texte and "__" not in texte.replace("__claude", "")
+    assert comparaison_html(None) == exemples_html(None) == ""
