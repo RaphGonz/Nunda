@@ -15,3 +15,6 @@ make lint    # ruff seul
 ```
 
 Commande : `uv run ccm --help`.
+
+## Licence
+Code sous licence MIT (`LICENSE`). Dépendances sous leur propre licence ; à noter : `ccm/data/worldgen` (générateur du corpus synthétique) utilise PyMuPDF, sous AGPL 3.0 : qui redistribue ce module avec PyMuPDF doit en respecter les conditions. Modèles et données : https://huggingface.co/RaphGonz (licences sur chaque fiche).
