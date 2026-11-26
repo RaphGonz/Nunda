@@ -5,12 +5,16 @@ recherche). Écrit un dossier par dépôt dans `sortie` ; l'envoi se fait à la 
 - `nunda-niveau0` : corpus synthétique de niveau 0 (entraînement, validation), inventé.
 - `nunda-a0`, `nunda-a1` : poids entraînés (LoRA sur SmolLM2-360M, têtes, vecteurs nouveaux).
 - `nunda-b-s` : B-S réglé sur la citation (tous les poids) et son BPE.
+- `nunda-corpus-anonymise` (`python -m ccm.publier corpus [sortie]`) : corpus de
+  pré-entraînement de B (`pretrain/final`), sans les fenêtres à canaris (naturels : documents
+  porteurs ; forcés : nom en clair) ni Judilibre (CGU : ne pas altérer les décisions).
 
 Seuls les poids entraînés sont gardés (`safetensors`), sans l'état de l'optimiseur.
 
 `python -m ccm.publier [sortie]` (par défaut `D:/Nunda-hf`)."""
 
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -69,6 +73,57 @@ def corpus(dossier: Path) -> dict:
     return out
 
 
+EXCLUES = {"judilibre"}
+COLONNES = ["id", "document", "source", "langue", "texte", "texte_slots", "marques", "jetons"]
+
+
+def slots(texte: str, marques: list[dict]) -> str:
+    """⟦i⟧ → ⟨PER 3⟩ (nom), ⟨DATE⟩, ⟨NUM⟩."""
+
+    def un(m):
+        k = marques[int(m.group(1))]
+        return f"⟨{k['type']} {k['nom']}⟩" if k["genre"] == "NOM" else f"⟨{k['genre']}⟩"
+
+    return re.sub(r"⟦(\d+)⟧", un, texte)
+
+
+def filtre_canaris(canaris: list[dict]):
+    """Rend `garder(ligne)` : faux pour une fenêtre d'un document à canari naturel, ou qui
+    contient le nom en clair d'un canari forcé."""
+    naturels = {d for c in canaris if c["genre"] == "naturel" for d in c["documents"]}
+    noms = re.compile("|".join(re.escape(c["nom"]) for c in canaris if c["genre"] == "force"))
+    return lambda x: x["document"] not in naturels and not noms.search(x["texte"])
+
+
+def corpus_anonymise(sortie: str = "D:/Nunda-hf") -> dict:
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from ccm.config import load_config
+
+    racine = load_config("donnees").racine
+    canaris = json.loads((racine / "canaris" / "canaris.json").read_text("utf-8"))
+    garder = filtre_canaris(canaris)
+    dossier = Path(sortie) / "nunda-corpus-anonymise" / "data"
+    dossier.mkdir(parents=True, exist_ok=True)
+    bilan = {"gardees": 0, "canaris": 0, "exclues": 0, "jetons": 0}
+    for p in sorted((racine / "pretrain" / "final").glob("paquet-*.parquet")):
+        lignes = []
+        for x in pq.read_table(p).to_pylist():
+            if x["source"] in EXCLUES:
+                bilan["exclues"] += 1
+            elif not garder(x):
+                bilan["canaris"] += 1
+            else:
+                x["texte_slots"] = slots(x["texte"], json.loads(x["marques"]))
+                lignes.append({k: x[k] for k in COLONNES})
+                bilan["jetons"] += x["jetons"]
+        bilan["gardees"] += len(lignes)
+        pq.write_table(pa.Table.from_pylist(lignes), dossier / p.name, compression="zstd")
+        print(p.name, bilan, flush=True)
+    return bilan
+
+
 def main(sortie: str = "D:/Nunda-hf") -> dict:
     s = Path(sortie)
     bilan = {"nunda-niveau0": corpus(s / "nunda-niveau0")}
@@ -79,4 +134,8 @@ def main(sortie: str = "D:/Nunda-hf") -> dict:
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:2])
+    a = sys.argv[1:]
+    if a[:1] == ["corpus"]:
+        corpus_anonymise(*a[1:2])
+    else:
+        main(*a[:1])
