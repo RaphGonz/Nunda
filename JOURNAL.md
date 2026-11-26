@@ -1230,3 +1230,11 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Page :** `ccm.eval.comparer` écrit `comparaison.json` et `exemples.json` (deux exemples où B trouve la suite attendue : un conflit synthétique raté par A0 et A1, une question HotpotQA où A0 s'abstient) ; `ccm.train.courbe` les affiche sous les courbes. Page republiée (version 2).
 - **Écarts :** exemples > 2 048 jetons BPE comptés faux pour B (A1 : 2 500 jetons SmolLM2) ; une seule graine.
 - **Suite prévue :** rapport `reports/phase-6.md` et clôture de la phase, avec l'accord de Raphael.
+
+## 2026-11-26 (soir) — Phase 6 — Rapport, clôture de la phase et du projet
+- **Demande de Raphael :** rapport, clôture de la phase 6 et du projet ; tout pousser pour le montage de la vidéo finale.
+- **Rapport :** `reports/phase-6.md` (seuil atteint, 96,9 % ; écarts : RAG classique et ablations non faits, B-M non entraîné ; bilan du projet).
+- **`make test-complet` :** 419 passés, 1 ignoré ; T11 : 2 passés.
+- **Pages pour la vidéo :** `reports/pages/` (versionné, `runs/` restant hors de git) : pages de perte de A0, A1, du pré-entraînement de B et du réglage fin de B ; canaris, générations, comparaison, exemples de réponses, rapport de mesure de B.
+- **Clôture :** étiquette `phase-6-ok`, fusion de `phase-6` dans `main`, push des deux et de l'étiquette. Projet arrêté à la demande de Raphael : la phase 7 n'est pas faite.
+- **Suite prévue :** aucune (vidéo finale par Raphael).
