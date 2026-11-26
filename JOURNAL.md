@@ -1238,3 +1238,12 @@ Un arrêt (SPEC.md §15) s'écrit dans une entrée avec une ligne **ARRÊT :** q
 - **Pages pour la vidéo :** `reports/pages/` (versionné, `runs/` restant hors de git) : pages de perte de A0, A1, du pré-entraînement de B et du réglage fin de B ; canaris, générations, comparaison, exemples de réponses, rapport de mesure de B.
 - **Clôture :** étiquette `phase-6-ok`, fusion de `phase-6` dans `main`, push des deux et de l'étiquette. Projet arrêté à la demande de Raphael : la phase 7 n'est pas faite.
 - **Suite prévue :** aucune (vidéo finale par Raphael).
+
+## 2026-11-26 (soir, suite) — Publication sur Hugging Face : préparation
+- **Décision de Raphael :** plus aucune visée commerciale ; le modèle est donné à la recherche, pour tous (remplace « poids fermés » du 2026-10-31, SPEC §16).
+- **Export (`ccm/publier.py`, `python -m ccm.publier`) :** `D:/Nunda-hf/`, un dossier par dépôt, poids entraînés seuls en `safetensors` (sans optimiseur), configurations, mesures :
+  - `nunda-niveau0` (1,4 Go) : corpus synthétique, 2 000 + 200 dossiers ; CC BY 4.0.
+  - `nunda-a0`, `nunda-a1` (57 Mo chacun) : LoRA, têtes, vecteurs (et δ) sur SmolLM2-360M ; CC BY-SA 4.0.
+  - `nunda-b-s` (432 Mo) : B-S réglé, 112,9 M paramètres, BPE ; CC BY-NC-SA 4.0 (CEDH non commerciale, sources CC BY-SA).
+- **Fiches (README.md, en anglais) :** résultats, données, attributions ; pour B, risque de vrais noms (GLiNER sur 10 % du corpus, ≈ 15 % de zones PER ratées) et résultat des canaris. La tête de langage de B est liée aux vecteurs d'entrée : impossible de la retirer seule.
+- **Reste :** le code (privé sur GitHub) est nécessaire pour charger les modèles ; envoi par Raphael.
